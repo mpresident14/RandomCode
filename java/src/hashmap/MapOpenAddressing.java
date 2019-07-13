@@ -6,6 +6,8 @@ import java.lang.Integer;
 import java.util.Random;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 
 import testing.MyAssert;
 
@@ -41,7 +43,7 @@ public class MapOpenAddressing<Key, Value> {
   }
 
   public MapOpenAddressing(AddressingType type) {
-    loadFactor = 0.3;
+    loadFactor = 0.4;
     collisions = 0;
     this.size = 0;
     this.type = type;
@@ -209,9 +211,12 @@ public class MapOpenAddressing<Key, Value> {
   }
 
   public static void main(String[] args) throws Exception {
-    int numItems = 10000;
+    int numItems = 100000;
     Random random = new Random();
 
+    /***********
+     * Testing *
+     ***********/
     for (double d = 0.1; d < 0.6; d += 0.1) {
       for (AddressingType type : AddressingType.values()) {
       
@@ -220,7 +225,7 @@ public class MapOpenAddressing<Key, Value> {
 
         // Test put, get, containsKey, size
         for (int i = 0; i < numItems; i++) {
-          int n = random.nextInt();
+          int n = random.nextInt() % 1000000;
           myMap.put(n, i);
           addedKeys.add(n);
           // System.out.println(myMap);
@@ -236,9 +241,97 @@ public class MapOpenAddressing<Key, Value> {
           MyAssert.assertEquals(myMap.get(n), 0);
         }
         
+        // Print Collisions
         System.out.println(String.format("%.1f", d) + ", " + type.toString() + ": " + myMap.collisions() + " collisions");
       }
       System.out.println();
     }  
+
+    /******************
+     * Execution time * 
+     ******************/ 
+    Set<Integer> set = new HashSet<>(numItems);
+    for (int i = 0; i < numItems; i++) {
+      set.add(random.nextInt() % 1000000);
+    }
+
+    MapOpenAddressing<Integer, Integer> mapLinear 
+        = new MapOpenAddressing<>(0.33, AddressingType.LINEAR);
+    MapOpenAddressing<Integer, Integer> mapQuadratic 
+        = new MapOpenAddressing<>(0.33, AddressingType.QUADRATIC);
+    MapOpenAddressing<Integer, Integer> mapDouble 
+        = new MapOpenAddressing<>(0.33, AddressingType.DOUBLE_HASHING);
+    Map<Integer, Integer> mapJava = new HashMap<>();
+
+    // PUT
+    System.out.println("PUT");
+
+    // Linear
+    long startTime = System.nanoTime();
+    for (Integer n : set) {
+      mapLinear.put(n, 0);
+    }
+    long endTime = System.nanoTime();
+    System.out.println("Linear: " + (endTime - startTime) * 1.0 / 1000000000);
+
+    // Quadratic
+    startTime = System.nanoTime();
+    for (Integer n : set) {
+      mapQuadratic.put(n, 0);
+    }
+    endTime = System.nanoTime();
+    System.out.println("Quadratic: " + (endTime - startTime) * 1.0 / 1000000000);
+
+    // Double Hashing
+    startTime = System.nanoTime();
+    for (Integer n : set) {
+      mapDouble.put(n, 0);
+    }
+    endTime = System.nanoTime();
+    System.out.println("Double Hashing: " + (endTime - startTime) * 1.0 / 1000000000);
+  
+    // Java
+    startTime = System.nanoTime();
+    for (Integer n : set) {
+      mapJava.put(n, 0);
+    }
+    endTime = System.nanoTime();
+    System.out.println("Java: " + (endTime - startTime) * 1.0 / 1000000000);
+    System.out.println();
+
+    // GET
+    System.out.println("GET");
+
+    // Linear
+    startTime = System.nanoTime();
+    for (Integer n : set) {
+      mapLinear.get(n);
+    }
+    endTime = System.nanoTime();
+    System.out.println("Linear: " + (endTime - startTime) * 1.0 / 1000000000);
+
+    // Quadratic
+    startTime = System.nanoTime();
+    for (Integer n : set) {
+      mapQuadratic.get(n);
+    }
+    endTime = System.nanoTime();
+    System.out.println("Quadratic: " + (endTime - startTime) * 1.0 / 1000000000);
+
+    // Double Hashing
+    startTime = System.nanoTime();
+    for (Integer n : set) {
+      mapDouble.get(n);
+    }
+    endTime = System.nanoTime();
+    System.out.println("Double Hashing: " + (endTime - startTime) * 1.0 / 1000000000);
+  
+    // Java
+    startTime = System.nanoTime();
+    for (Integer n : set) {
+      mapJava.get(n);
+    }
+    endTime = System.nanoTime();
+    System.out.println("Java: " + (endTime - startTime) * 1.0 / 1000000000);
   }
 }
