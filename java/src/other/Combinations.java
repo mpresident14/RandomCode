@@ -23,21 +23,13 @@ class Combinations {
 
   public static List<List<Integer>> getCombinations(List<Integer> list, int comboSize) {
     List<List<Integer>> result = new ArrayList<>();
-
-    if (comboSize < 0) {
+    if (comboSize == 0) {
+      result.add(new ArrayList<>());
       return result;
     }
 
-    if (comboSize == 1) {
-      for (int i = 0; i < list.size(); i++) {
-        result.add(new ArrayList<Integer>());
-        result.get(i).add(list.get(i));
-      }
-      return result;
-    }
-
-    for (int i = 0; i < list.size() - comboSize + 1; i++) {
-      List<List<Integer>> round = getCombinations(list.subList(i+1, list.size()), comboSize - 1);
+    for (int i = 0; i <= list.size() - comboSize; i++) {
+      List<List<Integer>> round = getCombinations(list.subList(i + 1, list.size()), comboSize - 1);
       for (int j = 0; j < round.size(); j++) {
         round.get(j).add(list.get(i));
       }
@@ -47,14 +39,8 @@ class Combinations {
   }
 
   public static void main(String[] args) {
-    List<Integer> list = Arrays.asList(1,2,3,4,5,6);
+    List<Integer> list = Arrays.asList(1,2,3,4,5);
     List<List<Integer>> combos = getCombinations(list, 3);
-    for (List<Integer> combo : combos) {
-      System.out.print("[");
-      for (Integer num : combo) {
-        System.out.print(num + ", ");
-      }  
-      System.out.println("]");
-    }
+    System.out.println(combos);
   }
 }
