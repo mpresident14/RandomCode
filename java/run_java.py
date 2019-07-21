@@ -2,7 +2,7 @@ import os
 import sys
 
 def help():
-  return ("Run this from your top level directory. Your .java files" 
+  return ("Run this from your top level directory. Your .java files " 
   "should be in src/ and there should be a bin/ folder for output .class files.\n"
   "Syntax: python run_java.py path.to.my.class.ClassName")
 

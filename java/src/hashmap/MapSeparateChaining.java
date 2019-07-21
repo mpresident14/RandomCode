@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.HashSet;
 
+import other.Pair;
 import testing.MyAssert;
 
 public class MapSeparateChaining<Key, Value> implements Iterable<Pair<Key, Value>> {
@@ -64,8 +65,8 @@ public class MapSeparateChaining<Key, Value> implements Iterable<Pair<Key, Value
     Queue<Pair<Key, Value>> bucket = buckets.get(getBucketNum(key));
     for (Pair<Key, Value> pair : bucket) {
       // Key already exists, so update value
-      if (pair.key.equals(key)) {
-        pair.value = value;
+      if (pair.first.equals(key)) {
+        pair.second = value;
         return;
       }
     }
@@ -81,8 +82,8 @@ public class MapSeparateChaining<Key, Value> implements Iterable<Pair<Key, Value
   public Value get(Key key) {
     Queue<Pair<Key, Value>> bucket = buckets.get(getBucketNum(key));
     for (Pair<Key, Value> pair : bucket) {
-      if (pair.key.equals(key)) {
-        return pair.value;
+      if (pair.first.equals(key)) {
+        return pair.second;
       }
     }
     return null;
@@ -91,7 +92,7 @@ public class MapSeparateChaining<Key, Value> implements Iterable<Pair<Key, Value
   public boolean containsKey(Key key) {
     Queue<Pair<Key, Value>> bucket = buckets.get(getBucketNum(key));
     for (Pair<Key, Value> pair : bucket) {
-      if (pair.key.equals(key)) {
+      if (pair.first.equals(key)) {
         return true;
       }
     }
@@ -104,7 +105,7 @@ public class MapSeparateChaining<Key, Value> implements Iterable<Pair<Key, Value
       Queue<Pair<Key, Value>> bucket = buckets.get(i);
       builder.append(String.format("%d: ", i));
       for (Pair<Key, Value> pair : bucket) {
-        builder.append(String.format("(%s -> %s); ", pair.key, pair.value));
+        builder.append(String.format("(%s -> %s); ", pair.first, pair.second));
       }
       builder.append('\n');
     }
@@ -131,7 +132,7 @@ public class MapSeparateChaining<Key, Value> implements Iterable<Pair<Key, Value
     size = 0;
     for (Queue<Pair<Key, Value>> bucket : oldBuckets) {
       for (Pair<Key, Value> pair : bucket) {
-        put(pair.key, pair.value);
+        put(pair.first, pair.second);
       }
     }
   }
@@ -173,7 +174,7 @@ public class MapSeparateChaining<Key, Value> implements Iterable<Pair<Key, Value
     // Test iterator
     int count = 0;
     for (Pair<Integer, Integer> pair : myMap) {
-      MyAssert.assertTrue(addedKeys.contains(pair.getKey()));
+      MyAssert.assertTrue(addedKeys.contains(pair.first));
       count++;
     }
     MyAssert.assertTrue(count == numItems);

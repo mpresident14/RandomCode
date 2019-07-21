@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 
+import other.Pair;
 import testing.MyAssert;
 
 public class MapOpenAddressing<Key, Value> {
@@ -84,8 +85,8 @@ public class MapOpenAddressing<Key, Value> {
     Pair<Key, Value> pair = buckets.get(bucketNum);
     while (pair != null) {
       // Key already in map
-      if (pair.key.equals(key)) {
-        pair.value = value;
+      if (pair.first.equals(key)) {
+        pair.second = value;
         return;
       }
       collisions++;
@@ -112,8 +113,8 @@ public class MapOpenAddressing<Key, Value> {
     Pair<Key, Value> pair = buckets.get(getBucketNum.call(hash, hash2, attempts));
     // Search until it finds the key or reaches an empty bucket
     while (pair != null) {
-      if (pair.key.equals(key)) {
-        return pair.value;
+      if (pair.first.equals(key)) {
+        return pair.second;
       }
       attempts++;
       pair = buckets.get(getBucketNum.call(hash, hash2, attempts));
@@ -139,7 +140,7 @@ public class MapOpenAddressing<Key, Value> {
       Pair<Key, Value> pair = buckets.get(i);
       builder.append(String.format("%d: ", i));
       if (pair != null) {
-        builder.append(String.format("(%s -> %s); ", pair.key, pair.value));
+        builder.append(String.format("(%s -> %s); ", pair.first, pair.second));
       }
       builder.append('\n');
     }
@@ -205,7 +206,7 @@ public class MapOpenAddressing<Key, Value> {
     this.size = 0;
     for (Pair<Key, Value> pair : oldBuckets) {
       if (pair != null) {
-        put(pair.key, pair.value);
+        put(pair.first, pair.second);
       }
     }
   }
