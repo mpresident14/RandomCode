@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Queue;
+import java.util.function.BiFunction;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Comparator;
 
 /** Directed, Weighted Graph */
 class ArrayGraph<Vertex> {
@@ -16,6 +19,7 @@ class ArrayGraph<Vertex> {
   private List<List<Integer>> grid;
   private int numVertices;
   private int numEdges;
+  private BiFunction<Vertex, Vertex, Integer> weightCalculator;
 
   public ArrayGraph() {
     indexToVertexMap = new HashMap<>();
@@ -23,6 +27,11 @@ class ArrayGraph<Vertex> {
     grid = new ArrayList<>();
     numVertices = 0;
     numEdges = 0;
+  }
+
+  public ArrayGraph(BiFunction<Vertex, Vertex, Integer> weightCalculator) {
+    this();
+    this.weightCalculator = weightCalculator;
   }
 
   public void addVertex(Vertex v) {
@@ -52,6 +61,14 @@ class ArrayGraph<Vertex> {
     return true;
   }
 
+  public boolean addEdge(Vertex v1, Vertex v2) {
+    if (weightCalculator == null) {
+      throw new UnsupportedOperationException(
+          "This ArrayGraph has no weight calculator.");
+    }
+    return addEdge(v1, v2, weightCalculator.apply(v1, v2));
+  }
+
   // Returns null if no edge
   public Integer getWeight(Vertex v1, Vertex v2) {
     Integer v1Index = indexToVertexMap.get(v1);
@@ -75,19 +92,66 @@ class ArrayGraph<Vertex> {
     return sb.toString();
   }
 
+  /** 
+   * Same as djikstra, but instead of a FIFO queue, it uses a 
+   * priority queue to try the path with the least value of f(v) + g(v),
+   * where f(v) is length of path so far, and g(v) is an admissible 
+   * heuristic. A heuristic is an estimate of the cost of the path between
+   * the some vertex and the goal vertex. For a heuristic to be admissible,
+   * it must never overestimate the actual length of the path.
+   */
+  public List<Vertex> aStar(Vertex v1, Vertex v2, BiFunction<Vertex, Vertex, Integer> heuristic) {
+    // Vertex -> (shortestPathLen, prevVertexOnShortestPath)
+    Map<Vertex, Pair<Integer, Vertex>> shortestPathSoFar = new HashMap<>();
+    return findPath(
+      v1, 
+      v2, 
+      shortestPathSoFar, 
+      new PriorityQueue<>(
+          (u, v) -> 
+              Integer.compare(
+                  shortestPathSoFar.get(u).first + heuristic.apply(u, v2), 
+                  shortestPathSoFar.get(v).first + heuristic.apply(v, v2))));
+  }
+
+  /** 
+   * Same as djikstra, but instead of a FIFO queue, it uses a 
+   * priority queue to try the path with the least weight so far.
+   */
+  public List<Vertex> uniformCostSearch(Vertex v1, Vertex v2) {
+    // Vertex -> (shortestPathLen, prevVertexOnShortestPath)
+    Map<Vertex, Pair<Integer, Vertex>> shortestPathSoFar = new HashMap<>();
+    return findPath(
+      v1, 
+      v2, 
+      shortestPathSoFar, 
+      new PriorityQueue<>(
+          Comparator.comparingInt(
+              vertex -> shortestPathSoFar.get(vertex).first)));
+  }
+
   public List<Vertex> djikstra(Vertex v1, Vertex v2) {
+    // Vertex -> (shortestPathLen, prevVertexOnShortestPath)
+    Map<Vertex, Pair<Integer, Vertex>> shortestPathSoFar = new HashMap<>();
+    return findPath(v1, v2, shortestPathSoFar, new LinkedList<>());
+  }
+
+  private List<Vertex> findPath(
+    Vertex v1, 
+    Vertex v2, 
+    Map<Vertex, Pair<Integer, Vertex>> shortestPathSoFar, 
+    Queue<Vertex> q) {
     if (getIndex(v1) == null || getIndex(v2) == null) {
       return null;
     }
 
     boolean foundV2 = false;
-    // Vertex -> (shortestPathLen, prevVertexOnShortestPath)
-    Map<Vertex, Pair<Integer, Vertex>> shortestPathSoFar = new HashMap<>();
-    Queue<Vertex> q = new LinkedList<>();
     shortestPathSoFar.put(v1, new Pair<>(0, null));
     q.offer(v1);
 
     while (!q.isEmpty()) {
+      System.out.println();
+      System.out.println(q); // For debugging
       System.out.println(shortestPathSoFar); // For debugging
       Vertex polled = q.poll();
       int polledPathLength = shortestPathSoFar.get(polled).first;
@@ -143,21 +207,42 @@ class ArrayGraph<Vertex> {
   }
 
   public static void main(String[] args) {
-    ArrayGraph<String> g = new ArrayGraph<>();
-    g.addVertex("A");
-    g.addVertex("B");
-    g.addVertex("C");
-    g.addVertex("D");
-    g.addVertex("E");
-    g.addVertex("F");
+    ArrayGraph<Character> g = new ArrayGraph<>((c1, c2) -> Math.abs(c1 - c2));
+    g.addVertex('A');
+    g.addVertex('C');
+    g.addVertex('G');
+    g.addVertex('M');
+    g.addVertex('N');
+    g.addVertex('T');
+    g.addVertex('Z');
 
-    g.addEdge("A", "B", 7);
-    g.addEdge("A", "C", 5);
-    g.addEdge("B", "D", 6);
-    g.addEdge("C", "E", 3);
-    g.addEdge("C", "F", 10);
-    g.addEdge("D", "F", 3);
+    // Weight is distance between letters (ex: C - A = 2)
+    // See Comparator arg to constructor above
+    g.addEdge('C', 'A');
+    g.addEdge('A', 'M');
+    g.addEdge('M', 'C');
+    g.addEdge('C', 'T');
+    g.addEdge('C', 'N');
+    g.addEdge('T', 'G');
+    g.addEdge('T', 'M');
+    g.addEdge('M', 'T');
+    g.addEdge('N', 'Z');
+    g.addEdge('G', 'Z');
     
-    System.out.println(g.djikstra("A", "D"));
+    System.out.println("DJIKSTRA");
+    System.out.println(g.djikstra('A', 'Z'));
+    System.out.println();
+
+    System.out.println("UNIFORM COST SEARCH");
+    System.out.println(g.uniformCostSearch('A', 'Z'));
+    System.out.println();
+
+    // The heuristic is the distance between letters
+    // Distance between any vertex and the goal vertex will always be 
+    // <= actual length of shortest path between them, so the heuristic 
+    // is admissible.
+    System.out.println("A STAR SEARCH");
+    System.out.println(g.aStar('A', 'Z', (c1, c2) -> Math.abs(c1 - c2)));
+    System.out.println();
   }
 }
