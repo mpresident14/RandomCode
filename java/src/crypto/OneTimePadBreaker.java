@@ -1,25 +1,22 @@
-package other;
+package crypto;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class OneTimePadBreaker {
-  private final static String OTHER_SYMBOLS = " ?.,'"; //"?.,' 0123456789";
-  private final byte[][] cipherBytes;
+  /** Start with "" and then add other symbols as necessary to fill in empty slots. */
+  private final static String OTHER_SYMBOLS = ". ";
+  final byte[][] cipherBytes;
   public OneTimePadBreaker(String[] cipherTexts) {
     this.cipherBytes = 
         (byte[][]) Arrays
             .stream(cipherTexts)
-            .map(str -> new BigInteger(str, 16).toByteArray())
+            .map(str -> CryptoUtil.hexStringToByteArray(str))
             .toArray(byte[][]::new);
   }  
 
+  /** Returns a list of possible characters for each slot in the plaintext. */
   public List<List<Character>> decryptMessage(int cipherIndex) {
     List<List<Character>> plaintext = new ArrayList<>();
     for (int i = 0; i < cipherBytes[cipherIndex].length; i++) {
@@ -47,6 +44,7 @@ public class OneTimePadBreaker {
       }
     }
 
+    // 0x28 is a file separator (blank space)
     List<Integer> indices = findInstancesOfLetter(xoredMessages, (byte) 0x28);
     for (Integer n : indices) {
       plaintext.get(n).add((char) 0x28);
@@ -59,7 +57,7 @@ public class OneTimePadBreaker {
    * XORs the cipher at <cipherIndex> with every other cipher and returns
    * the results.
    */
-  public List<byte[]> getXoredMessages(int cipherIndex) {
+  List<byte[]> getXoredMessages(int cipherIndex) {
     List<byte[]> result = new ArrayList<>();
     byte[] cipher = cipherBytes[cipherIndex];
 
@@ -68,24 +66,9 @@ public class OneTimePadBreaker {
         continue;
       }
 
-      result.add(xorTruncate(cipher, cipherBytes[i]));
+      result.add(CryptoUtil.xorTruncate(cipher, cipherBytes[i]));
     }
 
-    // for (byte[] b1 : result) {
-    //   for (int i = 0; i < b1.length; i++) { 
-    //     System.out.format(" 0x%02X", b1[i]); 
-    //   } 
-    //   System.out.println('\n');
-    // }
-    return result;
-  }
-
-  public static byte[] xorTruncate(byte[] b1, byte[] b2) {
-    int minSize = b1.length < b2.length ? b1.length : b2.length;
-    byte[] result = new byte[minSize];
-    for (int i = 0; i < minSize; i++) {
-      result[i] = (byte) (b1[i] ^ b2[i]);
-    }
     return result;
   }
 
@@ -100,17 +83,11 @@ public class OneTimePadBreaker {
     int leastSize = xoredMessages.stream().map(arr -> arr.length).min(Integer::compare).get();
     for (int i = 0; i < leastSize; i++) {
       boolean isValid = true;
-      int j = 0;
       for (byte[] xored : xoredMessages) {
         if (!xorCharIsValidLetter(xored[i], c)) {
-          // if (i == 2) {
-          //   System.out.println(String.format("(xored[%d]) 0x%02X XOR 0x%02X is not valid", j, xored[i], c));
-          //   System.out.println(String.format("= 0x%02X", xored[i] ^ c));
-          // }
           isValid = false;
           break;
         }
-        j++;
       }
       if (isValid) {
         result.add(i);
@@ -120,7 +97,7 @@ public class OneTimePadBreaker {
   }  
 
   /** Check if b xor c is a valid English letter (or space) */
-  public static boolean xorCharIsValidLetter(byte b, byte c) {
+  static boolean xorCharIsValidLetter(byte b, byte c) {
     return isValidLetterOrSpace((byte) (b ^ c));
   }
 
@@ -129,14 +106,6 @@ public class OneTimePadBreaker {
   }
 
   public static void main(String[] args) {
-    // byte[] b1 = OneTimePadBreaker.hexToByteArray(OneTimePadBreaker.CIPHERTEXTS[0]);
-
-    // for (int i = 0; i < b1.length; i++) { 
-    //   System.out.format(" 0x%02X", b1[i]); 
-    // } 
-
-    // byte b = 0x41;
-    // System.out.println("\nChar is " + (char) b);
 
     String[] CIPHERTEXTS = new String[] {
       "315c4eeaa8b5f8aaf9174145bf43e1784b8fa00dc71d885a804e5ee9fa40b16349c146fb778cdf2d3aff021dfff5b403b510d0d0455468aeb98622b137dae857553ccd8883a7bc37520e06e515d22c954eba5025b8cc57ee59418ce7dc6bc41556bdb36bbca3e8774301fbcaa3b83b220809560987815f65286764703de0f3d524400a19b159610b11ef3e",
@@ -149,10 +118,10 @@ public class OneTimePadBreaker {
       "315c4eeaa8b5f8bffd11155ea506b56041c6a00c8a08854dd21a4bbde54ce56801d943ba708b8a3574f40c00fff9e00fa1439fd0654327a3bfc860b92f89ee04132ecb9298f5fd2d5e4b45e40ecc3b9d59e9417df7c95bba410e9aa2ca24c5474da2f276baa3ac325918b2daada43d6712150441c2e04f6565517f317da9d3",
       "271946f9bbb2aeadec111841a81abc300ecaa01bd8069d5cc91005e9fe4aad6e04d513e96d99de2569bc5e50eeeca709b50a8a987f4264edb6896fb537d0a716132ddc938fb0f836480e06ed0fcd6e9759f40462f9cf57f4564186a2c1778f1543efa270bda5e933421cbe88a4a52222190f471e9bd15f652b653b7071aec59a2705081ffe72651d08f822c9ed6d76e48b63ab15d0208573a7eef027",
       "466d06ece998b7a2fb1d464fed2ced7641ddaa3cc31c9941cf110abbf409ed39598005b3399ccfafb61d0315fca0a314be138a9f32503bedac8067f03adbf3575c3b8edc9ba7f537530541ab0f9f3cd04ff50d66f1d559ba520e89a2cb2a83",
+      // TARGET 
       "32510ba9babebbbefd001547a810e67149caee11d945cd7fc81a05e9f85aac650e9052ba6a8cd8257bf14d13e6f0a803b54fde9e77472dbff89d71b57bddef121336cb85ccb8f3315f4b52e301d16e9f52f904"
     };
 
-    String TARGET = "32510ba9babebbbefd001547a810e67149caee11d945cd7fc81a05e9f85aac650e9052ba6a8cd8257bf14d13e6f0a803b54fde9e77472dbff89d71b57bddef121336cb85ccb8f3315f4b52e301d16e9f52f904";
     OneTimePadBreaker breaker = new OneTimePadBreaker(CIPHERTEXTS);
     for (int i = 0; i < 10; i++) {
       List<List<Character>> plaintext = breaker.decryptMessage(i);

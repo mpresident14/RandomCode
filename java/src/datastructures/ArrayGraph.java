@@ -1,4 +1,4 @@
-package other;
+package datastructures;
 
 import java.util.Map;
 import java.util.ArrayList;
@@ -9,6 +9,8 @@ import java.util.function.BiFunction;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Comparator;
+
+import other.Pair;
 
 /** Directed, Weighted Graph */
 class ArrayGraph<Vertex> {
