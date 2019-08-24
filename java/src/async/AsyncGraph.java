@@ -31,7 +31,7 @@ public class AsyncGraph {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    System.out.println("Thread: id " + Thread.currentThread().getId());
+
     return n;
   }
 
@@ -40,6 +40,8 @@ public class AsyncGraph {
         AsyncGraph
             .createAsync()
             .then(v -> longRunningOp(8))
+            .peek(num -> System.out.println("long op finished"))
+            .peek(num -> System.out.println("long op returned " + num))
             .then(num -> num + 0.5)
             .then(dec -> Double.toString(dec).substring(1));
 
@@ -47,15 +49,24 @@ public class AsyncGraph {
         AsyncGraph
             .createAsync(8)
             .then(num -> longRunningOp(num + 7))
+            .peek(num -> System.out.println("Thread: id " + Thread.currentThread().getId())            )
             .then(num -> Double.toString(num).substring(1));
 
-    AsyncGraph.runAsync(node1, str -> System.out.println(str));
+    AsyncGraph.runAsync(node1, 
+        str -> System.out.println(
+            String.format("Thread %d computed %s", Thread.currentThread().getId(), str)));
 
     for (int i = 0; i < 5; i++) {
       System.out.println("Main thread: id " + Thread.currentThread().getId());
     }
 
-    System.out.println(AsyncGraph.getSync(node2));
-    AsyncGraph.runAsync(node2, str -> System.out.println(str));
+    System.out.println(
+        String.format("Thread %d computed %s", 
+            Thread.currentThread().getId(), AsyncGraph.getSync(node2)));
+
+    AsyncGraph.runAsync(
+        node2, 
+        str -> System.out.println(
+            String.format("Thread %d computed %s", Thread.currentThread().getId(), str)));
   }
 }
