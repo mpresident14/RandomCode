@@ -11,7 +11,7 @@ public class Main {
   }
 
   public static void main(String[] args) throws InterruptedException {
-    AsyncNode<String> node1 = 
+    AsyncOperation<String> asyncOp1 = 
         AsyncGraph
             .createAsync(() -> longRunningOp(8))
             .peek(num -> System.out.println("long op finished"))
@@ -19,14 +19,14 @@ public class Main {
             .then(num -> num + 0.5)
             .then(dec -> Double.toString(dec).substring(1));
 
-    AsyncNode<String> node2 = 
+    AsyncOperation<String> asyncOp2 = 
         AsyncGraph
             .createImmediateAsync(8)
             .then(num -> longRunningOp(num + 7))
             .peek(num -> System.out.println("Thread: id " + Thread.currentThread().getId())            )
             .then(num -> Double.toString(num).substring(1));
 
-    AsyncGraph.runAsync(node1, 
+    AsyncGraph.runAsync(asyncOp1, 
         str -> System.out.println(
             String.format("Thread %d computed %s", Thread.currentThread().getId(), str)));
 
@@ -36,10 +36,10 @@ public class Main {
 
     System.out.println(
         String.format("Thread %d computed %s", 
-            Thread.currentThread().getId(), AsyncGraph.getSync(node2)));
+            Thread.currentThread().getId(), AsyncGraph.getSync(asyncOp2)));
 
     AsyncGraph.runAsync(
-        node2, 
+        asyncOp2, 
         str -> System.out.println(
             String.format("Thread %d computed %s", Thread.currentThread().getId(), str)));
   }

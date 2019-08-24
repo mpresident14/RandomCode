@@ -4,17 +4,17 @@ import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 public class AsyncGraph {
-  public static <R> AsyncNode<R> createVoidAsync() {
+  public static <R> AsyncOperation<R> createVoidAsync() {
     return createAsync(null);
   }
 
-  public static <R> AsyncNode<R> createImmediateAsync(R value) {
+  public static <R> AsyncOperation<R> createImmediateAsync(R value) {
     return createAsync(() -> value);
   }
 
-  public static <R> AsyncNode<R> createAsync(Callable<R> callable) {
-    AsyncNode<R> node = 
-        new AsyncNode<R>(
+  public static <R> AsyncOperation<R> createAsync(Callable<R> callable) {
+    AsyncOperation<R> asyncOp = 
+        new AsyncOperation<R>(
             (unused) -> 
             {
               try {
@@ -24,17 +24,17 @@ public class AsyncGraph {
               }
             });
 
-    node.first = node;
-    return node;
+    asyncOp.first = asyncOp;
+    return asyncOp;
   }
 
   // non-blocking
-  public static <R> void runAsync(AsyncNode<R> asyncNode, Consumer<R> callback) {
-    new Thread(() -> asyncNode.first.start(callback)).start();
+  public static <R> void runAsync(AsyncOperation<R> asyncOp, Consumer<R> callback) {
+    new Thread(() -> asyncOp.first.start(callback)).start();
   }
 
   // blocking
-  public static <R> R getSync(AsyncNode<R> asyncNode) {
-    return asyncNode.first.getValue();
+  public static <R> R getSync(AsyncOperation<R> asyncOp) {
+    return asyncOp.first.getValue();
   }
 }
