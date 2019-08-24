@@ -1,10 +1,8 @@
 package async;
 
-public class AsyncGraph {
-  public interface AsyncCallback<T> {
-    void onFinish(T value);
-  }
+import java.util.function.Consumer;
 
+public class AsyncGraph {
   public static <R> AsyncNode<R> createAsync() {
     return createAsync(null);
   }
@@ -16,7 +14,7 @@ public class AsyncGraph {
   }
 
   // non-blocking
-  public static <R> void runAsync(AsyncNode<R> asyncNode, AsyncCallback<R> callback) {
+  public static <R> void runAsync(AsyncNode<R> asyncNode, Consumer<R> callback) {
     (new Thread(() -> asyncNode.first.start(callback))).start();
   }
 

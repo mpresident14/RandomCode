@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import async.AsyncGraph.AsyncCallback;
-
 public class AsyncNode<T> {
   Function<T, ?> nextTransform = null;
   AsyncNode<?> next = null;
@@ -30,35 +28,29 @@ public class AsyncNode<T> {
     return (AsyncNode<N>) next;
   }
 
-  // Maybe have a List of Consumer Functions for each node?
   public AsyncNode<T> peek(Consumer<T> nextConsumer) {
-    // if (peekers == null) {
-    //   peekers = new ArrayList<>();
-    // }
     peekers.add(nextConsumer);
     return this;
   }
 
   @SuppressWarnings("unchecked")
-  <N> void start(AsyncCallback<?> callback) {
+  <N> void start(Consumer<?> callback) {
     runPeekers();
-    AsyncNode<N> castNext = (AsyncNode<N>) next;
     if (next == null) {
-      ((AsyncCallback<T>) callback).onFinish(myValue);
+      ((Consumer<T>) callback).accept(myValue);
     } else {
-      castNext.myValue = (N) nextTransform.apply(myValue);
+      ((AsyncNode<N>) next).myValue = (N) nextTransform.apply(myValue);
       next.start(callback);
     }
   }
 
   @SuppressWarnings("unchecked")
-  <R ,N> R getValue() {
+  <R, N> R getValue() {
     runPeekers();
-    AsyncNode<N> castNext = (AsyncNode<N>) next;
     if (next == null) {
       return (R) myValue;
     } else {
-      castNext.myValue = (N) nextTransform.apply(myValue);
+      ((AsyncNode<N>) next).myValue = (N) nextTransform.apply(myValue);
       return (R) next.getValue();
     }
   }
