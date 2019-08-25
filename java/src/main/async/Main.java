@@ -1,4 +1,4 @@
-package main.async;
+package async;
 
 public class Main {
   public static int longRunningOp(int n) {

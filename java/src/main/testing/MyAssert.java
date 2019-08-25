@@ -1,4 +1,4 @@
-package main.testing;
+package testing;
 
 public class MyAssert {
   private MyAssert() {}

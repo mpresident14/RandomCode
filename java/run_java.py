@@ -11,13 +11,13 @@ def help():
   # "[Syntax: python run_java.py [-t] path.to.my.class.ClassName]")
 
 def run(pathDots, pathSlashes):
-  compileCmd = f"javac -cp \"src/main\" src/main/{pathSlashes}.java -d bin"
+  compileCmd = f"javac -cp \"src/main\" src/main/{pathSlashes}.java -d bin -Xlint"
   runCmd = f"java -cp bin {pathDots}"
 
   return compileCmd, runCmd
 
 def test(pathDots, pathSlashes):
-  compileCmd = f"javac -cp \"C:\Program Files (x86)\junit4.10\junit-4.10.jar;src/test;src/main\" src/test/{pathSlashes}.java -d bin"
+  compileCmd = f"javac -cp \"C:\Program Files (x86)\junit4.10\junit-4.10.jar;src/test;src/main\" src/test/{pathSlashes}.java -d bin -Xlint"
   runCmd = f"java -cp \"C:\Program Files (x86)\junit4.10\junit-4.10.jar;bin;src/main\" org.junit.runner.JUnitCore {pathDots}"
 
   return compileCmd, runCmd

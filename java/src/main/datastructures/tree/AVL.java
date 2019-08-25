@@ -1,7 +1,7 @@
-package main.datastructures.tree;
+package datastructures.tree;
 
 import java.util.List;
-import main.other.Pair;
+import other.Pair;
 
 public class AVL<T extends Comparable<T>> {
   private class Node<T> {

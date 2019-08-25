@@ -1,4 +1,4 @@
-package main.datastructures.hashmap;
+package datastructures.hashmap;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -10,8 +10,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.HashSet;
 
-import main.other.Pair;
-import main.testing.MyAssert;
+import other.Pair;
+import testing.MyAssert;
 
 public class MapSeparateChaining<Key, Value> implements Iterable<Pair<Key, Value>> {
   

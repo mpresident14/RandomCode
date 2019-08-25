@@ -1,4 +1,4 @@
-package main.datastructures.tree;
+package datastructures.tree;
 
 public class BST<T extends Comparable<T>> {
   Node<T> root;

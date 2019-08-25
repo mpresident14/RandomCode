@@ -23,6 +23,13 @@ public class AsyncOperation<T> {
     return (AsyncOperation<N>) next;
   }
 
+  @SuppressWarnings("unchecked")
+  public <N> AsyncOperation<N> thenCollapse(Function<T, AsyncOperation<N>> transform) {
+    next = new AsyncOperation<N>((T var) -> AsyncGraph.getSync(transform.apply(var)));
+    next.first = this.first;
+    return (AsyncOperation<N>) next;
+  }
+
   public AsyncOperation<T> peek(Consumer<T> nextConsumer) {
     peekers.add(nextConsumer);
     return this;

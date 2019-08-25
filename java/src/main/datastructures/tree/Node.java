@@ -1,4 +1,4 @@
-package main.datastructures.tree;
+package datastructures.tree;
 
 class Node<T> {
   T val;

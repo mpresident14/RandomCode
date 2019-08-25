@@ -1,4 +1,4 @@
-package main.datastructures.hashmap;
+package datastructures.hashmap;
 
 import java.math.BigDecimal;
 import java.math.MathContext;

@@ -1,4 +1,4 @@
-package main.other;
+package other;
 
 public class Leetcode {
 	

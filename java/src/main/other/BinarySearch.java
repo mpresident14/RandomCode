@@ -1,4 +1,4 @@
-package main.other;
+package other;
 
 class BinarySearch {
   public static boolean searchMatrix(int[][] matrix, int target) {

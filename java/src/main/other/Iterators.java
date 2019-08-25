@@ -1,4 +1,4 @@
-package main.other;
+package other;
 
 import java.util.List;
 import java.util.Arrays;

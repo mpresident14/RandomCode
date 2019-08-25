@@ -1,4 +1,4 @@
-package main.datastructures.hashmap;
+package datastructures.hashmap;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -9,8 +9,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 
-import main.other.Pair;
-import main.testing.MyAssert;
+import other.Pair;
+import testing.MyAssert;
 
 public class MapOpenAddressing<Key, Value> {
   public enum AddressingType {
