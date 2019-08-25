@@ -1,5 +1,10 @@
 package async;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+
 public class Main {
   public static int longRunningOp(int n) {
     try {
@@ -42,5 +47,20 @@ public class Main {
         asyncOp2, 
         str -> System.out.println(
             String.format("Thread %d computed %s", Thread.currentThread().getId(), str)));
+
+    List<String> strList = new ArrayList<>(Arrays.asList("a", "b", "c"));
+
+    Function<String, AsyncOperation<Void>> fnReturnAsyncOp = 
+        str -> 
+            AsyncGraph
+                .createAsync(() -> {
+                    strList.remove(str);
+                    return null;
+                });
+
+    AsyncOperation<String> asyncOp = 
+        AsyncGraph
+            .createAsync(() -> "a")
+            .peekCollapse(str -> fnReturnAsyncOp.apply(str));        
   }
 }

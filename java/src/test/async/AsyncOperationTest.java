@@ -67,7 +67,18 @@ public class AsyncOperationTest {
         actual -> assertEquals((int) actual, string.length()));
   }
 
-  @SuppressWarnings("unchecked")
+  @Test
+  public void test_thenReturnVoid() {
+    AsyncOperation<Void> asyncOp = 
+        AsyncGraph
+            .createImmediateAsync(5)
+            .thenReturnVoid();
+
+    assertResult(
+        asyncOp, 
+        actual -> assertNull(actual));
+  }
+
   @Test
   public void test_peek() {
     List<String> strList = new ArrayList<>(Arrays.asList("a", "b", "c"));
@@ -82,6 +93,31 @@ public class AsyncOperationTest {
         Arrays.asList( 
             actual -> assertArrayEquals(new String[] {"b", "c"}, strList.toArray(new String[2])),
             actual -> assertEquals(actual, "abc")));
+  }
+
+  @Test
+  public void test_peekCollapse() {
+    List<String> strList = new ArrayList<>(Arrays.asList("a", "b", "c"));
+    
+    Function<String, AsyncOperation<Void>> fnReturnAsyncOp = 
+        str -> 
+            AsyncGraph
+                .createAsync(() -> 
+                    {
+                        strList.remove(str);
+                        return null;
+                    });
+
+    AsyncOperation<String> asyncOp = 
+        AsyncGraph
+            .createAsync(() -> "a")
+            .peekCollapse(str -> fnReturnAsyncOp.apply(str));
+
+    assertResults(
+        asyncOp,
+        Arrays.asList( 
+            actual -> assertArrayEquals(new String[] {"b", "c"}, strList.toArray(new String[2])),
+            actual -> assertEquals(actual, "a")));
   }
 
   private static <T> void assertResult(AsyncOperation<T> asyncOp, Consumer<T> assertion) {

@@ -4,7 +4,7 @@ import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 public class AsyncGraph {
-  public static <R> AsyncOperation<R> createVoidAsync() {
+  public static AsyncOperation<Void> createVoidAsync() {
     return createAsync(null);
   }
 

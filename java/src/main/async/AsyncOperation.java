@@ -30,8 +30,20 @@ public class AsyncOperation<T> {
     return (AsyncOperation<N>) next;
   }
 
+  @SuppressWarnings("unchecked")
+  public AsyncOperation<Void> thenReturnVoid() {
+    next = new AsyncOperation<>((T var) -> null);
+    next.first = this.first;
+    return (AsyncOperation<Void>) next;
+  }
+
   public AsyncOperation<T> peek(Consumer<T> nextConsumer) {
     peekers.add(nextConsumer);
+    return this;
+  }
+
+  public AsyncOperation<T> peekCollapse(Function<T, AsyncOperation<Void>> nextConsumer) {
+    peekers.add((T var) -> AsyncGraph.getSync(nextConsumer.apply(var)));
     return this;
   }
 
