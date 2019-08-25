@@ -31,6 +31,28 @@ public class AsyncOperation<T> {
   }
 
   @SuppressWarnings("unchecked")
+  public AsyncOperation<Void> thenConsume(Consumer<T> consumer) {
+    next = new AsyncOperation<Void>((T var) -> 
+        {
+            consumer.accept(var);
+            return null;
+        });
+    next.first = this.first;
+    return (AsyncOperation<Void>) next;
+  }
+
+  @SuppressWarnings("unchecked")
+  public AsyncOperation<Void> thenConsumeCollapse(Function<T, AsyncOperation<Void>> transform) {
+    next = new AsyncOperation<Void>((T var) -> 
+        {
+            AsyncGraph.getSync(transform.apply(var));
+            return null;
+        });
+    next.first = this.first;
+    return (AsyncOperation<Void>) next;
+  }
+
+  @SuppressWarnings("unchecked")
   public AsyncOperation<Void> thenReturnVoid() {
     next = new AsyncOperation<>((T var) -> null);
     next.first = this.first;

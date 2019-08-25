@@ -68,6 +68,45 @@ public class AsyncOperationTest {
   }
 
   @Test
+  public void test_thenConsume() {
+    List<String> strList = new ArrayList<>(Arrays.asList("a", "b", "c"));
+    AsyncOperation<Void> asyncOp = 
+        AsyncGraph
+            .createImmediateAsync("a")
+            .thenConsume(str -> strList.remove(str));
+
+    assertResults(
+        asyncOp,
+        Arrays.asList( 
+            actual -> assertArrayEquals(new String[] {"b", "c"}, strList.toArray(new String[2])),
+            actual -> assertNull(actual)));
+  }
+
+  @Test
+  public void test_thenConsumeCollapse() {
+    List<String> strList = new ArrayList<>(Arrays.asList("a", "b", "c"));
+    Function<String, AsyncOperation<Void>> fnReturnAsyncOp = 
+        str -> 
+            AsyncGraph
+                .createAsync(() -> 
+                    {
+                        strList.remove(str);
+                        return null;
+                    });
+    
+    AsyncOperation<Void> asyncOp = 
+        AsyncGraph
+            .createAsync(() -> "a")
+            .thenConsumeCollapse(str -> fnReturnAsyncOp.apply(str));
+
+    assertResults(
+        asyncOp,
+        Arrays.asList( 
+            actual -> assertArrayEquals(new String[] {"b", "c"}, strList.toArray(new String[2])),
+            actual -> assertNull(actual)));
+  }
+
+  @Test
   public void test_thenReturnVoid() {
     AsyncOperation<Void> asyncOp = 
         AsyncGraph
