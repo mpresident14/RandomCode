@@ -1,16 +1,15 @@
 package datastructures.tree;
 
-import java.util.List;
 import other.Pair;
 
 public class AVL<T extends Comparable<T>> {
-  private class Node<T> {
-    T val;
-    Node<T> left = null;
-    Node<T> right = null;
+  private class Node<R> {
+    R val;
+    Node<R> left = null;
+    Node<R> right = null;
     int height = 1;
   
-    Node(T val) {
+    Node(R val) {
       this.val = val;
     }
   }

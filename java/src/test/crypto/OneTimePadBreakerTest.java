@@ -1,11 +1,7 @@
-package test.crypto;
+package crypto;
 
 import org.junit.*;
 import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.Random;
-import java.math.BigInteger;
 
 public class OneTimePadBreakerTest {
 
