@@ -15,7 +15,7 @@ public class Main {
     return n;
   }
 
-  public static void main(String[] args) throws InterruptedException {
+  public static void main(String[] args) {
     AsyncOperation<String> asyncOp1 = 
         AsyncGraph
             .createAsync(() -> longRunningOp(8))
