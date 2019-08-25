@@ -1,0 +1,13 @@
+{
+  "configurations": [
+
+
+    {
+      "type": "java",
+      "name": "CodeLens (Launch) - Async",
+      "request": "launch",
+      "mainClass": "async.Main",
+      "projectName": "java"
+    },
+  ]
+}

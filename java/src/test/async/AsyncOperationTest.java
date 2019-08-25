@@ -1,6 +1,6 @@
 package async;
 
-import org.junit.*;
+import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -14,26 +14,48 @@ public class AsyncOperationTest {
   @Test
   public void test_createImmediateAsync() {
     Integer expected = 8;
+    long mainThreadId = getThreadId();
 
     AsyncOperation<Integer> asyncOp = 
         AsyncGraph
             .createImmediateAsync(expected);
 
-    assertResult(
-        asyncOp, 
-        actual -> assertEquals(actual, expected));
+    assertResults(
+        asyncOp,
+        Arrays.asList(
+            actual -> assertEquals(actual, expected),
+            actual -> assertFalse(getThreadId() == mainThreadId)));      
   }
+
+//   @Test
+//   public void test_createVoidAsync() {
+//     long mainThreadId = getThreadId();
+
+//     AsyncOperation<Void> asyncOp = 
+//         AsyncGraph
+//             .createVoidAsync();
+
+//     assertResults(
+//         asyncOp,
+//         Arrays.asList(
+//             actual -> assertNull(actual),
+//             actual -> assertFalse(getThreadId() == mainThreadId)));       
+//   }
 
   @Test
   public void test_createAsync() {
     String expected = "string";
+    long mainThreadId = getThreadId();
+    
     AsyncOperation<String> asyncOp = 
         AsyncGraph
             .createAsync(() -> expected);
 
-    assertResult(
+    assertResults(
         asyncOp,
-        actual -> assertEquals(actual, expected));
+        Arrays.asList(
+            actual -> assertEquals(actual, expected),
+            actual -> assertFalse(getThreadId() == mainThreadId))); 
   }
 
   @Test
@@ -172,5 +194,9 @@ public class AsyncOperationTest {
                 assertion.accept(actual);
               }
           });
+  }
+
+  private static long getThreadId() {
+      return Thread.currentThread().getId();
   }
 }
