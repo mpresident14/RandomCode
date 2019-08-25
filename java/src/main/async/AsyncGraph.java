@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 
 public class AsyncGraph {
   public static AsyncOperation<Void> createVoidAsync() {
-    return createAsync(null);
+    return createImmediateAsync(null);
   }
 
   public static <R> AsyncOperation<R> createImmediateAsync(R value) {
@@ -15,14 +15,14 @@ public class AsyncGraph {
   public static <R> AsyncOperation<R> createAsync(Callable<R> callable) {
     AsyncOperation<R> asyncOp = 
         new AsyncOperation<R>(
-            (unused) -> 
-            {
-              try {
-                return callable.call();
-              } catch (Exception e) {
-                throw new RuntimeException(e);
-              }
-            });
+            unused -> 
+                {
+                  try {
+                    return callable.call();
+                  } catch (Exception e) {
+                    throw new RuntimeException(e);
+                  }
+                });
 
     asyncOp.first = asyncOp;
     return asyncOp;

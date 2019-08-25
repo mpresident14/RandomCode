@@ -27,20 +27,20 @@ public class AsyncOperationTest {
             actual -> assertFalse(getThreadId() == mainThreadId)));      
   }
 
-//   @Test
-//   public void test_createVoidAsync() {
-//     long mainThreadId = getThreadId();
+  @Test
+  public void test_createVoidAsync() {
+    long mainThreadId = getThreadId();
 
-//     AsyncOperation<Void> asyncOp = 
-//         AsyncGraph
-//             .createVoidAsync();
+    AsyncOperation<Void> asyncOp = 
+        AsyncGraph
+            .createVoidAsync();
 
-//     assertResults(
-//         asyncOp,
-//         Arrays.asList(
-//             actual -> assertNull(actual),
-//             actual -> assertFalse(getThreadId() == mainThreadId)));       
-//   }
+    assertResults(
+        asyncOp,
+        Arrays.asList(
+            actual -> assertNull(actual),
+            actual -> assertFalse(getThreadId() == mainThreadId)));
+  }
 
   @Test
   public void test_createAsync() {

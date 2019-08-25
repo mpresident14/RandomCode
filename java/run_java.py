@@ -1,6 +1,6 @@
-import os
 import sys
 import argparse
+import subprocess
 
 def help():
   return "help commented out"
@@ -37,5 +37,5 @@ if __name__ == "__main__":
     compileCmd, runCmd = \
         test(pathDots, pathSlashes) if args["t"] else run(pathDots, pathSlashes)
 
-    os.system(compileCmd)
-    os.system(runCmd)
+    subprocess.check_call(compileCmd)
+    subprocess.call(runCmd)
