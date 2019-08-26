@@ -19,7 +19,7 @@ public class Main {
   private static AsyncOperation<String> getAsyncOp(int index) {
     return AsyncGraph
         .createAsync(() -> longRunningOp(index))
-        .peek(num -> System.out.println(String.format("Thread %d: long op returned %d", getThreadId(), num)))
+        .check(num -> System.out.println(String.format("Thread %d: long op returned %d", getThreadId(), num)))
         .then(num -> Integer.toString(num));
   }
 
@@ -33,13 +33,13 @@ public class Main {
     AsyncOperation<Integer> asyncOp4 = 
         AsyncGraph
             .createImmediateAsync(4)
-            .thenConsume(num -> {})
-            .peek(v -> System.out.println(String.format("Thread %d: Value is %s", getThreadId(), v)))
+            .consume(num -> {})
+            .check(v -> System.out.println(String.format("Thread %d: Value is %s", getThreadId(), v)))
             .then(v -> 4);
 
     AsyncOperation<String> asyncOpFinal = 
         AsyncGraph
-            .combineAsync(
+            .createCombinedAsync(
                 asyncOp1,
                 asyncOp2,
                 asyncOp3,

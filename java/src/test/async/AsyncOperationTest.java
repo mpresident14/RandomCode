@@ -54,7 +54,7 @@ public class AsyncOperationTest {
     AsyncOperation<Void> asyncOp = 
         AsyncGraph
             .createVoidAsync()
-            .peek(v -> asyncThreadId.set(getThreadId()));
+            .check(v -> asyncThreadId.set(getThreadId()));
 
     AsyncGraph.runAsyncBlocking(asyncOp);
 
@@ -83,7 +83,7 @@ public class AsyncOperationTest {
     AsyncOperation<Void> asyncOp = 
         AsyncGraph
             .createVoidAsync()
-            .peek(v -> syncThreadId.set(getThreadId()));
+            .check(v -> syncThreadId.set(getThreadId()));
 
     AsyncGraph.getSync(asyncOp);
 
@@ -123,12 +123,12 @@ public class AsyncOperationTest {
   }
 
   @Test
-  public void test_thenConsume() {
+  public void test_consume() {
     List<String> strList = new ArrayList<>(List.of("a", "a", "b", "c"));
     AsyncOperation<Void> asyncOp = 
         AsyncGraph
             .createImmediateAsync("a")
-            .thenConsume(str -> strList.remove(str));
+            .consume(str -> strList.remove(str));
 
     Object actual = AsyncGraph.getSync(asyncOp);
     assertNull(actual);
@@ -140,7 +140,7 @@ public class AsyncOperationTest {
   }
 
   @Test
-  public void test_thenConsumeCollapse() {
+  public void test_consumeCollapse() {
     List<String> strList = new ArrayList<>(List.of("a", "a", "b", "c"));
     Function<String, AsyncOperation<Void>> fnReturnAsyncOp = 
         str -> 
@@ -154,7 +154,7 @@ public class AsyncOperationTest {
     AsyncOperation<Void> asyncOp = 
         AsyncGraph
             .createAsync(() -> "a")
-            .thenConsumeCollapse(str -> fnReturnAsyncOp.apply(str));
+            .consumeCollapse(str -> fnReturnAsyncOp.apply(str));
 
     Object actual = AsyncGraph.getSync(asyncOp);
     assertNull(actual);
@@ -166,11 +166,11 @@ public class AsyncOperationTest {
   }
 
   @Test
-  public void test_thenReturnVoid() {
+  public void test_returnVoid() {
     AsyncOperation<Void> asyncOp = 
         AsyncGraph
             .createImmediateAsync(5)
-            .thenReturnVoid();
+            .returnVoid();
     
     Object actual = AsyncGraph.getSync(asyncOp);
 
@@ -179,12 +179,12 @@ public class AsyncOperationTest {
   }
 
   @Test
-  public void test_peek() {
+  public void test_check() {
     List<String> strList = new ArrayList<>(List.of("a", "a", "b", "c"));
     AsyncOperation<String> asyncOp = 
         AsyncGraph
             .createImmediateAsync("a")
-            .peek(str -> strList.remove(str))
+            .check(str -> strList.remove(str))
             .then(str -> str + "bc");
     
     String actual = AsyncGraph.getSync(asyncOp);
@@ -198,7 +198,7 @@ public class AsyncOperationTest {
   }
 
   @Test
-  public void test_peekCollapse() {
+  public void test_checkCollapse() {
     List<String> strList = new ArrayList<>(List.of("a", "a", "b", "c"));
     
     Function<String, AsyncOperation<Void>> fnReturnAsyncOp = 
@@ -213,7 +213,7 @@ public class AsyncOperationTest {
     AsyncOperation<String> asyncOp = 
         AsyncGraph
             .createAsync(() -> "a")
-            .peekCollapse(str -> fnReturnAsyncOp.apply(str));
+            .checkCollapse(str -> fnReturnAsyncOp.apply(str));
 
     String actual = AsyncGraph.getSync(asyncOp);
 
@@ -226,21 +226,21 @@ public class AsyncOperationTest {
   }
 
   @Test
-  public void test_combineAsync_computesCorrectValue_runsOnSeparateThreads() {
+  public void test_createCombinedAsync_computesCorrectValue_runsOnSeparateThreads() {
     long mainThreadId = getThreadId();
     long[] asyncThreadIds = new long[2];
 
     AsyncOperation<String> async1 = 
         AsyncGraph
             .createImmediateAsync("a")
-            .peek(unused -> asyncThreadIds[0] = getThreadId());
+            .check(unused -> asyncThreadIds[0] = getThreadId());
     AsyncOperation<Integer> async2 = 
         AsyncGraph
             .createAsync(() -> 6)
-            .peek(unused -> asyncThreadIds[1] = getThreadId());
+            .check(unused -> asyncThreadIds[1] = getThreadId());
 
     AsyncOperation<List<String>> asyncOp = 
-        AsyncGraph.combineAsync(
+        AsyncGraph.createCombinedAsync(
             async1, 
             async2, 
             (str, num) -> List.of(str, Integer.toString(num)));
@@ -261,7 +261,7 @@ public class AsyncOperationTest {
   }
 
   @Test
-  public void test_combineAsync_secondFinishesFirst() {
+  public void test_createCombinedAsync_secondFinishesFirst() {
     AsyncOperation<String> async1 = 
         AsyncGraph.createAsync(() -> {
             Thread.sleep(2000);
@@ -270,7 +270,7 @@ public class AsyncOperationTest {
     AsyncOperation<Integer> async2 = AsyncGraph.createImmediateAsync(6);
 
     AsyncOperation<List<String>> asyncOp = 
-        AsyncGraph.combineAsync(
+        AsyncGraph.createCombinedAsync(
             async1, 
             async2, 
             (str, num) -> List.of(str, Integer.toString(num)));
@@ -285,7 +285,7 @@ public class AsyncOperationTest {
   }
 
   @Test
-  public void test_combineAsync3() {
+  public void test_createCombinedAsync3() {
     AsyncOperation<String> async1 = 
         AsyncGraph.createAsync(() -> {
             Thread.sleep(1000);
@@ -296,7 +296,7 @@ public class AsyncOperationTest {
     
 
     AsyncOperation<List<Integer>> asyncOp = 
-        AsyncGraph.combineAsync(
+        AsyncGraph.createCombinedAsync(
             async1, 
             async2, 
             async3,

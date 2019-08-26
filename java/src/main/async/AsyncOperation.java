@@ -31,7 +31,7 @@ public class AsyncOperation<T> {
   }
 
   @SuppressWarnings("unchecked")
-  public AsyncOperation<Void> thenConsume(Consumer<T> consumer) {
+  public AsyncOperation<Void> consume(Consumer<T> consumer) {
     next = new AsyncOperation<Void>((T var) -> 
         {
             consumer.accept(var);
@@ -42,7 +42,7 @@ public class AsyncOperation<T> {
   }
 
   @SuppressWarnings("unchecked")
-  public AsyncOperation<Void> thenConsumeCollapse(Function<T, AsyncOperation<Void>> transform) {
+  public AsyncOperation<Void> consumeCollapse(Function<T, AsyncOperation<Void>> transform) {
     next = new AsyncOperation<Void>((T var) -> 
         {
             AsyncGraph.getSync(transform.apply(var));
@@ -53,18 +53,18 @@ public class AsyncOperation<T> {
   }
 
   @SuppressWarnings("unchecked")
-  public AsyncOperation<Void> thenReturnVoid() {
+  public AsyncOperation<Void> returnVoid() {
     next = new AsyncOperation<>((T var) -> null);
     next.first = this.first;
     return (AsyncOperation<Void>) next;
   }
 
-  public AsyncOperation<T> peek(Consumer<T> nextConsumer) {
+  public AsyncOperation<T> check(Consumer<T> nextConsumer) {
     peekers.add(nextConsumer);
     return this;
   }
 
-  public AsyncOperation<T> peekCollapse(Function<T, AsyncOperation<Void>> nextConsumer) {
+  public AsyncOperation<T> checkCollapse(Function<T, AsyncOperation<Void>> nextConsumer) {
     peekers.add((T var) -> AsyncGraph.getSync(nextConsumer.apply(var)));
     return this;
   }
