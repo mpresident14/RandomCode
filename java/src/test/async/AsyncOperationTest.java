@@ -4,7 +4,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -22,7 +21,7 @@ public class AsyncOperationTest {
 
     assertResults(
         asyncOp,
-        Arrays.asList(
+        List.of(
             actual -> assertEquals(actual, expected),
             actual -> assertFalse(getThreadId() == mainThreadId)));      
   }
@@ -37,7 +36,7 @@ public class AsyncOperationTest {
 
     assertResults(
         asyncOp,
-        Arrays.asList(
+        List.of(
             actual -> assertNull(actual),
             actual -> assertFalse(getThreadId() == mainThreadId)));
   }
@@ -53,7 +52,7 @@ public class AsyncOperationTest {
 
     assertResults(
         asyncOp,
-        Arrays.asList(
+        List.of(
             actual -> assertEquals(actual, expected),
             actual -> assertFalse(getThreadId() == mainThreadId))); 
   }
@@ -91,7 +90,7 @@ public class AsyncOperationTest {
 
   @Test
   public void test_thenConsume() {
-    List<String> strList = new ArrayList<>(Arrays.asList("a", "b", "c"));
+    List<String> strList = new ArrayList<>(List.of("a", "b", "c"));
     AsyncOperation<Void> asyncOp = 
         AsyncGraph
             .createImmediateAsync("a")
@@ -99,14 +98,14 @@ public class AsyncOperationTest {
 
     assertResults(
         asyncOp,
-        Arrays.asList( 
+        List.of(
             actual -> assertArrayEquals(new String[] {"b", "c"}, strList.toArray(new String[2])),
             actual -> assertNull(actual)));
   }
 
   @Test
   public void test_thenConsumeCollapse() {
-    List<String> strList = new ArrayList<>(Arrays.asList("a", "b", "c"));
+    List<String> strList = new ArrayList<>(List.of("a", "b", "c"));
     Function<String, AsyncOperation<Void>> fnReturnAsyncOp = 
         str -> 
             AsyncGraph
@@ -123,7 +122,7 @@ public class AsyncOperationTest {
 
     assertResults(
         asyncOp,
-        Arrays.asList( 
+        List.of(
             actual -> assertArrayEquals(new String[] {"b", "c"}, strList.toArray(new String[2])),
             actual -> assertNull(actual)));
   }
@@ -142,7 +141,7 @@ public class AsyncOperationTest {
 
   @Test
   public void test_peek() {
-    List<String> strList = new ArrayList<>(Arrays.asList("a", "b", "c"));
+    List<String> strList = new ArrayList<>(List.of("a", "b", "c"));
     AsyncOperation<String> asyncOp = 
         AsyncGraph
             .createImmediateAsync("a")
@@ -151,14 +150,14 @@ public class AsyncOperationTest {
 
     assertResults(
         asyncOp,
-        Arrays.asList( 
+        List.of(
             actual -> assertArrayEquals(new String[] {"b", "c"}, strList.toArray(new String[2])),
             actual -> assertEquals(actual, "abc")));
   }
 
   @Test
   public void test_peekCollapse() {
-    List<String> strList = new ArrayList<>(Arrays.asList("a", "b", "c"));
+    List<String> strList = new ArrayList<>(List.of("a", "b", "c"));
     
     Function<String, AsyncOperation<Void>> fnReturnAsyncOp = 
         str -> 
@@ -176,13 +175,49 @@ public class AsyncOperationTest {
 
     assertResults(
         asyncOp,
-        Arrays.asList( 
+        List.of( 
             actual -> assertArrayEquals(new String[] {"b", "c"}, strList.toArray(new String[2])),
             actual -> assertEquals(actual, "a")));
   }
 
+  @Test
+  public void test_combineAsync() {
+    AsyncOperation<String> async1 = AsyncGraph.createImmediateAsync("a");
+    AsyncOperation<Integer> async2 = AsyncGraph.createAsync(() -> 6);
+
+    AsyncOperation<List<String>> combinedAsync = 
+        AsyncGraph.combineAsync(
+            async1, 
+            async2, 
+            (str, num) -> List.of(str, Integer.toString(num)));
+
+    assertResult(
+        combinedAsync,
+        actual -> assertEquals(actual, List.of("a", "6")));
+  }
+
+  @Test
+  public void test_combineAsyncSecondFinishesFirst() {
+    AsyncOperation<String> async1 = 
+        AsyncGraph.createAsync(() -> {
+            Thread.sleep(1000);
+            return "a";
+        });
+    AsyncOperation<Integer> async2 = AsyncGraph.createImmediateAsync(6);
+
+    AsyncOperation<List<String>> combinedAsync = 
+        AsyncGraph.combineAsync(
+            async1, 
+            async2, 
+            (str, num) -> List.of(str, Integer.toString(num)));
+
+    assertResult(
+        combinedAsync,
+        actual -> assertEquals(actual, List.of("a", "6")));
+  }
+
   private static <T> void assertResult(AsyncOperation<T> asyncOp, Consumer<T> assertion) {
-    assertResults(asyncOp, Arrays.asList(assertion));
+    assertResults(asyncOp, List.of(assertion));
   }
 
   private static <T> void assertResults(AsyncOperation<T> asyncOp, List<Consumer<T>> assertions) {
