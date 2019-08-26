@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import other.Wrapper;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -47,45 +49,45 @@ public class AsyncOperationTest {
   @Test
   public void test_runAsync_runsOnDifferentThread() {
     long mainThreadId = getThreadId();
-    long[] asyncThreadId = new long[1];
+    Wrapper<Long> asyncThreadId = new Wrapper<>();
 
     AsyncOperation<Void> asyncOp = 
         AsyncGraph
             .createVoidAsync()
-            .peek(v -> asyncThreadId[0] = getThreadId());
+            .peek(v -> asyncThreadId.set(getThreadId()));
 
     AsyncGraph.runAsyncBlocking(asyncOp);
 
-    assertThat(asyncThreadId[0], not(mainThreadId));
+    assertThat(asyncThreadId.get(), not(mainThreadId));
   }
 
   @Test
   public void test_runAsync_executesCallback() {
-    String[] actual = new String[1];
+    Wrapper<String> actual = new Wrapper<>();
 
     AsyncOperation<String> asyncOp = 
         AsyncGraph
             .createImmediateAsync(5)
             .then(num -> Integer.toString(num));
 
-    AsyncGraph.runAsyncBlocking(asyncOp, result -> actual[0] = result);
+    AsyncGraph.runAsyncBlocking(asyncOp, result -> actual.set(result));
 
-    assertThat(actual[0], is("5"));
+    assertThat(actual.get(), is("5"));
   }
 
   @Test
   public void test_getSync_runsOnSameThread() {
     long mainThreadId = getThreadId();
-    long[] syncThreadId = new long[1];
+    Wrapper<Long> syncThreadId = new Wrapper<>();
 
     AsyncOperation<Void> asyncOp = 
         AsyncGraph
             .createVoidAsync()
-            .peek(v -> syncThreadId[0] = getThreadId());
+            .peek(v -> syncThreadId.set(getThreadId()));
 
     AsyncGraph.getSync(asyncOp);
 
-    assertThat(syncThreadId[0], is(mainThreadId));    
+    assertThat(syncThreadId.get(), is(mainThreadId));    
   }
 
   @Test
@@ -235,7 +237,7 @@ public class AsyncOperationTest {
     AsyncOperation<Integer> async2 = 
         AsyncGraph
             .createAsync(() -> 6)
-            .peek(unused -> asyncThreadIds[0] = getThreadId());
+            .peek(unused -> asyncThreadIds[1] = getThreadId());
 
     AsyncOperation<List<String>> asyncOp = 
         AsyncGraph.combineAsync(
@@ -311,7 +313,7 @@ public class AsyncOperationTest {
 
   @SafeVarargs
   private static <T> void assertAsyncResults(AsyncOperation<T> asyncOp, Consumer<T>... assertions) {
-    AssertionError[] error = new AssertionError[1];
+    Wrapper<AssertionError> error = new Wrapper<>();
 
     AsyncGraph.runAsyncBlocking(
         asyncOp,
@@ -320,14 +322,14 @@ public class AsyncOperationTest {
                 try {
                     assertion.accept(actual);
                 } catch (AssertionError e) {
-                    error[0] = e;
+                    error.set(e);
                     return;
                 }
             }
         });
     
-    if (error[0] != null) {
-        throw new AssertionError(error[0]);
+    if (error.get() != null) {
+        throw new AssertionError(error.get());
     }
   }
 
