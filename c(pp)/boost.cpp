@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstddef>
-#include <boost/algorithm/is_palindrome.hpp>
+// #include <boost/algorithm/is_palindrome.hpp>
 #include <boost/archive/tmpdir.hpp>
 
 #include <boost/archive/text_iarchive.hpp>
@@ -44,7 +44,7 @@ int main()
   boost::archive::text_oarchive oa(ofs);
   oa << test;
 
-  std::cout << boost::algorithm::is_palindrome("rotator") << std::endl;
+  // std::cout << boost::algorithm::is_palindrome("rotator") << std::endl;
 
   return 0;
 }
