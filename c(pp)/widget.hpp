@@ -1,82 +1,58 @@
 #ifndef WIDGET_HPP
 #define WIDGET_HPP 1
 
-#include <vector>
 #include <iostream>
-
-
+#include <vector>
 
 class Widget {
-	public:
-		Widget()
-		{
-			info("Default Constructor");
-		};
+ public:
+  Widget() { info("Default Constructor"); };
 
-		~Widget()
-		{
-			info("Destructor");
-		};
+  ~Widget() { info("Destructor"); };
 
-		Widget(const Widget& other)
-			: nums_{other.nums_}
-		{
-			info("Copy Constructor");
-		}
+  Widget(const Widget& other) : nums_{other.nums_} { info("Copy Constructor"); }
 
-		Widget& operator=(const Widget& other)
-		{
-			if (this != &other) {
-				nums_ = other.nums_;
-			}
+  Widget& operator=(const Widget& other) {
+    if (this != &other) {
+      nums_ = other.nums_;
+    }
 
-			info("Copy Assignment");
-			return *this;
-		};
+    info("Copy Assignment");
+    return *this;
+  };
 
-		Widget(Widget&& other)
-			: nums_{std::move(other.nums_)}
-		{
-			info("Move Constructor");
-		}
+  Widget(Widget&& other) : nums_{std::move(other.nums_)} {
+    info("Move Constructor");
+  }
 
-		Widget& operator=(Widget&& other)
-		{
-			nums_ = std::move(other.nums_);
+  Widget& operator=(Widget&& other) {
+    nums_ = std::move(other.nums_);
 
-			info("Move Assignment");
-			return *this;
-		};
+    info("Move Assignment");
+    return *this;
+  };
 
-		int work(int n) const
-		{
-			return n + 3;
-		};
+  int work(int n) const { return n + 3; };
 
-		static Widget create_widget(int n)
-		{
-			Widget w;
-			w.nums_.push_back(n);
-			return w;
-		}
+  static Widget create_widget(int n) {
+    Widget w;
+    w.nums_.push_back(n);
+    return w;
+  }
 
-		// Since std::move(w) is not the same as w, the compiler cannot use RVO.
-		// Results in an extra call to the move constructor.
-		// Clang even gives a nice warning.
-		static Widget create_widget_bad(int n)
-		{
-			Widget w;
-			w.nums_.push_back(n);
-			return std::move(w);
-		}
+  // Since std::move(w) is not the same as w, the compiler cannot use RVO.
+  // Results in an extra call to the move constructor.
+  // Clang even gives a nice warning.
+  static Widget create_widget_bad(int n) {
+    Widget w;
+    w.nums_.push_back(n);
+    return std::move(w);
+  }
 
-	private:
-		void info(const char* msg)
-		{
-			std::cout << msg << ": " << this << std::endl;
-		}
+ private:
+  void info(const char* msg) { std::cout << msg << ": " << this << std::endl; }
 
-		std::vector<int> nums_;
+  std::vector<int> nums_;
 };
 
 #endif
