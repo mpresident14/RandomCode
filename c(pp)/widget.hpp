@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 
 class Widget {
  public:
@@ -25,6 +26,12 @@ class Widget {
     info("Move Constructor");
   }
 
+  Widget(std::string str)
+    :nums_{(int) str[0]}
+  {
+    info("String Constructor");
+  }
+
   Widget& operator=(Widget&& other) {
     nums_ = std::move(other.nums_);
 
@@ -36,6 +43,7 @@ class Widget {
 
   static Widget create_widget(int n) {
     Widget w;
+    std::cout << "&w=" << &w << std::endl;
     w.nums_.push_back(n);
     return w;
   }
