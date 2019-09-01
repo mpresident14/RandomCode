@@ -13,10 +13,6 @@ class Thing {
 			:w_{move(w)}
 		{};
 
-		// TODO: Include a copy elision (RVO and NRVO)
-
-
-
 	private:
 		Widget w_;
 };
