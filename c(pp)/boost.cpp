@@ -1,50 +1,16 @@
-#include <iostream>
-#include <fstream>
-#include <cstddef>
+// https://www.boost.org/doc/libs/1_55_0/more/getting_started/unix-variants.html
+// Does not include any binaries that must be built
+
 #include <boost/algorithm/is_palindrome.hpp>
-#include <boost/archive/tmpdir.hpp>
+#include <cstddef>
+#include <fstream>
+#include <iostream>
 
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/detail/common_iarchive.hpp>
+// Windows: g++ -I/cygdrive/c/boost_1_67_0/ -g -Wall -Wextra -std=c++11
+// -pedantic -o boost boost.cpp Ubuntu: clang++ -std=c++1z
+// -I/usr/local/include/boost_1_71_0 boost.cpp -o boost
 
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/utility.hpp>
-#include <boost/serialization/list.hpp>
-#include <boost/serialization/assume_abstract.hpp>
-
-// g++ -I/cygdrive/c/boost_1_67_0/ -g -Wall -Wextra -std=c++11 -pedantic -o boost boost.cpp
-
-class Test {
-  public:
-    friend class boost::serialization::access;
-
-    Test(int x, int y)
-      : x_{x}, y_{y} {}
-    
-    template<typename Archive>
-    void serialize(Archive& ar, const unsigned int version)
-    {
-      ar & x_;
-      ar & y_;
-    }
-
-  
-  private:
-    int x_;
-    int y_;
-
-};
-
-int main()
-{
-  std::ofstream ofs("boost_serialization.txt");
-  Test test{4,3};
-
-  boost::archive::text_oarchive oa(ofs);
-  oa << test;
-
+int main() {
   std::cout << boost::algorithm::is_palindrome("rotator") << std::endl;
-
   return 0;
 }

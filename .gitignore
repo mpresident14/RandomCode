@@ -1,3 +1,10 @@
+# Extensionless executables
+*
+!/**/
+!*.*
+
+bin/
+
 # java
 *.class
 

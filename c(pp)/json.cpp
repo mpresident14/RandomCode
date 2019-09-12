@@ -1,16 +1,15 @@
 // http://zenol.fr/blog/boost-property-tree/en.html for more info
 
-#include <iostream>
-#include <cstddef>
-#include <string>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <cstddef>
+#include <iostream>
+#include <string>
 
 using namespace std;
 namespace pt = boost::property_tree;
 
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const* argv[]) {
   // Create a root
   pt::ptree root;
 
@@ -26,6 +25,8 @@ int main(int argc, char const *argv[])
   for (pt::ptree::value_type& category : root.get_child("quiz")) {
     cout << "Category: " << category.first << endl;
     for (pt::ptree::value_type& question_num : category.second)
-      cout << question_num.first << ": " << question_num.second.get<string>("question") << endl;;
+      cout << question_num.first << ": "
+           << question_num.second.get<string>("question") << endl;
+    ;
   }
 }
