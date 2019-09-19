@@ -20,8 +20,8 @@ int main() {
   // Lifetime of temporary object is extended for the stack-based reference
   const int& i = getInt(5);
 
-  // ERROR! WILL NOT COMPILE. We cannot modify a literal, so the compiler
-  // enforces "const" int& i = getInt();
+  //  We cannot modify a literal, so the compiler enforces "const" int& i = getInt();
+  // int& j = getInt(4); ERROR! WILL NOT COMPILE.
 
   cout << "i=" << i << endl;
 
