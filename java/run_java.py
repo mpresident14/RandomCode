@@ -1,14 +1,16 @@
 import sys
 import argparse
 import subprocess
+import os
 
 def help():
-  return "help commented out"
-  # return ("Run this from your top level directory. Your .java files " 
+  return ("Run this from your top level directory."
+  "[Syntax: python run_java.py [-t] path.to.my.class.ClassName]")
+
+  # Your .java files " 
   # "should be in src/main and there should be a bin/ folder for output .class files. " 
   # "The CLASSPATH env variable should have src/main, bin/, src/test, and "
   # "C:\Program Files (x86)\junit4.10\junit-4.10.jar.\n"
-  # "[Syntax: python run_java.py [-t] path.to.my.class.ClassName]")
 
 def run(pathDots, pathSlashes):
   compileCmd = f"javac -cp \"src/main\" src/main/{pathSlashes}.java -d bin -Xlint"
@@ -23,9 +25,9 @@ def test(pathDots, pathSlashes):
   return compileCmd, runCmd
 
 if __name__ == "__main__":
-    # if len(sys.argv) != 2:
-    #   print(help())
-    #   exit()
+    if len(sys.argv) != 2:
+      print(help())
+      exit()
     parser = argparse.ArgumentParser(description='Run java files.')
     parser.add_argument("-t", action='store_true')
     parser.add_argument("className")
@@ -37,5 +39,12 @@ if __name__ == "__main__":
     compileCmd, runCmd = \
         test(pathDots, pathSlashes) if args["t"] else run(pathDots, pathSlashes)
 
-    subprocess.check_call(compileCmd)
-    subprocess.call(runCmd)
+    print(compileCmd)
+    os.system(compileCmd)
+    # subprocess.check_call(compileCmd)
+
+    print(runCmd)
+    print()
+    os.system(runCmd)
+    # subprocess.call(runCmd)    
+    
