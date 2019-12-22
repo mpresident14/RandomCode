@@ -1,3 +1,5 @@
 {
-  "java.home": "C:\\Program Files\\Java\\jdk-12.0.2"
+    "python.pythonPath": "/usr/bin/python3",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
 }

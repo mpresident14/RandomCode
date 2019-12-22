@@ -1,16 +1,11 @@
 import sys
 import argparse
 import subprocess
-import os
 
-def help():
-  return ("Run this from your top level directory."
-  "[Syntax: python run_java.py [-t] path.to.my.class.ClassName]")
-
-  # Your .java files " 
-  # "should be in src/main and there should be a bin/ folder for output .class files. " 
-  # "The CLASSPATH env variable should have src/main, bin/, src/test, and "
-  # "C:\Program Files (x86)\junit4.10\junit-4.10.jar.\n"
+# There should be in src/main and src/test and 
+# a bin/ folder for output .class and .java files.
+  
+# NOTE: Classpath separator is colon for Linux, semicolon for Windows
 
 def run(pathDots, pathSlashes):
   compileCmd = f"javac -cp \"src/main\" src/main/{pathSlashes}.java -d bin -Xlint"
@@ -19,32 +14,27 @@ def run(pathDots, pathSlashes):
   return compileCmd, runCmd
 
 def test(pathDots, pathSlashes):
-  compileCmd = f"javac -cp \"C:\Program Files (x86)\junit4.10\junit-4.10.jar;src/test;src/main\" src/test/{pathSlashes}.java -d bin -Xlint"
-  runCmd = f"java -cp \"C:\Program Files (x86)\junit4.10\junit-4.10.jar;bin;src/main\" org.junit.runner.JUnitCore {pathDots}"
+  compileCmd = f"javac -cp \"/usr/share/java/junit4-4.12.jar:src/test:src/main\" src/test/{pathSlashes}.java -d bin -Xlint"
+  runCmd = f"java -cp \"/usr/share/java/junit4-4.12.jar:bin:src/main\" org.junit.runner.JUnitCore {pathDots}"
 
   return compileCmd, runCmd
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-      print(help())
-      exit()
-    parser = argparse.ArgumentParser(description='Run java files.')
-    parser.add_argument("-t", action='store_true')
-    parser.add_argument("className")
-    args = vars(parser.parse_args())
+    parser = argparse.ArgumentParser(description='Run java files from top level java directory.')
+    parser.add_argument("-t", "--test", action='store_true', default=False, help="Run a test file.")
+    parser.add_argument("className", help="path.to.my.class.ClassName")
 
-    pathDots = args["className"]
+    args = parser.parse_args()
+
+    pathDots = args.className
     pathSlashes = "/".join(pathDots.split("."))
 
     compileCmd, runCmd = \
-        test(pathDots, pathSlashes) if args["t"] else run(pathDots, pathSlashes)
+        test(pathDots, pathSlashes) if args.test else run(pathDots, pathSlashes)
 
     print(compileCmd)
-    os.system(compileCmd)
-    # subprocess.check_call(compileCmd)
+    subprocess.check_call(compileCmd, shell=True) # Super bad security
 
     print(runCmd)
     print()
-    os.system(runCmd)
-    # subprocess.call(runCmd)    
-    
+    subprocess.call(runCmd, shell=True) # Super bad security 

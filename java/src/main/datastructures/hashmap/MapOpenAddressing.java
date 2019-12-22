@@ -73,7 +73,7 @@ public class MapOpenAddressing<Key, Value> {
     this.loadFactor = loadFactor;
   }
 
-  public void put(Key key, Value value) throws Exception {
+  public void put(Key key, Value value) {
     int attempts = 0;
     int hash = key.hashCode();
     int hash2 = 0;
@@ -195,7 +195,7 @@ public class MapOpenAddressing<Key, Value> {
     return (result & 1) == 1 ? result : result + 1;
   }
 
-  private void reallocate() throws Exception {
+  private void reallocate() {
     int newSize = 2 * buckets.size(); // power of two, better if prime though
     List<Pair<Key, Value>> oldBuckets = buckets;
     buckets = new ArrayList<>(newSize);

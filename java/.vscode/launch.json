@@ -1,13 +1,18 @@
 {
   "configurations": [
-
-
+    {
+      "type": "java",
+      "name": "CodeLens (Launch) - BinarySearch",
+      "request": "launch",
+      "mainClass": "other.BinarySearch",
+      "projectName": "java"
+    },
     {
       "type": "java",
       "name": "CodeLens (Launch) - Async",
       "request": "launch",
       "mainClass": "async.Main",
       "projectName": "java"
-    },
+    }
   ]
 }

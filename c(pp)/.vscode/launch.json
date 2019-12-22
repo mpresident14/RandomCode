@@ -8,33 +8,20 @@
       "name": "(gdb) Launch",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/main",
-      "args": [""],
-      "stopAtEntry": true,
-      "cwd": "${workspaceFolder}/",
+      "program": "${fileDirname}/${fileBasenameNoExtension}",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
       "environment": [],
-      "externalConsole": true,
-      "windows": {
-        "MIMode": "gdb",
-        "miDebuggerPath": "/usr/bin/gdb",
-        "setupCommands": [
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
           {
-            "description": "Enable pretty-printing for gdb",
-            "text": "-enable-pretty-printing",
-            "ignoreFailures": true
+              "description": "Enable pretty-printing for gdb",
+              "text": "-enable-pretty-printing",
+              "ignoreFailures": true
           }
-        ]
-      },
-      "pipeTransport": {
-        "pipeCwd": "",
-        "pipeProgram": "c:\\windows\\sysnative\\bash.exe",
-        "pipeArgs": ["-c"],
-        "debuggerPath": "/usr/bin/gdb"
-      },
-      "sourceFileMap": {
-        "/mnt/c": "${env:systemdrive}/",
-        "/usr": "C:\\Users\\Miles\\AppData\\Local\\Packages\\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\\LocalState\\rootfs\\usr"
-      }
-    }
+      ]
+    },
   ]
 }
