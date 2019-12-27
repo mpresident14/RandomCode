@@ -1,92 +1,70 @@
+#include "widget.hpp"
+
 #include <cstddef>
 #include <iostream>
 #include <utility>
 
 /*
-   The copy and swap idiom has 3 advantages over the normal assignment operator.
+  Copy/swap vs normal assignment operator.
+  Pros
     1. No need for a self-assignment test
     2. Contains only non-throwing operations (strong exception guarantee)
     3. No duplicated code from copy constructor.
-    4. Allows us to take advantage of copy elision by passing by value.
+    4. We don't have to write a move assignment operator.
+  Cons
+    1. Assignment with an rvalue by cast (via move) calls move constructor, whereas
+      move assignment operator would take the rvalue by reference.  
  */
+
+using namespace std;
 
 class Practice {
  public:
-  Practice() = delete;
   /** Constructor */
   Practice(size_t inputSize) : size_{inputSize}, data_{new int[inputSize]} {
-    std::cout << "Constructor " << inputSize << std::endl;
+    cout << "Constructor " << this << endl;
   };
 
   /** Destructor */
   ~Practice() {
-    std::cout << "Destructor " << size_ << std::endl;
-    delete[] data_;
+    cout << "Destructor " << this << endl;
+    if (data_ != nullptr) delete[] data_;
   };
 
   /** Copy constructor */
   Practice(const Practice& other)
       : size_{other.size_}, data_{new int[other.size_]} {
-    std::cout << "Copy Constructor" << std::endl;
+    cout << "Copy Constructor " << this << endl;
   };
 
   /** Move constructor */
-  Practice(Practice&& other) {
-    std::cout << "Move Constructor" << std::endl;
+  // Note that we have to initialize data_ to nullptr so that the destructor can 
+  // check it. Otherwise the destructor will attempt to free memory that has not 
+  // been allocated.
+  Practice(Practice&& other)
+    : data_{nullptr}
+  {
+    cout << "Move Constructor " << this << endl;
     // Move data from other to this (other is left with junk, but it doesn't
     // matter b/c it is an rvalue)
-    swap(*this, other);
+    myswap(*this, other);
   }
 
   /** Passing by value assignment operator */
   // If lvalue is passed, other is created using copy constructor
-  // If rvalue is passed, other is created using move constructor
-  // (Other may also be generated via copy elision if possible)
+  // If rvalue is passed, other is created using move constructor, or
+  // possibly created directly via copy elision.
   Practice& operator=(Practice other) {
-    std::cout << "&other=" << &other << std::endl;
-    std::cout << "Assignment Operator" << std::endl;
+    cout << "Assignment Operator " << this << endl;
     // Swaps data (other is destroyed)
-    swap(*this, other);
+    myswap(*this, other);
     return *this;
   };
 
-  /** Passing by reference assignment operator */
-  // Practice& operator=(const Practice& other)
-  // {
-  //     Passing by reference forces us to create a tmp object before
-  //     swapping so that we do not invalidate other. This forces a call to the copy constructor.
-  //     Passing by value in the function above allows the compiler to use
-  //     copy elision when possible, whereas this version prevents this opportunity for
-  //     optimization. 
-  // };
-
   /** swap fcn */
-  friend void swap(Practice& first, Practice& second) {
-    std::swap(first.size_, second.size_);
-    std::swap(first.data_, second.data_);
-  }
-
-  // The local variable variable prac is created directly in the parent stack
-  // frame, rather than in its own return frame. This "elides" the temporary
-  // copy. Also known as (named) return value optimization.
-  Practice operator+(Practice& other) {
-    Practice prac{size_ + other.size_};
-    std::cout << "&prac=" << &prac << std::endl;
-    return prac;
-  }
-
-  // In a situation with multiple local vars that can possibly be returned, copy
-  // elision is difficult for the compiler. In this case, the compiler is
-  // required to treat returning a local var as if it were written "return
-  // std::move(local_var)". Thus, it calls the move constructor.
-  static Practice getPractice(size_t inputSize) {
-    Practice local1{inputSize}, local2{inputSize};
-    std::cout << "&local2=" << &local2 << std::endl;
-    if (inputSize % 2 == 0) {
-      return local1;
-    } else {
-      return local2;
-    }
+  friend void myswap(Practice& first, Practice& second) {
+    swap(first.size_, second.size_);
+    swap(first.data_, second.data_);
   }
 
   size_t size_;
@@ -96,13 +74,30 @@ class Practice {
 int main() {
   Practice p1{3};
   Practice p2{4};
-  Practice q{5};
+  Widget w1;
+  Widget w2;
+  cout << endl;
 
-  std::cout << std::endl;
-  q = p1 + p2;
+  cout << "Assign to lvalue" << endl;
+  cout << "Practice" << endl;
+  p1 = p2;
+  cout << "Widget" << endl;
+  w1 = w2;
+  cout << endl;
 
-  std::cout << std::endl;
-  q = Practice::getPractice(15);
+  cout << "Assign to rvalue" << endl;
+  cout << "Practice" << endl;
+  p1 = Practice{5};
+  cout << "Widget" << endl;
+  w1 = Widget::create_widget(5);
+  cout << endl;
+
+  cout << "Assign to rvalue (cast)" << endl;
+  cout << "Practice" << endl;
+  p1 = move(p2);
+  cout << "Widget" << endl;
+  w1 = move(w2);
+  cout << endl;
 }
 
 // OUTPUT
@@ -120,7 +115,7 @@ int main() {
 // Constructor 15
 // &local2=0x7fffc6b725f8
 // Move constructor         * Compiler must treat as if "return
-// std::move(local2)" Destructor 0             * Move Constructor: swap if
+// move(local2)" Destructor 0             * Move Constructor: swap if
 // uninitialized Practice Destructor 15            * Destroy local1
 // &other=0x7fff18ead480
 // Assignment Operator
