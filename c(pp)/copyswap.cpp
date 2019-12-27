@@ -7,6 +7,7 @@
     1. No need for a self-assignment test
     2. Contains only non-throwing operations (strong exception guarantee)
     3. No duplicated code from copy constructor.
+    4. Allows us to take advantage of copy elision by passing by value.
  */
 
 class Practice {
@@ -52,15 +53,11 @@ class Practice {
   /** Passing by reference assignment operator */
   // Practice& operator=(const Practice& other)
   // {
-  //     std::cout << "&other=" << &other << std::endl;
-  //     std::cout << "Assignment Operator" << std::endl;
-  //     // Passing by reference forces us to create a tmp object before
-  //     swapping so that we
-  //     // do not invalidate other. This forces a call to the copy constructor.
-  //     // Passing by value in the function above allows the compiler to use
-  //     copy elision
-  //     // when possible, whereas this version prevents this opportunity for
-  //     optimization. Practice tmp{other}; swap(*this, tmp); return *this;
+  //     Passing by reference forces us to create a tmp object before
+  //     swapping so that we do not invalidate other. This forces a call to the copy constructor.
+  //     Passing by value in the function above allows the compiler to use
+  //     copy elision when possible, whereas this version prevents this opportunity for
+  //     optimization. 
   // };
 
   /** swap fcn */

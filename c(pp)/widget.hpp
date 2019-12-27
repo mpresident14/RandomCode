@@ -48,15 +48,6 @@ class Widget {
     return w;
   }
 
-  // Since std::move(w) is not the same as w, the compiler cannot use RVO.
-  // Results in an extra call to the move constructor.
-  // Clang even gives a nice warning.
-  static Widget create_widget_bad(int n) {
-    Widget w;
-    w.nums_.push_back(n);
-    return std::move(w);
-  }
-
  private:
   void info(const char* msg) { std::cout << msg << ": " << this << std::endl; }
 

@@ -1,8 +1,17 @@
 #include "widget.hpp"
 
 #include <iostream>
+#include <string>
 
 using namespace std;
+
+// Since std::move(w) is not the same as w, the compiler cannot use RVO.
+// Results in an extra call to the move constructor.
+// Clang even gives a nice warning.
+Widget create_widget_bad(int n) {
+  Widget w{string{(char) n}};  
+  return std::move(w);
+}
 
 class Thing {
  public:
@@ -28,6 +37,6 @@ int main() {
   cout << endl;
 
   cout << "Bad return local (RVO inhibited)" << endl;
-  w = Widget::create_widget_bad(4);
+  w = create_widget_bad(4);
   cout << endl;
 }

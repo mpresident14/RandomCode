@@ -1,3 +1,6 @@
+#include <type_traits>
+#include <iostream>
+
 #include "widget.hpp"
 
 using namespace std;
@@ -8,9 +11,18 @@ void f2(const Widget& w) { w.work(5); }
 
 void f3(const Widget w) { w.work(5); }
 
+// Reference collapsing rules. Only rvalue with rvalue results in rvalue
+// T &  &  -> T&
+// T &  && -> T&
+// T && &  -> T&
+// T && && -> T&&
 template <typename T>
 void f4(T&& item) {
-  // TODO: print the type of the reference
+  if (is_rvalue_reference_v<decltype(item)>) {
+    cout << "rvalue reference" << endl;
+  } else {
+    cout << "lvalue reference" << endl;
+  }
   item.work(5);
 }
 

@@ -1,3 +1,9 @@
+
+// https://en.cppreference.com/w/cpp/language/lambdaalias
+
+// More on lambdas and std::function:
+// https://shaharmike.com/cpp/lambdas-and-functions/
+
 #include <iostream>
 #include <vector>
 #include <forward_list>
