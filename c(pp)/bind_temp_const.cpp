@@ -14,16 +14,17 @@
 
 using namespace std;
 
-int getInt(int n) { return n; }
+void fConstIntRef(const int& n) { cout << n << endl; }
+
+void fIntRef(int& n) { cout << n << endl; }
+
 
 int main() {
   // Lifetime of temporary object is extended for the stack-based reference
-  const int& i = getInt(5);
+  fConstIntRef(7);
 
   //  We cannot modify a literal, so the compiler enforces "const" int& i = getInt();
-  // int& j = getInt(4); ERROR! WILL NOT COMPILE.
-
-  cout << "i=" << i << endl;
-
+  // fIntRef(7); // ERROR! WILL NOT COMPILE.
+  
   return 0;
 }

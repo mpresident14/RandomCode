@@ -18,7 +18,7 @@ Widget makeWidgetReturnLocal()
 // elision is difficult for the compiler. In this case, the compiler is
 // required to treat returning a local var as if it were written "return
 // std::move(local_var)". Thus, it calls the move constructor.
-Widget makeWidgetReturnLocalBranch(int n) {
+Widget makeWidgetReturnLocalBranched(int n) {
     Widget local1;
     Widget local2;
     
@@ -30,7 +30,7 @@ Widget makeWidgetReturnLocalBranch(int n) {
 }
 
 // Returned rvalue created in parent stack frame.
-Widget makeWidgetReturnRvalue(int n) {
+Widget makeWidgetReturnRvalueBranched(int n) {
     if (n % 2 == 0) {
       return Widget{};
     } else {
@@ -38,18 +38,67 @@ Widget makeWidgetReturnRvalue(int n) {
     }
 }
 
+// Since move(w) is not the same as w, the compiler cannot use RVO.
+// Results in an extra call to the move constructor.
+// Clang even gives a nice warning let you know you done messed up.
+Widget makeWidgetBad(int n) {
+  Widget w;
+  return move(w);
+}
+
+// RVO works for by-value parameters as well
+void acceptWidget(Widget w) {
+  w.work(4);
+}
+
+Widget acceptAndReturnWidget(Widget w) {
+  w.work(4);
+  return w;
+}
+
+struct Thing {
+  Widget w_;
+};
+
+
+// No RVO when returning member variables.
+Widget makeWidgetStructMember() {
+  return Thing().w_;
+}
+
+
 int main()
 {
     cout << "makeWidgetReturnLocal()" << endl;
     Widget w1 = makeWidgetReturnLocal();
     cout << endl;
 
-    cout << "makeWidgetReturnLocalBranch()" << endl;
-    Widget w2 = makeWidgetReturnLocalBranch(4);
+    cout << "makeWidgetReturnLocalBranched()" << endl;
+    Widget w2 = makeWidgetReturnLocalBranched(4);
     cout << endl;
 
-    cout << "makeWidgetReturnRvalue()" << endl;
-    Widget w3 = makeWidgetReturnRvalue(4);
+    cout << "makeWidgetReturnRvalueBranched()" << endl;
+    Widget w3 = makeWidgetReturnRvalueBranched(4);
+    cout << endl;
+
+    cout << "makeWidgetBad()" << endl;
+    Widget w4 = makeWidgetBad(4);
+    cout << endl;
+
+    cout << "makeWidgetStructMember()" << endl;
+    Widget w5 = makeWidgetStructMember();
+    cout << endl;
+
+    cout << "acceptWidget()" << endl;
+    acceptWidget(Widget{});
+    cout << endl;
+
+    cout << "acceptAndReturnWidget() rvalue" << endl;
+    acceptWidget(Widget{});
+    cout << endl;
+
+    cout << "acceptAndReturnWidget() lvalue" << endl;
+    acceptWidget(w1);
     cout << endl;
 }
 

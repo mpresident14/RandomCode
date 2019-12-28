@@ -5,6 +5,10 @@
 
 using namespace std;
 
+// Rule of thumb: If you know you have to make a copy, pass by value. Then, if an rvalue
+// is passed, we utilize the move constructor or copy elision. If you don't have to copy
+// pass by const reference.
+
 void f1(Widget w) { w.work(5); }
 
 void f2(const Widget& w) { w.work(5); }
