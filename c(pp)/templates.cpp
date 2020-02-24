@@ -25,7 +25,7 @@ struct Thing {
     string f(U);
 
     /****************************************************************************
-     * NOTE: we cannot do just "template<enable_if_t<is_integral_v<U>, int> = 0>"
+     * NOTE: we cannot do just "template<enable_if_t<is_integral_v<T>, int> = 0>"
      * because T is not deduced in the context of this function (it is deduced in
      * the context of the class). Thus, we need to supply the additional deduced
      * type U.
