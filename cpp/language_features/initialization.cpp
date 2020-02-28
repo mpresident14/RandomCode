@@ -1,4 +1,4 @@
-#include "widget.hpp"
+#include "../widget.hpp"
 
 #include <iostream>
 #include <string>

@@ -1,7 +1,7 @@
 #include <type_traits>
 #include <iostream>
 
-#include "widget.hpp"
+#include "../widget.hpp"
 
 using namespace std;
 
