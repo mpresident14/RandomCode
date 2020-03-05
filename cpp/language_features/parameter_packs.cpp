@@ -17,7 +17,7 @@ int g()
     return 3;
 }
 
-// We can pass parameters as value or reference like normal using 
+// We can pass parameters as value or reference like normal using
 // Args, Args&, Args&&, const Arg&, etc.
 
 // https://en.cppreference.com/w/cpp/language/fold
@@ -40,6 +40,8 @@ void foldOperator(Args ... args)
     // ((((10 - 1) - 2) - 3) - 4) = 0
     int d = (10 - ... - args);
     cout << "d = " << d << endl;
+
+    ((cout  << args << ", ") , ... , (cout << endl));
 }
 
 // (a, b) computes a and b, discards a, and results in b
