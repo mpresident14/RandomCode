@@ -6,21 +6,29 @@
 
 /*
   Copy/swap vs normal assignment operator.
+  Pros
     1. No need for a self-assignment test.
     2. Contains only non-throwing operations (strong exception guarantee).
     3. No duplicated code from copy constructor.
-    4. Move constructor and assignment can use swap function.
+    4. Move constructor can use swap function, copy and move assignment are the same.
+  Cons
+    1. Move assignment parameter may have to be move constructed rather than taken
+       by rvalue reference (overloading with Practice&& would make operator= ambiguous).
  */
 
 using namespace std;
 
 class Practice {
  public:
-  
-  /** "swap" fcn */
-  friend void take(Practice& first, Practice& second) {
-    first.size_ = second.size_;
-    first.data_ = second.data_;
+
+  // See https://stackoverflow.com/questions/5695548/public-friend-swap-member-function
+  // and https://en.cppreference.com/w/cpp/language/adl (notes)
+  // Gist: calling swap tries to find swap function in Practice first via argument
+  // dependent lookup (ADL), and then since we are using namespace std, it tries
+  // std::swap.
+  friend void swap(Practice& first, Practice& second) {
+    swap(first.size_, second.size_);
+    swap(first.data_, second.data_);
   }
 
   /** Constructor */
@@ -41,8 +49,8 @@ class Practice {
   };
 
   /** Move constructor */
-  // Note that we have to initialize data_ to nullptr so that the destructor can 
-  // check it. Otherwise the destructor will attempt to free memory that has not 
+  // Note that we have to initialize data_ to nullptr so that the destructor can
+  // check it. Otherwise the destructor will attempt to free memory that has not
   // been allocated.
   Practice(Practice&& other)
     : data_{nullptr}
@@ -50,24 +58,16 @@ class Practice {
     cout << "Move Constructor " << this << endl;
     // Move data from other to this (other is left with junk, but it doesn't
     // matter b/c it is an rvalue)
-    take(*this, other);
+    swap(*this, other);
   }
 
-  Practice& operator=(const Practice& other) {
+  Practice& operator=(Practice other) {
     cout << "Copy Assignment Operator " << this << endl;
-    // Temporary copy
-    Practice tmp{other};
     // Steals data (tmp is destroyed)
-    take(*this, tmp);
+    swap(*this, other);
     return *this;
   };
 
-  Practice& operator=(Practice&& other) {
-    cout << "Move Assignment Operator " << this << endl;
-    // Steals data (other is destroyed)
-    take(*this, other);
-    return *this;
-  };
 
   size_t size_;
   int* data_;
