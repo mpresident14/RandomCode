@@ -8,12 +8,14 @@
   Copy/swap vs normal assignment operator.
   Pros
     1. No need for a self-assignment test.
-    2. Contains only non-throwing operations (strong exception guarantee).
+    2. Contains only non-throwing operations (strong exception guarantee). It is possible
+       to do this in a normal assignment operator but you have to be careful to make sure
+       that all allocations are done before modifying the current state of *this
     3. No duplicated code from copy constructor.
     4. Move constructor can use swap function, copy and move assignment are the same.
   Cons
-    1. Move assignment parameter may have to be move constructed rather than taken
-       by rvalue reference (overloading with Practice&& would make operator= ambiguous).
+    1. Assignment operator now requires an extra move (e.g. swap) except in the case of copy
+       elision.
  */
 
 using namespace std;
@@ -61,8 +63,10 @@ class Practice {
     swap(*this, other);
   }
 
+  // Take it by value so that copy elision can occur. Otherwise, we have to
+  // to create our own temp object
   Practice& operator=(Practice other) {
-    cout << "Copy Assignment Operator " << this << endl;
+    cout << "Assignment Operator " << this << endl;
     // Steals data (tmp is destroyed)
     swap(*this, other);
     return *this;
