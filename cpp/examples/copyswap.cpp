@@ -28,7 +28,7 @@ class Practice {
   // Gist: calling swap tries to find swap function in Practice first via argument
   // dependent lookup (ADL), and then since we are using namespace std, it tries
   // std::swap.
-  friend void swap(Practice& first, Practice& second) {
+  friend void swap(Practice& first, Practice& second) noexcept {
     swap(first.size_, second.size_);
     swap(first.data_, second.data_);
   }
@@ -54,7 +54,7 @@ class Practice {
   // Note that we have to initialize data_ to nullptr so that the destructor can
   // check it. Otherwise the destructor will attempt to free memory that has not
   // been allocated.
-  Practice(Practice&& other)
+  Practice(Practice&& other) noexcept
     : data_{nullptr}
   {
     cout << "Move Constructor " << this << endl;
@@ -64,8 +64,10 @@ class Practice {
   }
 
   // Take it by value so that copy elision can occur. Otherwise, we have to
-  // to create our own temp object
-  Practice& operator=(Practice other) {
+  // to create our own temp object. Also allows us to make this noexcept,
+  // whereas taking it by const& would require a call to the copy constructor,
+  // which is not noexcept because it allocates memory.
+  Practice& operator=(Practice other) noexcept {
     cout << "Assignment Operator " << this << endl;
     // Steals data (tmp is destroyed)
     swap(*this, other);
