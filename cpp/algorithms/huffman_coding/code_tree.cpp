@@ -203,8 +203,7 @@ void CodeTree::decode(size_t nbytes, ifstream& in, ofstream& out) const {
 
   size_t count = 0;
   while (count != nbytes) {
-    // We required more than one type of byte in build(), so the root will not
-    // be a leaf
+    // We required more than one type of byte in build(), so the root will not be a leaf
     currentNode = inBits.readBit() ? currentNode->right_ : currentNode->left_;
     // Reached a leaf
     if (!currentNode->left_) {
