@@ -5,16 +5,18 @@
 #include <vector>
 #include <stdint.h>
 #include <iostream>
+#include <fstream>
 
 uint8_t bitsToByte(const std::vector<bool>& bits, const size_t pos);
 void byteToBits(uint8_t theByte, std::vector<bool>& bits);
 
+class IBitStream;
 struct CodeTreePtrGtCmp;
 
 class CodeTree {
 public:
   static CodeTree build(const std::vector<size_t>& freqs);
-  static CodeTree fromBits(const std::vector<bool>& bits, size_t& pos);
+  static CodeTree fromBits(std::ifstream& in);
 
   ~CodeTree();
   CodeTree(const CodeTree& other) = delete;
@@ -22,19 +24,19 @@ public:
   CodeTree(CodeTree&& other);
   CodeTree& operator=(CodeTree&& other);
   std::vector<std::vector<bool>> getByteMapping() const;
-  std::vector<bool> toBits() const;
-  std::vector<uint8_t> decode(const std::vector<bool>& bits, size_t pos) const;
+  void toBits(std::ofstream& out) const;
+  void decode(size_t nbytes, std::ifstream& in, std::ofstream& out) const;
   // friend std::ostream& operator<<(std::ostream& out, const CodeTree& tree) {
   //   tree.root_->toStream(out);
   //   return out;
   // }
   friend struct CodeTreePtrGtCmp;
 
-  static constexpr size_t BYTE_RANGE = 1 << (sizeof(uint8_t) * 7); // 128
+  static constexpr size_t BYTE_RANGE = 1 << (sizeof(uint8_t)*8 - 1); // 128
 
 private:
   struct Node {
-    static Node* fromBits(const std::vector<bool>& bits, size_t& pos);
+    static Node* fromBits(IBitStream& in);
 
     ~Node();
     void toBits(std::vector<bool>&) const;

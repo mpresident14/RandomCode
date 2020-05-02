@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <numeric>
 
 #include <prez/print_stuff.hpp>
 
@@ -36,25 +37,49 @@ vector<size_t> getFrequencies(ifstream& in) {
 }
 
 
+void extendAndMaybeFlush(vector<bool>& bits, const vector<bool>& newBits, ofstream& out) {
+  bits.insert(bits.end(), newBits.cbegin(), newBits.cend());
+
+  // constexpr size_t capacity = 1 << 23; // 2^20 = bytes/MB * 2^3 bits/byte = 2^23 bits/MB
+  // size_t len = bits.size();
+  // // In-memory size exceeded, flush all full bytes to file
+  // if (len > capacity) {
+  //   size_t i;
+  //   for (i = 0; i + 8 < len; i += 8) {
+  //     uint8_t theByte = bitsToByte(bits, i);
+  //     out.write(reinterpret_cast<char*>(&theByte), sizeof(theByte));
+  //   }
+
+  //   // Copy the leftover bits to the start of the vector
+  //   copy(bits.begin() + i, bits.end(), bits.begin());
+  // }
+}
+
+
 void compress(ifstream& in, ofstream& out) {
   const vector<size_t> freqs = getFrequencies(in);
+  size_t nbytes = accumulate(freqs.cbegin(), freqs.cend(), 0);
+  // Store original file size
+  out.write(reinterpret_cast<char*>(&nbytes), sizeof(nbytes));
+
+  // Write code tree into file
   const CodeTree codeTree = CodeTree::build(freqs);
-  const vector<vector<bool>> byteMapping = codeTree.getByteMapping();
-  vector<bool> outBits = codeTree.toBits();
+  codeTree.toBits(out);
 
   // Encode each byte of input
+  vector<bool> outBits;
+  const vector<vector<bool>> byteMapping = codeTree.getByteMapping();
+  // Reset stream from getFrequencies
+  in.seekg(0);
   for_each(
-      istreambuf_iterator<char>{in},
-      istreambuf_iterator<char>{},
-      [&outBits, &byteMapping](char c){
-        const vector<bool>& bits = byteMapping[static_cast<uint8_t>(c)];
-        outBits.insert(outBits.end(), bits.cbegin(), bits.cend()); // TODO: Shouldn't be in memory
+      istreambuf_iterator<char>(in),
+      istreambuf_iterator<char>(),
+      [&outBits, &byteMapping, &out](char c){
+        const vector<bool>& newBits = byteMapping[static_cast<uint8_t>(c)];
+        extendAndMaybeFlush(outBits, newBits, out);
       });
 
-  // Store number of bits that will be left over at the end
-  uint8_t numBitsLeftOver = outBits.size() % 8;
-  out.write(reinterpret_cast<char*>(&numBitsLeftOver), sizeof(numBitsLeftOver));
-
+  // Flush the rest of the encodings
   size_t len = outBits.size();
   for (size_t i = 0; i < len; i += 8) {
     uint8_t theByte = bitsToByte(outBits, i);
@@ -76,35 +101,15 @@ void compress(const string& fileName) {
 
 
 void decompress(ifstream& in, ofstream& out) {
-  // Read the number of bits that will be leftover at the end
-  uint8_t numBitsLeftOver;
-  in.read(reinterpret_cast<char*>(&numBitsLeftOver), sizeof(numBitsLeftOver));
+  // Read the size of the original file
+  size_t nbytes;
+  in.read(reinterpret_cast<char*>(&nbytes), sizeof(nbytes));
 
-  // Convert to bits
-  vector<bool> bits;
-  size_t len = input.size();
-  for (size_t i = 1; i < len - 1; ++i) {
-    byteToBits(input[i], bits);
-  }
+  // Read in the code tree
+  const CodeTree codeTree = CodeTree::fromBits(in);
 
-  // Grab valid bits of last byte
-  uint8_t lastByte = input[len - 1];
-  uint8_t mask = 1 << 7;
-  for (size_t i = 0; i < numBitsLeftOver; ++i) {
-    if (lastByte & mask) {
-      bits.push_back(true);
-    } else {
-      bits.push_back(false);
-    }
-    mask >>= 1;
-  }
-
-  size_t pos = 0;
-  const CodeTree codeTree = CodeTree::fromBits(bits, pos);
-  cout << pos << endl;
-  cout << codeTree.getByteMapping() << endl;
-  vector<uint8_t> output = codeTree.decode(bits, pos);
-  out.write((char*) output.data(), output.size() * sizeof(uint8_t));
+  // Use the code tree to decode and write the compressed bytes
+  codeTree.decode(nbytes, in, out);
 }
 
 

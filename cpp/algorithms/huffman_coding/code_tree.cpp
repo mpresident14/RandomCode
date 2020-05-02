@@ -3,13 +3,50 @@
 #include <queue>
 #include <algorithm>
 
+#include <prez/print_stuff.hpp>
+
 using namespace std;
+
+
+class IBitStream {
+public:
+  IBitStream(ifstream& in) : curByte(0), mask(0), in(in) {}
+  bool readBit() {
+    // Finished with this bit, need to read in another and reset the mask
+    if (mask == 0) {
+      in.read(reinterpret_cast<char*>(&curByte), sizeof(curByte));
+      mask = 1 << (sizeof(mask)*8 - 1);
+    }
+
+    bool b = curByte & mask;
+    mask >>= 1;
+    return b;
+  }
+
+  uint8_t readByte() {
+    uint8_t theByte = 0;
+    for (size_t i = 0; i < 8; ++i) {
+      theByte <<= 1;
+      if (readBit()) {
+        theByte |= 1;
+      }
+    }
+    return theByte;
+  }
+
+private:
+  uint8_t curByte;
+  uint8_t mask;
+  ifstream& in;
+};
+
 
 struct CodeTreePtrGtCmp {
   bool operator()(const CodeTree* t1, const CodeTree* t2) const noexcept {
     return t1->root_->freq_ > t2->root_->freq_;
   }
 };
+
 
 CodeTree CodeTree::build(const vector<size_t>& freqs)
 {
@@ -25,10 +62,8 @@ CodeTree CodeTree::build(const vector<size_t>& freqs)
   while (minHeap.size() > 1) {
     // NOTE: Can't use unique ptrs because top() returns const reference
     CodeTree* tree1 = minHeap.top();
-    // cout << *tree1 << endl;
     minHeap.pop();
     CodeTree* tree2 = minHeap.top();
-    // cout << *tree2 << endl;
     minHeap.pop();
     minHeap.push(new CodeTree(move(*tree1), move(*tree2)));
     delete tree1;
@@ -119,10 +154,15 @@ void CodeTree::addPaths(const Node* node, vector<bool>& currentPath, vector<vect
 }
 
 
-vector<bool> CodeTree::toBits() const {
+void CodeTree::toBits(ofstream& out) const {
   vector<bool> bits;
   root_->toBits(bits);
-  return bits;
+  size_t len = bits.size();
+
+  for (size_t i = 0; i < len; i += 8) {
+    uint8_t theByte = bitsToByte(bits, i);
+    out.write(reinterpret_cast<char*>(&theByte), sizeof(theByte));
+  }
 }
 
 
@@ -139,41 +179,41 @@ void CodeTree::Node::toBits(vector<bool>& bits) const {
 }
 
 
-CodeTree CodeTree::fromBits(const std::vector<bool>& bits, size_t& pos) {
-  return CodeTree(Node::fromBits(bits, pos));
+CodeTree CodeTree::fromBits(ifstream& in) {
+  IBitStream inBits(in);
+  // return CodeTree(nullptr);
+  return CodeTree(Node::fromBits(inBits));
 }
 
-CodeTree::Node* CodeTree::Node::fromBits(const std::vector<bool>& bits, size_t& pos) {
+CodeTree::Node* CodeTree::Node::fromBits(IBitStream& inBits) {
   // Leaf
-  if (bits[pos++]) {
-    uint8_t theByte = bitsToByte(bits, pos);
-    pos += 8;
-    return new LeafNode{0, nullptr, nullptr, theByte};
+  if (inBits.readBit()) {
+    return new LeafNode{0, nullptr, nullptr, inBits.readByte()};
   }
 
-  Node* left = fromBits(bits, pos);
-  Node* right = fromBits(bits, pos);
+  Node* left = fromBits(inBits);
+  Node* right = fromBits(inBits);
   return new Node{0, left, right};
 }
 
 
-vector<uint8_t> CodeTree::decode(const std::vector<bool>& bits, size_t pos) const {
-  vector<uint8_t> bytes;
+void CodeTree::decode(size_t nbytes, ifstream& in, ofstream& out) const {
+  IBitStream inBits(in);
   const Node* currentNode = root_;
-  size_t len = bits.size();
-  for (size_t i = pos; i < len; ++i) {
-    bool b = bits[i];
+
+  size_t count = 0;
+  while (count != nbytes) {
     // Assume that root is not a leaf, i.e. more than one type of byte
     // (TODO: Enforce this somewhere above)
-    currentNode = b ? currentNode->right_ : currentNode->left_;
+    currentNode = inBits.readBit() ? currentNode->right_ : currentNode->left_;
     // Reached a leaf
     if (!currentNode->left_) {
-      cout << (size_t) static_cast<const LeafNode*>(currentNode)->byte_ << endl;
-      bytes.push_back(static_cast<const LeafNode*>(currentNode)->byte_);
+      uint8_t theByte = static_cast<const LeafNode*>(currentNode)->byte_;
+      out.write(reinterpret_cast<char*>(&theByte), sizeof(theByte));
       currentNode = root_;
+      ++count;
     }
   }
-  return bytes;
 }
 
 
