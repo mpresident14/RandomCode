@@ -8,6 +8,37 @@
 using namespace std;
 
 
+void byteToBits(uint8_t theByte, vector<bool>& bits) {
+  uint8_t mask = 1 << 7;
+  while (mask > 0) {
+    if (theByte & mask) {
+      bits.push_back(true);
+    } else {
+      bits.push_back(false);
+    }
+    mask >>= 1;
+  }
+}
+
+
+uint8_t bitsToByte(const vector<bool>& bits, const size_t pos) {
+  uint8_t theByte = 0;
+  const size_t len = min(bits.size() - pos, (size_t) 8);
+  for (size_t i = pos; i < pos + len; ++i) {
+    theByte <<= 1;
+    if (bits[i]) {
+      theByte |= 1;
+    }
+  }
+
+  // Pad the last byte with 0s
+  for (size_t i = 0; i < 8 - len; ++i) {
+    theByte <<= 1;
+  }
+
+  return theByte;
+}
+
 class IBitStream {
 public:
   IBitStream(ifstream& in) : curByte(0), mask(0), in(in) {}
@@ -215,34 +246,3 @@ void CodeTree::decode(size_t nbytes, ifstream& in, ofstream& out) const {
   }
 }
 
-
-void byteToBits(uint8_t theByte, vector<bool>& bits) {
-  uint8_t mask = 1 << 7;
-  while (mask > 0) {
-    if (theByte & mask) {
-      bits.push_back(true);
-    } else {
-      bits.push_back(false);
-    }
-    mask >>= 1;
-  }
-}
-
-
-uint8_t bitsToByte(const vector<bool>& bits, const size_t pos) {
-  uint8_t theByte = 0;
-  const size_t len = min(bits.size() - pos, (size_t) 8);
-  for (size_t i = pos; i < pos + len; ++i) {
-    theByte <<= 1;
-    if (bits[i]) {
-      theByte |= 1;
-    }
-  }
-
-  // Pad the last byte with 0s
-  for (size_t i = 0; i < 8 - len; ++i) {
-    theByte <<= 1;
-  }
-
-  return theByte;
-}

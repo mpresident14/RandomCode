@@ -7,9 +7,6 @@
 #include <iostream>
 #include <fstream>
 
-uint8_t bitsToByte(const std::vector<bool>& bits, const size_t pos);
-void byteToBits(uint8_t theByte, std::vector<bool>& bits);
-
 class IBitStream;
 struct CodeTreePtrGtCmp;
 
