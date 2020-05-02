@@ -9,23 +9,6 @@
 
 using namespace std;
 
-// TODO: Files are likely large, so don't read all bytes into memory first
-
-// vector<uint8_t> streamToBytes(const string& fileName) {
-//   ifstream in;
-//   in.open(fileName, in.binary);
-//   if (!in.is_open()) {
-//     throw invalid_argument("Could not open file " + fileName);
-//   }
-
-//   vector<uint8_t> bytes;
-//   for_each(
-//       istreambuf_iterator<char>{in},
-//       istreambuf_iterator<char>{},
-//       [&bytes](char b){ bytes.push_back((uint8_t) b); });
-//   return bytes;
-// }
-
 
 vector<size_t> getFrequencies(ifstream& in) {
   vector<size_t> freqs(CodeTree::BYTE_RANGE, 0);
@@ -40,19 +23,21 @@ vector<size_t> getFrequencies(ifstream& in) {
 void extendAndMaybeFlush(vector<bool>& bits, const vector<bool>& newBits, ofstream& out) {
   bits.insert(bits.end(), newBits.cbegin(), newBits.cend());
 
-  // constexpr size_t capacity = 1 << 23; // 2^20 = bytes/MB * 2^3 bits/byte = 2^23 bits/MB
-  // size_t len = bits.size();
-  // // In-memory size exceeded, flush all full bytes to file
-  // if (len > capacity) {
-  //   size_t i;
-  //   for (i = 0; i + 8 < len; i += 8) {
-  //     uint8_t theByte = bitsToByte(bits, i);
-  //     out.write(reinterpret_cast<char*>(&theByte), sizeof(theByte));
-  //   }
+  // // Allow ~ 1MB in memory: 2^20 = bytes/MB * 2^3 bits/byte = 2^23 bits/MB
+  constexpr size_t capacity = 1 << 23;
+  size_t len = bits.size();
+  // In-memory size exceeded, flush all full bytes to file
+  if (len > capacity) {
+    size_t i;
+    for (i = 0; i + 8 < len; i += 8) {
+      uint8_t theByte = bitsToByte(bits, i);
+      out.write(reinterpret_cast<char*>(&theByte), sizeof(theByte));
+    }
 
-  //   // Copy the leftover bits to the start of the vector
-  //   copy(bits.begin() + i, bits.end(), bits.begin());
-  // }
+    // Copy the leftover bits to the start of the vector
+    copy(bits.begin() + i, bits.end(), bits.begin());
+    bits.resize(bits.size() - i);
+  }
 }
 
 
@@ -69,6 +54,7 @@ void compress(ifstream& in, ofstream& out) {
   // Encode each byte of input
   vector<bool> outBits;
   const vector<vector<bool>> byteMapping = codeTree.getByteMapping();
+
   // Reset stream from getFrequencies
   in.seekg(0);
   for_each(

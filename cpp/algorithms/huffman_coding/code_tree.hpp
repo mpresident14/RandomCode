@@ -32,7 +32,7 @@ public:
   // }
   friend struct CodeTreePtrGtCmp;
 
-  static constexpr size_t BYTE_RANGE = 1 << (sizeof(uint8_t)*8 - 1); // 128
+  static constexpr size_t BYTE_RANGE = 1 << (sizeof(uint8_t)*8); // 256
 
 private:
   struct Node {

@@ -51,11 +51,15 @@ struct CodeTreePtrGtCmp {
 CodeTree CodeTree::build(const vector<size_t>& freqs)
 {
   priority_queue<CodeTree*, vector<CodeTree*>, CodeTreePtrGtCmp> minHeap;
-  for (uint8_t i = 0; i < BYTE_RANGE; ++i) {
+  for (size_t i = 0; i < BYTE_RANGE; ++i) {
     size_t freq = freqs[i];
     if (freq != 0) {
       minHeap.push(new CodeTree(freq, i));
     }
+  }
+
+  if (minHeap.size() <= 1) {
+    throw invalid_argument("Code tree requires at least two different types of bytes");
   }
 
 
@@ -68,10 +72,6 @@ CodeTree CodeTree::build(const vector<size_t>& freqs)
     minHeap.push(new CodeTree(move(*tree1), move(*tree2)));
     delete tree1;
     delete tree2;
-  }
-
-  if (minHeap.empty()) {
-    throw invalid_argument("Cannot build code tree for no data");
   }
 
   CodeTree ret = move(*minHeap.top());
@@ -203,8 +203,8 @@ void CodeTree::decode(size_t nbytes, ifstream& in, ofstream& out) const {
 
   size_t count = 0;
   while (count != nbytes) {
-    // Assume that root is not a leaf, i.e. more than one type of byte
-    // (TODO: Enforce this somewhere above)
+    // We required more than one type of byte in build(), so the root will not
+    // be a leaf
     currentNode = inBits.readBit() ? currentNode->right_ : currentNode->left_;
     // Reached a leaf
     if (!currentNode->left_) {
