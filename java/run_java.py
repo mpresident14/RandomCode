@@ -2,20 +2,20 @@ import sys
 import argparse
 import subprocess
 
-# There should be in src/main and src/test and 
+# There should be in src/main and src/test and
 # a bin/ folder for output .class and .java files.
-  
+
 # NOTE: Classpath separator is colon for Linux, semicolon for Windows
 
 def run(pathDots, pathSlashes):
-  compileCmd = f"javac -cp \"src/main\" src/main/{pathSlashes}.java -d bin -Xlint"
+  compileCmd = f"javac -cp \"src\" src/{pathSlashes}.java -d bin -Xlint"
   runCmd = f"java -cp bin {pathDots}"
 
   return compileCmd, runCmd
 
 def test(pathDots, pathSlashes):
-  compileCmd = f"javac -cp \"/usr/share/java/junit4-4.12.jar:src/test:src/main\" src/test/{pathSlashes}.java -d bin -Xlint"
-  runCmd = f"java -cp \"/usr/share/java/junit4-4.12.jar:bin:src/main\" org.junit.runner.JUnitCore {pathDots}"
+  compileCmd = f"javac -cp \"/usr/share/java/junit4.jar:test:src\" test/{pathSlashes}.java -d bin -Xlint"
+  runCmd = f"java -cp \"/usr/share/java/junit4.jar:bin:src\" org.junit.runner.JUnitCore {pathDots}"
 
   return compileCmd, runCmd
 
@@ -37,4 +37,4 @@ if __name__ == "__main__":
 
     print(runCmd)
     print()
-    subprocess.call(runCmd, shell=True) # Super bad security 
+    subprocess.call(runCmd, shell=True) # Super bad security
