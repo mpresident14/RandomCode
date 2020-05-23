@@ -15,6 +15,12 @@ bin/
 # Python
 __pycache__/
 
-# Folders
+# Things starting with .
 .*
 !/.gitignore
+
+# LaTeX
+*.aux
+*.synctex.gz
+*.log
+

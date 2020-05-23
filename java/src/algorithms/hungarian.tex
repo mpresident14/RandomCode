@@ -79,10 +79,7 @@ Let
 Then, all of the following are true:
 \begin{enumerate}
   \item $\ell'$ is a feasible labelling.
-  \item If $(x,y) \in E_\ell$ and $x \in S, y \in T$, then $(x,y) \in E_{\ell'}$.
-  \item If $(x,y) \in E_\ell$ and $x \notin S, y \notin T$, then $(x,y) \in E_{\ell'}$.
   \item $N_{\ell'}(S) \neq T$.
-  \item If a matching $M \subseteq E_\ell$, then $M \subseteq E_{\ell'}$.
 \end{enumerate}
 \lskip
 \begin{proof}  $ $\newline
@@ -110,16 +107,13 @@ Then, all of the following are true:
     \end{enumerate}
     Thus, $\ell'$ is a feasible labelling.
 
-    \item This follows from 1(a) since $\ell(x) + \ell(y) = w(x,y)$.
-    \item This follows from 1(b) since $\ell(x) + \ell(y) = w(x,y)$.
     \item Let $x \in S, y \notin T$ be the vertices that gave us $\alpha$. Since $N_\ell(S) = T$, we know that $y \notin N_\ell(S)$. From 1(c), using equality instead of inequality, we can see that $\ell'(x) + \ell'(y) = w(x,y)$. Therefore, $(x,y) \in E_{\ell'}$, so $y \in N_{\ell'}(S)$. Since $y \notin T$, $N_{\ell'}(S) \neq T$.
-    \item If $(x,y) \in M \subseteq E_\ell$,
   \end{enumerate}
 \end{proof}
 \lskip
 
 \section*{The Algorithm}
-The idea of the algorithm is to start with an empty matching and the trivial labelling. In each iteration, we add edges to the equality graph until we create an augmenting path that we can ``flip'' without causing any conflicts. Since the augmenting path starts and ends with unmatched edges, this will increase the size of our matching by one. The algorithm is as follows:
+The idea of the algorithm is to start with an empty matching and the trivial labelling. In each phase, we add edges to the equality graph until we create an augmenting path that we can ``flip'' without causing any conflicts. Since the augmenting path starts and ends with unmatched edges, this will increase the size of our matching by one. The algorithm is as follows:
 
 \begin{verbatim}
   def hungarian(G):
@@ -134,7 +128,7 @@ The idea of the algorithm is to start with an empty matching and the trivial lab
         L[x] -= alpha for x in S
         L[y] += alpha for y in T
 
-      Choose y not in N_L(S)
+      Choose y in N_L(S)\T
       if y is matched to some x in S:
         S.add(x)
         T.add(y)
@@ -150,9 +144,51 @@ The idea of the algorithm is to start with an empty matching and the trivial lab
 
 \section*{Correctness}
 \begin{enumerate}
-  \item We can always start with trivial labelling and and empty matching
-  \item
+  \item We can always start with trivial labelling and and empty matching.
+  \item When we update the labelling of $E_\ell$ in the case where $N_\ell(S) = T$, $M$ is guaranteed to remain in the resulting equality graph $E_{\ell'}$.
+  \begin{proof}
+    Suppose $(x,y) \in M \subseteq E_\ell$. Again, there are 4 types of edges $(x,y) \in M$ to consider:
+    \begin{enumerate}
+      \item $x \in S, y \in T$.
+
+      By part 1(a) of the lemma, $\ell'(x) + \ell'(y) = w(x,y)$, so $(x,y) \in E_{\ell'}$
+      \item $x \notin S, y \notin T$.
+
+      By part 1(b) of the lemma, $\ell'(x) + \ell'(y) = w(x,y)$, so $(x,y) \in E_{\ell'}$
+      \item $x \in S, y \notin T$.
+
+      Since $N_\ell(S) = T$, but $y \notin T$, this means $(x,y)$ cannot be in $E_\ell$ and therefore $(x,y) \notin M$, so this case is not possible.
+      \item $x \notin S, y \in T$.
+
+      If $y \in T$ and $(x,y) \in M$, then it must be the case that $x \in S$ since in our algorithm, when we add $y$ to $T$, we always add the matching $x$ as well. Therefore, this case is not possible.
+    \end{enumerate}
+  \end{proof}
+
+  \item When $N_\ell(S) \neq T$ and $y \in N_\ell(S) \setminus T$ is free, $u \ldots y$ is an augmenting path and flipping that path will increase the number of matchings by 1.
+
+  We first show by strong induction that $u \ldots y_k$ is an augmenting path for any $y_k$ that we visit in a phase (the iterations over which the size of the matching does not change).
+
+  \textbf{Base case: }From the algorithm, we know $u$ is not matched. When we pick $y_0$, it must be a neighbor of $u$, since $S = \{u\}$. Therefore, $(u, y_0)$ is not matched, so $uy_0$ is an augmenting path.
+
+  \textbf{Inductive Hypothesis: } Assume true for the $i^{th}$ $y$ that we visit, $i < k$, that we visit.
+
+  \textbf{Inductive Step: } Consider a chosen vertex $y_k$. That means $y_k$ was a neighbor of some $x \in S$. But to get into $S$, that $x$ must have been matched to some $y_j$, $j < k$, that we already put into $T$, so $(x, y_j)$ is matched. Since a vertex can only be incident to a single matching edge, $(x, y_k)$ is unmatched. By induction, we know $u\ldots y_j$ is an augmenting path. Therefore, $u\ldots y_jxy_k$ is also an augmenting path.
+
+  From the algorithm, we know $u$ and $y$ are not matched, so giving them matchings will not conflict with any existing matchings. All intermediate vertices on the augmenting path have one edge that is a matching and another that is not, so switching them will not cause a conflict either. Since, the augmenting path starts and ends with unmatched edges and flipping it does not eliminate any existing matchings, the flip increases the number of matchings by 1.
+
+
+  \item The algorithm is guaranteed to terminate. Since we increase the size of $M$ at each phase, we can have a maximum of $n$ phases. In each phase, we can only reach the case where $N_\ell(S) \neq T$ up to $n$ times. This is because we keep moving the matched $y$s to $T$, and we have to reach a free $y$ at some point; otherwise, if all the $y$s were matched, we would have already had a perfect matching. Also, we already showed by our lemma, that every time we update our matchings when $N_\ell(S) = T$, we move to the case where $N_\ell(S) \neq T$, so this can happen $n$ times per phase as well.
+
+\item The algorithm is correct because it is guaranteed to terminate with a perfect matching in the equality set of a feasible labelling. Therefore, by the theorem, it is a maximal perfect matching.
 \end{enumerate}
+
+
+\section*{Time Complexity}
+
+For efficiency, we keep track of the alphas of each $y \notin T$ throughout each phase.
+
+As explained previously, we have at most $n$ phases. In each phase, we can hit the cases of $N_\ell(S) = T$ and $N_\ell(S) \neq T$ each $n$ times. In the former case, we have to get the minimum of all the alphas and then update them to account for the new labelling. This takes $O(n)$ time. In the latter case, we add a vertex $x$ to $S$, so we must check if $(x, y)$ is smaller than the current alpha for each $y \notin T$. This takes $O(n)$ time as well. Altogether, we have up to $n$ phases, and each phase contains up to $n$ iterations, and each iteration takes $O(n)$ time, giving us an asymptotic runtime of $O(n^3)$.
+
 
 
 \end{document}
