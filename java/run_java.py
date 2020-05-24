@@ -2,21 +2,21 @@ import sys
 import argparse
 import subprocess
 
-# There should be in src/main and src/test and
-# a bin/ folder for output .class and .java files.
-
+# Expected hierarchy
+# java
+# - bin
+# - src
+# - test (matching src file tree structure)
 # NOTE: Classpath separator is colon for Linux, semicolon for Windows
 
 def run(pathDots, pathSlashes):
-  compileCmd = f"javac -cp \"src\" src/{pathSlashes}.java -d bin -Xlint"
+  compileCmd = f"javac -g -cp \"src\" src/{pathSlashes}.java -d bin -Xlint"
   runCmd = f"java -cp bin {pathDots}"
-
   return compileCmd, runCmd
 
 def test(pathDots, pathSlashes):
-  compileCmd = f"javac -cp \"/usr/share/java/junit4.jar:test:src\" test/{pathSlashes}.java -d bin -Xlint"
+  compileCmd = f"javac -g -cp \"/usr/share/java/junit4.jar:test:src\" test/{pathSlashes}.java -d bin -Xlint"
   runCmd = f"java -cp \"/usr/share/java/junit4.jar:bin:src\" org.junit.runner.JUnitCore {pathDots}"
-
   return compileCmd, runCmd
 
 if __name__ == "__main__":

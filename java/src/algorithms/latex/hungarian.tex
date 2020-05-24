@@ -5,7 +5,6 @@
 \usepackage{graphicx}
 \usepackage{multicol}
 
-\newcommand{\defn}{\noindent \textbf{Definition: }}
 \newcommand{\lemma}{\noindent \textbf{Lemma: }}
 \newcommand{\thm}{\noindent \textbf{Theorem: }}
 \newcommand{\lskip}{\vspace{\baselineskip}}
@@ -22,25 +21,25 @@ The Hungarian method solves the assignment problem. Given $n$ people, $n$ tasks,
 
 \section*{Vocabulary}
 
-\defn A \emph{labelling} is attaching a number to each vertex of a graph: $\ell: V \rightarrow \mathbb{R}$.
+\noindent A \emph{labelling} is attaching a number to each vertex of a graph: $\ell: V \rightarrow \mathbb{R}$.\lskip
 
-\defn A \emph{feasible labelling} is one such that the sum of the labels of every edge are greater than or equal to its weight: $\ell(x) + \ell(y) \geq w(x,y) \ \forall x,y \in V$.
+\noindent A \emph{feasible labelling} is one such that the sum of the labels of every edge are greater than or equal to its weight: $\ell(x) + \ell(y) \geq w(x,y) \ \forall x,y \in V$.\lskip
 
-\defn The \emph{equality graph} is a subset of edges where the sum of the labels are equal to its weight: $G = (V, E_\ell)$, where $E_\ell = \{ (x,y) \ | \ \ell(x) + \ell(y) = w(x,y) \}$.
+\noindent The \emph{equality graph} is a subset of edges where the sum of the labels are equal to its weight: $G = (V, E_\ell)$, where $E_\ell = \{ (x,y) \ | \ \ell(x) + \ell(y) = w(x,y) \}$.\lskip
 
-\defn A \emph{matching} is a subset of edges such that every vertex is incident to at most one edge.
+\noindent A \emph{matching} is a subset of edges such that every vertex is incident to at most one edge.\lskip
 
-\defn A \emph{perfect matching} is a subset of edges such that every vertex is incident to exactly one edge.
+\noindent A \emph{perfect matching} is a subset of edges such that every vertex is incident to exactly one edge.\lskip
 
-\defn A \emph{maximum weight perfect matching} is a perfect matching with the maximum possible sum of edge weights.
+\noindent A \emph{maximum weight perfect matching} is a perfect matching with the maximum possible sum of edge weights.\lskip
 
-\defn A vertex is \emph{matched} if it is incident to an edge in a matching. Otherwise it is \emph{free}.
+\noindent A vertex is \emph{matched} if it is incident to an edge in a matching. Otherwise it is \emph{free}.\lskip
 
-\defn The \emph{neighborhood} with respect to $\ell$ of a set $S$ is the union of all the neighbors in $E_\ell$ of the vertices in $S$: $N_\ell(S) = \bigcup_{x \in S}\{ y \ | \ (x,y) \in E_\ell \}$.
+\noindent The \emph{neighborhood} with respect to $\ell$ of a set $S$ is the union of all the neighbors in $E_\ell$ of the vertices in $S$: $N_\ell(S) = \bigcup_{x \in S}\{ y \ | \ (x,y) \in E_\ell \}$.\lskip
 
-\defn An \emph{augmenting path} in $E_\ell$ is a path that starts and ends with unmatched edges, and alternates in between: $P = e_0 e_1\ldots e_n$, where $n$ is even and $e_i \in M$ if $i$ is odd.
+\noindent An \emph{augmenting path} in $E_\ell$ is a path that starts and ends with unmatched edges, and alternates in between: $P = e_0 e_1\ldots e_n$, where $n$ is even and $e_i \in M$ if $i$ is odd.\lskip
 
-\defn The \emph{trivial labelling} of a bipartite graph with partitions $X$ and $Y$ is to label each vertex in $X$ with the weight of its largest incident edge, and label the vertices of $Y$ with 0:
+\noindent The \emph{trivial labelling} of a bipartite graph with partitions $X$ and $Y$ is to label each vertex in $X$ with the weight of its largest incident edge, and label the vertices of $Y$ with 0:
 \[ \ell(v) =
   \begin{cases}
     \max_{y} w(v,y) & \text{if } v \in X \\
@@ -67,7 +66,7 @@ The Hungarian method solves the assignment problem. Given $n$ people, $n$ tasks,
 This theorem tells us that if we find a perfect matching in an equality graph of $G$, it is guaranteed to be the optimal perfect matching.\lskip
 \lskip
 
-\thm Let $G$ be a bipartite graph partitioned into vertex sets $X$ and $Y$ and $\ell$ be a feasible labelling. Let $S \subseteq X$, $T = N_\ell(S) \neq Y$. Let \[ \alpha = \min_{(x \in S, y \notin T)} (\ell(x) + \ell(y) - w(x,y)) \]
+\lemma Let $G$ be a bipartite graph partitioned into vertex sets $X$ and $Y$ and $\ell$ be a feasible labelling. Let $S \subseteq X$, $T = N_\ell(S) \neq Y$. Let \[ \alpha = \min_{(x \in S, y \notin T)} (\ell(x) + \ell(y) - w(x,y)) \]
 Let
 \[ \ell'(v) =
   \begin{cases}
@@ -79,7 +78,7 @@ Let
 Then, all of the following are true:
 \begin{enumerate}
   \item $\ell'$ is a feasible labelling.
-  \item $N_{\ell'}(S) \neq T$.
+  \item $N_\ell(S) = T \subset N_{\ell'}(S)$.
 \end{enumerate}
 \lskip
 \begin{proof}  $ $\newline
@@ -102,12 +101,14 @@ Then, all of the following are true:
         \ell(x) - \alpha + \ell(y) \geq w(x,y) \\
         \ell'(x) + \ell'(y) \geq w(x,y) \\
       \end{align*}
-      \item $x \notin S, y \in T$. Then
-      \[ \ell'(x) + \ell'(y) = \ell(x) + \ell(y) + \alpha \geq \ell(x) + \ell(y) \geq w(x,y) \]
+      \item $x \notin S, y \in T$. (Though it is not necessary for this proof, note that $\alpha > 0$ since otherwise, $\ell(x) + \ell(y) - w(x,y) = 0$ for some $x \in S, y \notin T$. But then, $(x,y) \in E_\ell$, which means $y \in N_\ell(S)$, which isn't possible since $N_\ell(S) = T$.) Then
+      \[ \ell'(x) + \ell'(y) = \ell(x) + \ell(y) + \alpha > \ell(x) + \ell(y) \geq w(x,y) \]
     \end{enumerate}
     Thus, $\ell'$ is a feasible labelling.
 
-    \item Let $x \in S, y \notin T$ be the vertices that gave us $\alpha$. Since $N_\ell(S) = T$, we know that $y \notin N_\ell(S)$. From 1(c), using equality instead of inequality, we can see that $\ell'(x) + \ell'(y) = w(x,y)$. Therefore, $(x,y) \in E_{\ell'}$, so $y \in N_{\ell'}(S)$. Since $y \notin T$, $N_{\ell'}(S) \neq T$.
+    \item First, we argue that any vertex in $N_\ell(S)$ is in $N_{\ell'}(S)$, i.e., $N_\ell(S) \subseteq N_{\ell'}(S)$. To that end, let $y \in N_\ell(S)$. By definition, there exists $x \in S$ such that $(x,y) \in E_\ell$. Since $N_\ell(S) = T$, we know $y \in T$. We saw in 1(a) that $\ell'(x) + \ell'(y) = \ell(x) + \ell(y)$, so $(x,y) \in E_{\ell'}$, which means $y \in N_{\ell'}(S)$.
+
+    Now, let $x^* \in S, y^* \notin T$ be the vertices that gave us $\alpha$. Since $N_\ell(S) = T$, we know that $y^* \notin N_\ell(S)$. From 1(c), using equality instead of inequality, we can see that $\ell'(x^*) + \ell'(y^*) = w(x^*,y^*)$. Therefore, $(x^*,y^*) \in E_{\ell'}$, so $y^* \in N_{\ell'}(S)$. Since $y^* \notin N_{\ell}(S)$, $N_{\ell}(S) \subset N_{\ell'}(S)$.
   \end{enumerate}
 \end{proof}
 \lskip
@@ -118,11 +119,14 @@ The idea of the algorithm is to start with an empty matching and the trivial lab
 \begin{verbatim}
   def hungarian(G):
     Start with trivial labelling L and empty matching M
+
+    <1>
     while M is not a perfect matching:
       Choose a free vertex u in X
       S = {u}
       T = {}
 
+      <2>
       if N_L(S) == T:
         alpha = min([L[x] + L[y] - w(x,y) for x in S, y not in T])
         L[x] -= alpha for x in S
@@ -132,12 +136,14 @@ The idea of the algorithm is to start with an empty matching and the trivial lab
       if y is matched to some x in S:
         S.add(x)
         T.add(y)
+        go to <2>
       else:
         for each edge e in augmenting path u...y:
           if e in M:
             M.remove(e)
           else:
             M.add(e)
+        go to <1>
 
     return M
 \end{verbatim}
@@ -177,7 +183,7 @@ The idea of the algorithm is to start with an empty matching and the trivial lab
   From the algorithm, we know $u$ and $y$ are not matched, so giving them matchings will not conflict with any existing matchings. All intermediate vertices on the augmenting path have one edge that is a matching and another that is not, so switching them will not cause a conflict either. Since, the augmenting path starts and ends with unmatched edges and flipping it does not eliminate any existing matchings, the flip increases the number of matchings by 1.
 
 
-  \item The algorithm is guaranteed to terminate. Since we increase the size of $M$ at each phase, we can have a maximum of $n$ phases. In each phase, we can only reach the case where $N_\ell(S) \neq T$ up to $n$ times. This is because we keep moving the matched $y$s to $T$, and we have to reach a free $y$ at some point; otherwise, if all the $y$s were matched, we would have already had a perfect matching. Also, we already showed by our lemma, that every time we update our matchings when $N_\ell(S) = T$, we move to the case where $N_\ell(S) \neq T$, so this can happen $n$ times per phase as well.
+  \item The algorithm is guaranteed to terminate. Since we increase the size of $M$ at each phase, we can have a maximum of $n$ phases. In each phase, we can only reach the case where $N_\ell(S) \neq T$ up to $n$ times. This is because we keep moving the matched $y$s to $T$, and we have to reach a free $y$ at some point; otherwise, if all the $y$s were matched, we would have already had a perfect matching. Also, we already showed by our lemma, that every time we update our matchings when $N_\ell(S) = T$, we move to the case where $N_{\ell'}(S) \neq T$, since $N_{\ell}(S) \subset N_{\ell'}(S)$, so this can happen $n$ times per phase as well.
 
 \item The algorithm is correct because it is guaranteed to terminate with a perfect matching in the equality set of a feasible labelling. Therefore, by the theorem, it is a maximal perfect matching.
 \end{enumerate}
