@@ -37,6 +37,8 @@ The Hungarian method solves the assignment problem. Given $n$ people, $n$ tasks,
 
 \noindent The \emph{neighborhood} with respect to $\ell$ of a set $S$ is the union of all the neighbors in $E_\ell$ of the vertices in $S$: $N_\ell(S) = \bigcup_{x \in S}\{ y \ | \ (x,y) \in E_\ell \}$.\lskip
 
+\noindent An \emph{alternating tree} in $E_\ell$ is a tree in which every other edge is in the matching $M$.\lskip
+
 \noindent An \emph{augmenting path} in $E_\ell$ is a path that starts and ends with unmatched edges, and alternates in between: $P = e_0 e_1\ldots e_n$, where $n$ is even and $e_i \in M$ if $i$ is odd.\lskip
 
 \noindent The \emph{trivial labelling} of a bipartite graph with partitions $X$ and $Y$ is to label each vertex in $X$ with the weight of its largest incident edge, and label the vertices of $Y$ with 0:
@@ -191,9 +193,7 @@ The idea of the algorithm is to start with an empty matching and the trivial lab
 
 \section*{Time Complexity}
 
-For efficiency, we keep track of the alphas of each $y \notin T$ throughout each phase.
-
-As explained previously, we have at most $n$ phases. In each phase, we can hit the cases of $N_\ell(S) = T$ and $N_\ell(S) \neq T$ each $n$ times. In the former case, we have to get the minimum of all the alphas and then update them to account for the new labelling. This takes $O(n)$ time. In the latter case, we add a vertex $x$ to $S$, so we must check if $(x, y)$ is smaller than the current alpha for each $y \notin T$. This takes $O(n)$ time as well. Altogether, we have up to $n$ phases, and each phase contains up to $n$ iterations, and each iteration takes $O(n)$ time, giving us an asymptotic runtime of $O(n^3)$.
+As explained previously, we have at most $n$ phases. In each phase, we can hit the cases of $N_\ell(S) = T$ and $N_\ell(S) \neq T$ each $n$ times. Every operation within each iteration takes at most $O(n)$ time, giving us an asymptotic runtime of $O(n^3)$. See the implementation for details.
 
 
 

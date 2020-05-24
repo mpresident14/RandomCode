@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "CodeLens (Launch) - BinarySearch",
+      "request": "launch",
+      "mainClass": "other.BinarySearch",
+      "projectName": "java"
+    },
+    {
+      "type": "java",
       "name": "CodeLens (Launch) - Hungarian",
       "request": "launch",
       "mainClass": "algorithms.Hungarian",
@@ -15,7 +22,7 @@
       "type": "java",
       "name": "Debug (Launch) - Current File",
       "request": "launch",
-      "mainClass": "${file}"
+      "mainClass": "${file}",
     },
     {
       "type": "java",
