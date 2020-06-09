@@ -1,7 +1,19 @@
 package datastructures.tree;
 
 public class BST<T extends Comparable<T>> {
-  Node<T> root;
+  private class Node {
+    T val;
+    Node left;
+    Node right;
+
+    Node(T val) {
+      this.val = val;
+      this.left = null;
+      this.right = null;
+    }
+  }
+
+  Node root;
   int size;
   static int r = 0;
 
@@ -18,19 +30,19 @@ public class BST<T extends Comparable<T>> {
 
   public boolean insert(T value) {
     if (root == null) {
-      root = new Node<>(value);
+      root = new Node(value);
       this.size++;
       return true;
     }
 
-    Node<T> currentNode = root;
+    Node currentNode = root;
     while (true) {
       int comp = value.compareTo(currentNode.val);
       if (comp == 0) {
         return false;
       } else if (comp < 0) {
         if (currentNode.left == null) {
-          currentNode.left = new Node<>(value);
+          currentNode.left = new Node(value);
           this.size++;
           return true;
         } else {
@@ -38,7 +50,7 @@ public class BST<T extends Comparable<T>> {
         }
       } else {
         if (currentNode.right == null) {
-          currentNode.right = new Node<>(value);
+          currentNode.right = new Node(value);
           this.size++;
           return true;
         } else {
@@ -56,7 +68,7 @@ public class BST<T extends Comparable<T>> {
     return isDeleted;
   }
 
-  private boolean delete(T value, Node<T> current, Node<T> parent) {
+  private boolean delete(T value, Node current, Node parent) {
     if (current == null) {
       return false;
     }
@@ -67,24 +79,24 @@ public class BST<T extends Comparable<T>> {
       if (isLeaf(current)) {
         setParentChildToNodeChild(parent, current, null);
         return true;
-      } 
+      }
 
       // Node to remove has one child, set parent to child
       if (current.left == null) {
         setParentChildToNodeChild(parent, current, current.right);
         return true;
-      } 
+      }
       if (current.right == null) {
         setParentChildToNodeChild(parent, current, current.left);
         return true;
-      } 
+      }
 
-      // If node to remove has two children, find inorder successor (right 
+      // If node to remove has two children, find inorder successor (right
       // once, then continuously left), copy it into the place of node to be
       // removed, and delete inorder successor. This could equivalently be
       // done with inorder predecessor: left once, then continuously right.
-      Node<T> nextInorderParent = current;
-      Node<T> nextInorder = current.right;
+      Node nextInorderParent = current;
+      Node nextInorder = current.right;
       while (nextInorder.left != null) {
         nextInorderParent = nextInorder;
         nextInorder = nextInorder.left;
@@ -99,7 +111,7 @@ public class BST<T extends Comparable<T>> {
     }
   }
 
-  private void setParentChildToNodeChild(Node<T> parent, Node<T> node, Node<T> nodeChild) {
+  private void setParentChildToNodeChild(Node parent, Node node, Node nodeChild) {
     if (parent == null) {
       this.root = nodeChild;
     } else if (parent.left != null && parent.left.val.equals(node.val)) {
@@ -113,7 +125,7 @@ public class BST<T extends Comparable<T>> {
     return toStringHelper(root, 0);
   }
 
-  public String toStringHelper(Node<T> node, int depth) {
+  public String toStringHelper(Node node, int depth) {
     if (node == null) {
       return "";
     }
@@ -132,7 +144,7 @@ public class BST<T extends Comparable<T>> {
     return size;
   }
 
-  private boolean isLeaf(Node<T> node) {
+  private boolean isLeaf(Node node) {
     return node.left == null && node.right == null;
   }
 }

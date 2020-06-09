@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "CodeLens (Launch) - RandomTree",
+      "request": "launch",
+      "mainClass": "datastructures.tree.RandomTree",
+      "projectName": "java"
+    },
+    {
+      "type": "java",
       "name": "CodeLens (Launch) - BinarySearch",
       "request": "launch",
       "mainClass": "other.BinarySearch",
@@ -22,7 +29,7 @@
       "type": "java",
       "name": "Debug (Launch) - Current File",
       "request": "launch",
-      "mainClass": "${file}",
+      "mainClass": "${file}"
     },
     {
       "type": "java",
