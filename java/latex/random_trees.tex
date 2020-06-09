@@ -25,6 +25,18 @@ For a randomized tree, we can think of each node being indexed from 1 to $n$. Gi
 
 
 \section*{Time Complexity}
+
+\subsection*{Average Depth of a Perfectly Balanced Binary Tree}
+Suppose we have a perfectly balanced tree with $n = 2^{h+1} - 1$ nodes, where $h$ is the height of the tree. Then the sum of the depths of the nodes is
+\begin{align*}
+  \sum_{d=0}^h d 2^d &= h 2^{h+1} - 2^{h+1} + 2 \\
+  &= h(2^{h+1} - 1) - (2^{h+1} - 1) + h + 1 \\
+\end{align*}
+Dividing by the total number of nodes gives us an average depth of
+\[ \frac{h(2^{h+1} - 1) - (2^{h+1} - 1) + h + 1}{2^{h+1} - 1} = h - 1 + \frac{h+1}{2^{h+1} - 1} \]
+In the limit, we have $\lim_{h \rightarrow \infty} h - 1 + \frac{h+1}{2^{h+1} - 1} = h - 1 \in O(\log n)$.
+
+\subsection*{Average Depth of a Random Binary Tree}
 Suppose we have a set $S$ of $n$ random numbers that we insert in order into a binary tree. Let $X$ be a random variable representing the number of ancestors of node $x$, i.e., the depth of $x$. Let $X_i$ be a Bernoulli random variable equal to
 \[
   \begin{cases}
@@ -42,7 +54,9 @@ Then, $X = \sum_{i=1}^nX_i$, so $E[X] = \sum_{i=1}^nE[X_i] = \sum_{i=1}^nP(X_i=1
   &\leq 2H_n \\
   & \in O(\log n)
 \end{align*}
-
+The sum of the depths of all the nodes would be
+\[ \sum_{j=1}^n \left( \sum_{i=1}^{j-1} \frac{1}{i+1} + \sum_{i=j+1}^n \frac{1}{(i-j)+1} \right) = 2n(H_n-1)\]
+which agrees with the result above.
 
 
 
