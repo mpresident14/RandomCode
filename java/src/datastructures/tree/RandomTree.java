@@ -59,7 +59,7 @@ public class RandomTree<T extends Comparable<T>> {
 
   /*
    * Insert val as the root of the subtree currently rooted by node with
-   * probability 1 / (node.size + 1). With probaility node.size / (node.size + 1),
+   * probability 1 / (node.size + 1). With probability node.size / (node.size + 1),
    * recurse on the appropriate subtree. At least one of parent or node will be
    * non-null
    */
@@ -87,8 +87,9 @@ public class RandomTree<T extends Comparable<T>> {
   }
 
   /*
-   * Insert val as the root of the subtree currently rooted by node At least one
-   * of parent or node will be non-null
+   * Insert val as the root of the subtree currently rooted by node.
+   *
+   * - At least one of parent or node will be non-null
    */
   private boolean insertAt(T val, Node node, Node parent, boolean isLeftChild) {
     if (node == null) {
@@ -204,8 +205,10 @@ public class RandomTree<T extends Comparable<T>> {
     }
   }
 
-  /* Recurse to the left subtree until the left child is null.
-   * Also update the parent of the next inorder node */
+  /*
+   * Recurse to the left subtree until the left child is null. Also update the
+   * parent of the next inorder node
+   */
   private Node nextInorder(Node node) {
     if (node.right.left == null) {
       return node.right;
@@ -262,7 +265,7 @@ public class RandomTree<T extends Comparable<T>> {
     System.out.println("# nodes: " + root.size);
     System.out.println("Perfectly balanced avg depth (approx): " + pbAvgDepth);
     System.out.println("Avg depth: " + avgDepth);
-    System.out.println("Ratio: " + avgDepth/pbAvgDepth);
+    System.out.println("Ratio: " + avgDepth / pbAvgDepth);
   }
 
   private void statsRec(Node node, int depth, int[] acc) {
@@ -274,7 +277,6 @@ public class RandomTree<T extends Comparable<T>> {
       statsRec(node.right, depth + 1, acc);
     }
   }
-
 
   public static void main(String[] args) {
     RandomTree<Integer> rt = new RandomTree<>();
