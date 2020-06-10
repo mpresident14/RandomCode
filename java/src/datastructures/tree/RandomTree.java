@@ -1,13 +1,10 @@
 package datastructures.tree;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Random;
 
 public class RandomTree<T extends Comparable<T>> {
 
-  private static Random random = new Random();
+  private static Random random = new Random(5);
 
   private class Node {
     private T val;
@@ -49,182 +46,160 @@ public class RandomTree<T extends Comparable<T>> {
   }
 
   public boolean insert(T val) {
-    if (root == null) {
-      root = new Node(val);
-      return true;
-    } else {
-      return insertRandom(val, root, null, /* irrelevant */ false);
-    }
+    int oldSize = nodeSize(root);
+    root = insertRandom(val, root);
+    return root.size != oldSize;
   }
 
   /*
    * Insert val as the root of the subtree currently rooted by node with
-   * probability 1 / (node.size + 1). With probability node.size / (node.size + 1),
-   * recurse on the appropriate subtree. At least one of parent or node will be
-   * non-null
+   * probability 1 / (node.size + 1). With probability node.size / (node.size +
+   * 1), recurse on the appropriate subtree. At least one of parent or node will
+   * be non-null
    */
-  private boolean insertRandom(T val, Node node, Node parent, boolean isLeftChild) {
+  private Node insertRandom(T val, Node node) {
     if (node == null || random.nextInt(node.size + 1) == 0) {
-      return insertAt(val, node, parent, isLeftChild);
+      return insertAt(val, node);
     }
 
     int comp = val.compareTo(node.val);
     if (comp < 0) {
-      if (insertRandom(val, node.left, node, true)) {
-        ++node.size;
-        return true;
-      }
-      return false;
+      node.left = insertRandom(val, node.left);
+      updateSize(node);
+      return node;
     } else if (comp > 0) {
-      if (insertRandom(val, node.right, node, false)) {
-        ++node.size;
-        return true;
-      }
-      return false;
+      node.right = insertRandom(val, node.right);
+      updateSize(node);
+      return node;
     } else {
-      return false;
+      return node;
     }
   }
 
   /*
-   * Insert val as the root of the subtree currently rooted by node.
-   *
-   * - At least one of parent or node will be non-null
+   * Insert val as the root of the subtree and return the root of the updated
+   * subtree
    */
-  private boolean insertAt(T val, Node node, Node parent, boolean isLeftChild) {
+  private Node insertAt(T val, Node node) {
     if (node == null) {
-      if (isLeftChild) {
-        parent.left = new Node(val);
-      } else {
-        parent.right = new Node(val);
-      }
-      return true;
+      return new Node(val);
     }
 
     int comp = val.compareTo(node.val);
     if (comp < 0) {
-      // Insert as root of left subtree and rotate right
-      if (insertAt(val, node.left, node, true)) {
+      // Insert as root of left subtree and rotate right if
+      // it was inserted
+      Node newLeft = insertAt(val, node.left);
+      if (node.left != newLeft) {
+        node.left = newLeft;
         ++node.size;
-        rotateRight(node, parent);
-        return true;
+        return rotateRight(node); // newLeft
+      } else {
+        return node;
       }
-      return false;
     } else if (comp > 0) {
-      // Insert as root of right subtree and rotate left
-      if (insertAt(val, node.right, node, false)) {
+      // Insert as root of right subtree and rotate left if
+      // it was inserted
+      Node newRight = insertAt(val, node.right);
+      if (node.right != newRight) {
+        node.right = newRight;
         ++node.size;
-        rotateLeft(node, parent);
-        return true;
+        return rotateLeft(node); // newRight
+      } else {
+        return node;
       }
-      return false;
     } else {
       // Already in the set
-      return false;
+      return node;
     }
   }
 
   /*
-   * Rotate the subtree rooted at node to the left - node.right must be non-null
+   * Rotate the subtree rooted at node to the left and return the new root of the
+   * subtree
+   *
+   * - node.right must be non-null
    */
-  private void rotateLeft(Node node, Node parent) {
+  private Node rotateLeft(Node node) {
     Node newRoot = node.right;
     node.right = newRoot.left;
     newRoot.left = node;
-    if (parent == null) {
-      root = newRoot;
-    } else if (parent.left == node) {
-      parent.left = newRoot;
-    } else {
-      parent.right = newRoot;
-    }
 
-    node.size = 1 + (node.left == null ? 0 : node.left.size) + (node.right == null ? 0 : node.right.size);
-    newRoot.size = 1 + node.size + (newRoot.right == null ? 0 : newRoot.right.size);
+    updateSize(node);
+    updateSize(newRoot);
+
+    return newRoot;
   }
 
   /*
-   * Rotate the subtree rooted at node to the right - node.left must be non-null
+   * Rotate the subtree rooted at node to the right and return the new root of the
+   * subtree
+   *
+   * - node.left must be non-null
    */
-  private void rotateRight(Node node, Node parent) {
+  private Node rotateRight(Node node) {
     Node newRoot = node.left;
     node.left = newRoot.right;
     newRoot.right = node;
-    if (parent == null) {
-      root = newRoot;
-    } else if (parent.left == node) {
-      parent.left = newRoot;
-    } else {
-      parent.right = newRoot;
-    }
 
-    node.size = 1 + (node.left == null ? 0 : node.left.size) + (node.right == null ? 0 : node.right.size);
-    newRoot.size = 1 + node.size + (newRoot.left == null ? 0 : newRoot.left.size);
+    updateSize(node);
+    updateSize(newRoot);
+
+    return newRoot;
   }
+
 
   public boolean delete(T val) {
-    return deleteRec(val, root, null);
+    int oldSize = nodeSize(root);
+    root = deleteRec(val, root);
+    return oldSize != nodeSize(root);
   }
 
-  private boolean deleteRec(T val, Node node, Node parent) {
+  /*
+   * Deletes val from the subtree rooted at Node and returns the root of the
+   * resulting subtree
+   */
+  private Node deleteRec(T val, Node node) {
     if (node == null) {
-      return false;
+      return null;
     }
 
     int comp = val.compareTo(node.val);
     if (comp == 0) {
-      if (node.right == null) {
-        // node.right is null, so just slide left subtree up
-        if (parent == null) {
-          root = node.left;
-        } else if (node == parent.left) {
-          parent.left = node.left;
-        } else {
-          parent.right = node.left;
-        }
+      // This is the node to delete
+      if (node.left == null) {
+        // Just slide the right child up
+        return node.right;
+      } else if (node.right == null) {
+        // Just slide the left child up
+        return node.left;
       } else {
         // Find next inorder node and replace deleted node with it
-        Node nextInorder = nextInorder(node);
-        if (nextInorder != node.right) {
-          nextInorder.right = node.right;
-        }
-        nextInorder.left = node.left;
-        if (parent == null) {
-          root = nextInorder;
-        } else if (parent.left == node) {
-          parent.left = nextInorder;
-        } else {
-          parent.right = nextInorder;
-        }
+        T nextInorder = minValue(node.right);
+        node.val = nextInorder;
+        node.right = deleteRec(nextInorder, node.right);
       }
-      return true;
     } else if (comp < 0) {
-      return deleteRec(val, node.left, node);
+      node.left = deleteRec(val, node.left);
     } else {
-      return deleteRec(val, node.right, node);
+      node.right = deleteRec(val, node.right);
     }
+
+    updateSize(node);
+    return node;
   }
 
   /*
-   * Recurse to the left subtree until the left child is null. Also update the
-   * parent of the next inorder node
+   * Return the minimum value in the subtree rooted by node
    */
-  private Node nextInorder(Node node) {
-    if (node.right.left == null) {
-      return node.right;
+  private T minValue(Node node) {
+    Node current = node;
+    while (current.left != null) {
+      current = current.left;
     }
-
-    return nextInorderRec(node.right.left, node.right);
+    return current.val;
   }
 
-  private Node nextInorderRec(Node node, Node parent) {
-    if (node.left == null) {
-      parent.left = node.right;
-      return node;
-    } else {
-      return nextInorderRec(node.left, node);
-    }
-  }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
@@ -247,7 +222,15 @@ public class RandomTree<T extends Comparable<T>> {
   }
 
   public int size() {
-    return root == null ? 0 : root.size;
+    return nodeSize(root);
+  }
+
+  private void updateSize(Node node) {
+    node.size = 1 + nodeSize(node.left) + nodeSize(node.right);
+  }
+
+  private int nodeSize(Node node) {
+    return node == null ? 0 : node.size;
   }
 
   public void stats() {
