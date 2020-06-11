@@ -47,18 +47,13 @@ public class Treap<T extends Comparable<T>> {
   }
 
   public boolean insert(T val) {
-    double priority = random.nextDouble();
-    if (root == null) {
-      root = new Node(val, priority);
+    boolean[] inserted = new boolean[1];
+    root = insertAtPriority(val, random.nextDouble(), root, inserted);
+    if (inserted[0]) {
       ++this.size;
       return true;
-    } else {
-      if (insertAtPriority(val, priority, root, null, /* irrelevant */ false)) {
-        ++this.size;
-        return true;
-      }
-      return false;
     }
+    return false;
   }
 
   /*
@@ -67,142 +62,141 @@ public class Treap<T extends Comparable<T>> {
    *
    * - At least one of parent or node will be non-null
    */
-  private boolean insertAtPriority(T val, double priority, Node node, Node parent, boolean isLeftChild) {
-    // NOTE: Could be an issue if priority == node.priority, but not gonna worry about it
+  private Node insertAtPriority(T val, double priority, Node node, boolean[] inserted) {
+    // NOTE: Could be an issue if priority == node.priority, but not gonna worry
+    // about it
     if (node == null || priority > node.priority) {
-      return insertAt(val, priority, node, parent, isLeftChild);
+      return insertAt(val, priority, node, inserted);
     }
 
     int comp = val.compareTo(node.val);
     if (comp < 0) {
-      return insertAtPriority(val, priority, node.left, node, true);
+      node.left = insertAtPriority(val, priority, node.left, inserted);
     } else if (comp > 0) {
-      return insertAtPriority(val, priority, node.right, node, false);
-    } else {
-      // Already in the set
-      return false;
+      node.right = insertAtPriority(val, priority, node.right, inserted);
     }
+    return node;
   }
 
   /*
-   * Insert val as the root of the subtree currently rooted by node.
-   *
-   * - At least one of parent or node will be non-null
+   * Insert val as the root of the subtree and return the root of the updated
+   * subtree
    */
-  private boolean insertAt(T val, double priority, Node node, Node parent, boolean isLeftChild) {
+  private Node insertAt(T val, double priority, Node node, boolean[] inserted) {
     if (node == null) {
-      if (isLeftChild) {
-        parent.left = new Node(val, priority);
-      } else {
-        parent.right = new Node(val, priority);
-      }
-      return true;
+      inserted[0] = true;
+      return new Node(val, priority);
     }
 
     int comp = val.compareTo(node.val);
     if (comp < 0) {
-      // Insert as root of left subtree and rotate right
-      if (insertAt(val, priority, node.left, node, true)) {
-        rotateRight(node, parent);
-        return true;
+      // Insert as root of left subtree and rotate right if
+      // it was inserted
+      Node newLeft = insertAt(val, priority, node.left, inserted);
+      if (node.left != newLeft) {
+        node.left = newLeft;
+        return rotateRight(node); // newLeft
+      } else {
+        return node;
       }
-      return false;
     } else if (comp > 0) {
-      // Insert as root of right subtree and rotate left
-      if (insertAt(val, priority, node.right, node, false)) {
-        rotateLeft(node, parent);
-        return true;
+      // Insert as root of right subtree and rotate left if
+      // it was inserted
+      Node newRight = insertAt(val, priority, node.right, inserted);
+      if (node.right != newRight) {
+        node.right = newRight;
+        return rotateLeft(node); // newRight
+      } else {
+        return node;
       }
-      return false;
     } else {
       // Already in the set
-      return false;
+      return node;
     }
   }
 
   public boolean delete(T val) {
-    if (deleteRec(val, root, null)) {
+    boolean[] deleted = new boolean[1];
+    root = deleteRec(val, root, deleted);
+    if (deleted[0]) {
       --this.size;
       return true;
     }
     return false;
   }
 
-  private boolean deleteRec(T val, Node node, Node parent) {
+  /*
+   * Delete val from the subtree with node at the root and return the root of the
+   * updated subtree
+   */
+  private Node deleteRec(T val, Node node, boolean[] deleted) {
     if (node == null) {
-      return false;
+      return node;
     }
 
     int comp = val.compareTo(node.val);
     if (comp == 0) {
-      deleteAtLeaf(node, parent);
-      return true;
+      deleted[0] = true;
+      return deleteAtLeaf(node);
     } else if (comp < 0) {
-      return deleteRec(val, node.left, node);
+      node.left = deleteRec(val, node.left, deleted);
+      return node;
     } else {
-      return deleteRec(val, node.right, node);
+      node.right = deleteRec(val, node.right, deleted);
+      return node;
     }
   }
 
   /**
-   * Rotate node all the way to leaf and delete it while maintaining the heap
+   * Rotate the subtree currently rooted at node while maintaining the heap
+   * structure. If node is a leaf, returns null (deletes it)
    */
-  private void deleteAtLeaf(Node node, Node parent) {
+  private Node deleteAtLeaf(Node node) {
     if (node.left == null && node.right == null) {
       // We are deleting a leaf node
-      if (parent == null) {
-        root = null;
-      } else if (node == parent.left) {
-        parent.left = null;
-      } else {
-        parent.right = null;
-      }
+      return null;
     } else {
       // Rotate max priority child to the root of the subtree, which pushes node
       // towards the leaves
       boolean leftChildHigher = node.right == null || (node.left != null && node.left.priority > node.right.priority);
       if (leftChildHigher) {
-        Node newParent = node.left;
-        rotateRight(node, parent);
-        deleteAtLeaf(node, newParent);
+        Node newRoot = rotateRight(node);
+        newRoot.right = deleteAtLeaf(node);
+        return newRoot;
       } else {
-        Node newParent = node.right;
-        rotateLeft(node, parent);
-        deleteAtLeaf(node, newParent);
+        Node newRoot = rotateLeft(node);
+        newRoot.left = deleteAtLeaf(node);
+        return newRoot;
       }
     }
   }
 
   /*
-   * Rotate the subtree rooted at node to the left - node.right must be non-null
+   * Rotate the subtree rooted at node to the left and return the new root of the
+   * subtree
+   *
+   * - node.right must be non-null
    */
-  private void rotateLeft(Node node, Node parent) {
+  private Node rotateLeft(Node node) {
     Node newRoot = node.right;
     node.right = newRoot.left;
     newRoot.left = node;
-    if (parent == null) {
-      root = newRoot;
-    } else if (parent.left == node) {
-      parent.left = newRoot;
-    } else {
-      parent.right = newRoot;
-    }
+
+    return newRoot;
   }
 
   /*
-   * Rotate the subtree rooted at node to the right - node.left must be non-null
+   * Rotate the subtree rooted at node to the right and return the new root of the
+   * subtree
+   *
+   * - node.left must be non-null
    */
-  private void rotateRight(Node node, Node parent) {
+  private Node rotateRight(Node node) {
     Node newRoot = node.left;
     node.left = newRoot.right;
     newRoot.right = node;
-    if (parent == null) {
-      root = newRoot;
-    } else if (parent.left == node) {
-      parent.left = newRoot;
-    } else {
-      parent.right = newRoot;
-    }
+
+    return newRoot;
   }
 
   public String toString() {

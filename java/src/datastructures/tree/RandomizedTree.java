@@ -2,7 +2,7 @@ package datastructures.tree;
 
 import java.util.Random;
 
-public class RandomTree<T extends Comparable<T>> {
+public class RandomizedTree<T extends Comparable<T>> {
 
   private static Random random = new Random(5);
 
@@ -66,14 +66,11 @@ public class RandomTree<T extends Comparable<T>> {
     if (comp < 0) {
       node.left = insertRandom(val, node.left);
       updateSize(node);
-      return node;
     } else if (comp > 0) {
       node.right = insertRandom(val, node.right);
       updateSize(node);
-      return node;
-    } else {
-      return node;
     }
+    return node;
   }
 
   /*
@@ -262,7 +259,7 @@ public class RandomTree<T extends Comparable<T>> {
   }
 
   public static void main(String[] args) {
-    RandomTree<Integer> rt = new RandomTree<>();
+    RandomizedTree<Integer> rt = new RandomizedTree<>();
     Random random = new Random();
     for (int i = 0; i < 100000; ++i) {
       rt.insert(random.nextInt());

@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
-public class RandomTreeTest {
+public class RandomizedTreeTest {
 
   private static List<Integer> L1 = Arrays.asList(7, 4, 3, 2, 9, 12);
   private static List<Integer> L2 = Arrays.asList(-4, 7, 9, 3, 5, 19, 11);
@@ -20,11 +20,11 @@ public class RandomTreeTest {
     Collections.shuffle(L2_SHUF);
   }
 
-  private RandomTree<Integer> tree;
+  private RandomizedTree<Integer> tree;
 
   @Before
   public void setUp() {
-    tree = new RandomTree<>();
+    tree = new RandomizedTree<>();
   }
 
   @Test
