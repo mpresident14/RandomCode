@@ -16,11 +16,6 @@ public class BST<T extends Comparable<T>> {
   Node root;
   int size;
 
-  public BST() {
-    this.root = null;
-    this.size = 0;
-  }
-
   public void insert(Iterable<? extends T> iterable) {
     for (T value : iterable) {
       insert(value);
@@ -59,65 +54,58 @@ public class BST<T extends Comparable<T>> {
     }
   }
 
-  public boolean delete(T value) {
-    boolean isDeleted = delete(value, root, null);
-    if (isDeleted) {
-      this.size--;
+  public boolean delete(T val) {
+    boolean[] deleted = new boolean[1];
+    root = deleteRec(val, root, deleted);
+    if (deleted[0]) {
+      --this.size;
     }
-    return isDeleted;
+    return deleted[0];
   }
 
-  private boolean delete(T value, Node current, Node parent) {
-    if (current == null) {
-      return false;
+  /*
+   * Deletes val from the subtree rooted at Node and returns the root of the
+   * resulting subtree
+   */
+  private Node deleteRec(T val, Node node, boolean[] deleted) {
+    if (node == null) {
+      return null;
     }
 
-    int comp = value.compareTo(current.val);
+    int comp = val.compareTo(node.val);
     if (comp == 0) {
-      // Node to remove is a leaf, just remove it
-      if (isLeaf(current)) {
-        setParentChildToNodeChild(parent, current, null);
-        return true;
+      // This is the node to delete
+      deleted[0] = true;
+      if (node.left == null) {
+        // Just slide the right child up
+        return node.right;
+      } else if (node.right == null) {
+        // Just slide the left child up
+        return node.left;
+      } else {
+        // Find next inorder node and replace deleted node with it
+        T nextInorder = minValue(node.right);
+        node.val = nextInorder;
+        node.right = deleteRec(nextInorder, node.right, deleted);
       }
-
-      // Node to remove has one child, set parent to child
-      if (current.left == null) {
-        setParentChildToNodeChild(parent, current, current.right);
-        return true;
-      }
-      if (current.right == null) {
-        setParentChildToNodeChild(parent, current, current.left);
-        return true;
-      }
-
-      // If node to remove has two children, find inorder successor (right
-      // once, then continuously left), copy it into the place of node to be
-      // removed, and delete inorder successor. This could equivalently be
-      // done with inorder predecessor: left once, then continuously right.
-      Node nextInorderParent = current;
-      Node nextInorder = current.right;
-      while (nextInorder.left != null) {
-        nextInorderParent = nextInorder;
-        nextInorder = nextInorder.left;
-      }
-      current.val = nextInorder.val;
-      return delete(nextInorder.val, nextInorder, nextInorderParent);
-
-      } else if (comp < 0) {
-      return delete(value, current.left, current);
+    } else if (comp < 0) {
+      node.left = deleteRec(val, node.left, deleted);
     } else {
-      return delete(value, current.right, current);
+      node.right = deleteRec(val, node.right, deleted);
     }
+
+    return node;
   }
 
-  private void setParentChildToNodeChild(Node parent, Node node, Node nodeChild) {
-    if (parent == null) {
-      this.root = nodeChild;
-    } else if (parent.left != null && parent.left.val.equals(node.val)) {
-      parent.left = nodeChild;
-    } else {
-      parent.right = nodeChild;
+  /*
+   * Return the minimum value in the subtree rooted by node
+   */
+  private T minValue(Node node) {
+    Node current = node;
+    while (current.left != null) {
+      current = current.left;
     }
+    return current.val;
   }
 
   public String toString() {
@@ -141,9 +129,5 @@ public class BST<T extends Comparable<T>> {
 
   public int size() {
     return size;
-  }
-
-  private boolean isLeaf(Node node) {
-    return node.left == null && node.right == null;
   }
 }
