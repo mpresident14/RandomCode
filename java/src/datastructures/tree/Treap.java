@@ -227,12 +227,11 @@ public class Treap<T extends Comparable<T>> {
 
     int[] acc = new int[1];
     statsRec(root, 0, acc);
-    double pbHeight = Math.floor(Math.log(this.size) / Math.log(2));
-    double pbAvgDepth = pbHeight - 1 + (pbHeight + 1) / ((1 << ((long) pbHeight + 1)) - 1);
 
+    double pbAvgDepth = TreeUtils.pbAvgDepth(this.size);
     double avgDepth = acc[0] * 1.0 / this.size;
     System.out.println("# nodes: " + this.size);
-    System.out.println("Perfectly balanced avg depth (approx): " + pbAvgDepth);
+    System.out.println("Perfectly balanced avg depth: " + pbAvgDepth);
     System.out.println("Avg depth: " + avgDepth);
     System.out.println("Ratio: " + avgDepth / pbAvgDepth);
   }

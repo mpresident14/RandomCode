@@ -238,9 +238,8 @@ public class RandomizedTree<T extends Comparable<T>> {
 
     int[] acc = new int[1];
     statsRec(root, 0, acc);
-    double pbHeight = Math.floor(Math.log(root.size) / Math.log(2));
-    double pbAvgDepth = pbHeight - 1 + (pbHeight + 1) / ((1 << ((long) pbHeight + 1)) - 1);
 
+    double pbAvgDepth = TreeUtils.pbAvgDepth(root.size);
     double avgDepth = acc[0] * 1.0 / root.size;
     System.out.println("# nodes: " + root.size);
     System.out.println("Perfectly balanced avg depth (approx): " + pbAvgDepth);
@@ -257,6 +256,8 @@ public class RandomizedTree<T extends Comparable<T>> {
       statsRec(node.right, depth + 1, acc);
     }
   }
+
+
 
   public static void main(String[] args) {
     RandomizedTree<Integer> rt = new RandomizedTree<>();
