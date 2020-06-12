@@ -24,8 +24,6 @@ The first part of insertion is the same as inserting into a regular BST. However
 
 Now, suppose that inserting a node $v$ caused an imbalance. Let $z$ be the first node on the path from $v$ to the root that was imbalanced. Let $y$ be the child of $z$ on that path and $x$ be the grandchild of $z$ on that path. Since $z$ became imbalanced, we know the $h(y)$ increased and therefore the $h(x)$ increased as well. Suppose originally $h(x) = m$. There are 4 cases:
 
-% PICTURE
-
 \begin{enumerate}
   \item LL: $y$ is the left child of $z$ and $x$ is the left child of $y$.
 
@@ -62,6 +60,42 @@ Now, suppose that inserting a node $v$ caused an imbalance. Let $z$ be the first
 
 \end{enumerate}
 
+\section*{Deletion}
+The first part of deletion is the same as deleting from a regular BST. However, deletion may cause one or more nodes in the tree to become imbalanced. Let $z$ be the first imbalanced ancestor of the deleted node. Again, $z$ must have a height of at least 2 to have an imbalance. Let $y$ be the child of $z$ of greater height and $x$ be the child of $y$ with greater height (the left one if they are equal). Note that since $z$ became imbalanced, $y$ cannot be in the subtree we just deleted from. There are 4 cases:
+
+\begin{enumerate}
+  \item LL: $y$ is the left child of $z$ and $x$ is the left child of $y$.
+
+  \begin{figure}[h]
+    \centering
+    \includegraphics[trim=50 50 150 40, clip,scale=0.33]{pics/avl_delete_ll1}
+    \includegraphics[trim=250 50 50 40, clip,scale=0.33]{pics/avl_delete_ll2}
+  \end{figure}
+
+  Suppose $h(z_R) = m$ before the deletion. Since $z$ became imbalanced, $h(z_R)$ must have decreased as a result of the deletion, so $h(z_R) = m-1$ after. Also since $z$ became imbalanced, $h(y) = m+1$. We know $h(x) \geq h(y_R)$, so since $y$ is balanced, $h(x) = m$ and $h(y_R) = m$ or $m-1$.
+
+  After the rotation, we can see that all the nodes are balanced. However, note that the height of the subtree may have changed from $m+2$ to $m+1$ from before the deletion to after the rotation. This means one of $z$'s ancestors may have become imbalanced. Unlike insertion, we must check all the ancestors and balance them if necessary.
+
+
+
+  \item RR: $y$ is the right child of $z$ and $x$ is the right child of $y$. This is analogous to the previous case.
+
+  \item LR: $y$ is the left child of $z$ and $x$ is the right child of $y$.
+
+  Suppose $h(z_R) = m$ before the deletion. By the same logic as in the first case, we have $h(z_R) = m-1$ after the deletion and $h(y) = m+1$. We know $h(x) > h(y_L)$, so since $y$ is balanced, $h(x) = m$ and $h(y_L) = m-1$. Since $x$ is balanced, $h(x_L)$ and $h(x_R)$ are $m-1$ or $m-2$.
+
+  After the rotation, we can see that all the nodes are balanced, but again, the height of the subtree has changed, so we must check all the ancestors.
+
+  \begin{figure}[h]
+  \centering
+    \includegraphics[trim=50 0 150 40, clip,scale=0.33]{pics/avl_insert_lr1}\\
+    \includegraphics[trim=0 0 250 40, clip,scale=0.33]{pics/avl_insert_lr2}
+    \includegraphics[trim=50 50 50 40, clip,scale=0.33]{pics/avl_insert_lr3}
+  \end{figure}
+
+  \item RL: $y$ is the right child of $z$ and $x$ is the left child of $y$. This is analogous to the previous case.
+
+\end{enumerate}
 
 \section*{Time Complexity}
 
