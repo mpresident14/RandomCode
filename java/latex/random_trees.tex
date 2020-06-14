@@ -17,11 +17,11 @@
 
 
 \section*{Description}
-We prove below that given a set of $n$ random integers, we can insert them in order into a binary search tree and the expected depth of a node will be $O(\log n)$. This is known as a \emph{random tree}. However, in practice, we don't have all the values that we want to put into the tree up front. For both randomized trees and treaps, the goal is to simulate a random tree by inserting the value at a random index in the existing set of values while using rotations to maintain the search constraints.
+We prove below that given a set of $n$ random integers, we can insert them in order into a binary search tree and the expected depth of a node will be $O(\log n)$. This is known as a \emph{random tree}. However, in practice, we don't have all the values that we want to put into the tree up front. For both randomized trees and treaps, the goal is to simulate a random tree by inserting the value at a random index in the existing set of values while using rotations to maintain the search constraints. Essentially, we ask, ``what is the probability that the node would be at this spot in the tree given a random permutation of node insertion order?"
 
 Treaps randomly generate a priority for each node and maintain the heap property among the priorities in addition to the search constraints. An equivalent way of describing the treap is that it could be formed by inserting the nodes highest-priority-first into a binary search tree without doing any rebalancing. Since, we generate each priority randomly when adding a node, treap insertion simulates putting a value at a random index in the set.
 
-For a randomized tree, we can think of each node being indexed from 1 to $n$. Given a tree with $n$ nodes, the $n+1^{th}$ node would have had a $\frac{1}{n+1}$ chance of being at index 1 (the root).
+For randomized trees, we can think of the nodes as being indexed from 1 to $n$. Given a tree with $n$ nodes, the $n+1^{th}$ node would have had a $\frac{1}{n+1}$ chance of being at index 1 (the root). If it is not the root and is less than the current root, then it is has a $\frac{1}{\ell+1}$ of being in the left subtree, where $\ell$ is the size of the left subtree. The same goes for the right subtree if the value is larger.
 
 
 \section*{Time Complexity}

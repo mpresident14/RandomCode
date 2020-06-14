@@ -27,10 +27,11 @@ Now, suppose that inserting a node $v$ caused an imbalance. Let $z$ be the first
 \begin{enumerate}
   \item LL: $y$ is the left child of $z$ and $x$ is the left child of $y$.
 
-  \begin{figure}
+  \begin{figure}[h!]
     \centering
     \includegraphics[trim=50 50 150 40, clip,scale=0.33]{pics/avl_insert_ll1}
     \includegraphics[trim=250 50 50 40, clip,scale=0.33]{pics/avl_insert_ll2}
+    \caption{LL rotation on insertion}
   \end{figure}
 
   Since $h(x)$ was $m$, that means $h(y_R)$ be $m-1, m$, or $m+1$, since $y$ was balanced. After the insertion $h(x) = m+1$. Now, $y$ is still balanced, so $h(y_R) \neq m-1$. Since $h(y)$ increased, $h(y_R) \neq m+1$. Therefore, $h(y_R) = m$. Thus, $h(y)$ increased from $m+1$ to $m+2$.
@@ -41,11 +42,12 @@ Now, suppose that inserting a node $v$ caused an imbalance. Let $z$ be the first
 
   \item LR: $y$ is the left child of $z$ and $x$ is the right child of $y$.
 
-  \begin{figure}
+  \begin{figure}[h!]
   \centering
     \includegraphics[trim=50 0 150 40, clip,scale=0.33]{pics/avl_insert_lr1}\\
     \includegraphics[trim=0 0 250 40, clip,scale=0.33]{pics/avl_insert_lr2}
     \includegraphics[trim=50 50 50 40, clip,scale=0.33]{pics/avl_insert_lr3}
+    \caption{LR rotation on insertion}
   \end{figure}
 
   Since $h(x)$ was $m$, that means $h(y_L)$ can be $m-1, m$, or $m+1$, since $y$ was balanced. After the insertion $h(x) = m+1$. Now, $y$ is still balanced, so $h(y_L) \neq m-1$. Since $h(y)$ increased, $h(y_L) \neq m+1$. Therefore, $h(y_L) = m$. Thus, $h(y)$ increased from $m+1$ to $m+2$.
@@ -66,10 +68,11 @@ The first part of deletion is the same as deleting from a regular BST. However, 
 \begin{enumerate}
   \item LL: $y$ is the left child of $z$ and $x$ is the left child of $y$.
 
-  \begin{figure}[h]
+  \begin{figure}[h!]
     \centering
     \includegraphics[trim=50 50 150 40, clip,scale=0.33]{pics/avl_delete_ll1}
     \includegraphics[trim=250 50 50 40, clip,scale=0.33]{pics/avl_delete_ll2}
+    \caption{LL rotation on deletion}
   \end{figure}
 
   Suppose $h(z_R) = m$ before the deletion. Since $z$ became imbalanced, $h(z_R)$ must have decreased as a result of the deletion, so $h(z_R) = m-1$ after. Also since $z$ became imbalanced, $h(y) = m+1$. We know $h(x) \geq h(y_R)$, so since $y$ is balanced, $h(x) = m$ and $h(y_R) = m$ or $m-1$.
@@ -86,11 +89,12 @@ The first part of deletion is the same as deleting from a regular BST. However, 
 
   After the rotation, we can see that all the nodes are balanced, but again, the height of the subtree has changed, so we must check all the ancestors.
 
-  \begin{figure}[h]
+  \begin{figure}[h!]
   \centering
     \includegraphics[trim=50 0 150 40, clip,scale=0.33]{pics/avl_insert_lr1}\\
     \includegraphics[trim=0 0 250 40, clip,scale=0.33]{pics/avl_insert_lr2}
     \includegraphics[trim=50 50 50 40, clip,scale=0.33]{pics/avl_insert_lr3}
+    \caption{LR rotation on deletion}
   \end{figure}
 
   \item RL: $y$ is the right child of $z$ and $x$ is the left child of $y$. This is analogous to the previous case.
@@ -98,7 +102,15 @@ The first part of deletion is the same as deleting from a regular BST. However, 
 \end{enumerate}
 
 \section*{Time Complexity}
+Given a height $h$, let $T_h$ be the AVL tree with the fewest possible number of nodes. Since $h$ is the asymptotic time it takes for each one of an AVL tree's methods, $T_h$ has the worst possible runtimes as a function of the number of nodes. We can see that $T_0 = 0$ and $T_1 = 1$, and in general $T_h$ has a root with $T_{h-1}$ and $T_{h-2}$ as subtrees.
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{pics/avl_time} \\
+  \caption{Worst-case AVL tree of height 4}
+\end{figure}
 
+Letting $N_h$ be the number of nodes in $T_h$, we have $N_h = N_{h-1} + N_{h-2} + 1$. Solving the recurrence relations yields $N_h = \frac{1}{2}\left(3F_h + L_h + 2\right)$, where $F_h$ and $L_h$ are the $h^{th}$ Fibonacci and Lucas numbers, respectively. We know $F_n = \frac{1}{\sqrt{5}}\left( \phi^n - \overline{\phi}^n \right)$ and $L_n = \phi^n + \overline{\phi}^n $, where $\phi$ is the golden ratio and $\overline{\phi} = 1 - \phi$. Therefore, $N_h \in O(\phi^h)$. So, our worst case runtime on an AVL tree of height $h$ occurs when the tree has about $\phi^h$ nodes. So, the runtime is $O(h) = O(\log_{\phi}n)$.
+We can see that $\log_{\phi}n = \frac{\log_2 n}{\log_2 \phi} \approx 1.44 \log_2 n$, so the worst-case AVL lookup time is about 1.44 times worse than a perfectly balanced tree.
 
 
 
