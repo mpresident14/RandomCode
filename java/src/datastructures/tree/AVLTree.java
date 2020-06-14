@@ -2,7 +2,7 @@ package datastructures.tree;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
+import java.util.Random;
 
 public class AVLTree<T extends Comparable<T>> {
   private class Node {
@@ -23,21 +23,47 @@ public class AVLTree<T extends Comparable<T>> {
   private Node root;
   private long size;
 
+  public boolean contains(T val) {
+    return containsRec(val, root);
+  }
+
+  private boolean containsRec(T val, Node node) {
+    if (node == null) {
+      return false;
+    }
+
+    int comp = val.compareTo(node.val);
+    if (comp == 0) {
+      return true;
+    } else if (comp < 0) {
+      return containsRec(val, node.left);
+    } else {
+      return containsRec(val, node.right);
+    }
+  }
+
+  public void insertAll(Iterable<? extends T> iterable) {
+    for (T value : iterable) {
+      insert(value);
+    }
+  }
+
   boolean insert(T val) {
     List<Node> path = new ArrayList<>();
-    path.add(root);
     root = insertRec(val, root, path);
+    path.add(root);
 
-    int pathLen = path.size();
-    if (path.get(pathLen - 1) == null) {
+    if (path.get(0) == null) {
       return false;
     }
 
 
-    for (int i = pathLen - 1; i >= 0; --i) {
+    int pathLen = path.size();
+    // Find first imbalanced node on path from leaf to root
+    for (int i = 2; i < pathLen; ++i) {
       Node node = path.get(i);
       if (!node.isBalanced()) {
-        insertRebalance(node, path.get(i+1), path.get(i+2));
+        insertRebalance(node, path.get(i-1), path.get(i-2));
         break;
       }
     }
@@ -71,7 +97,19 @@ public class AVLTree<T extends Comparable<T>> {
 
 
   void insertRebalance(Node z, Node y, Node x) {
-
+    if (z.left == y) {
+      if (y.left == x) {
+        rotateLL(z);
+      } else {
+        rotateLR(z);
+      }
+    } else {
+      if (y.left == x) {
+        rotateRL(z);
+      } else {
+        rotateRR(z);
+      }
+    }
   }
 
 
@@ -104,14 +142,76 @@ public class AVLTree<T extends Comparable<T>> {
   }
 
   private Node rotateLR(Node node) {
-    return null;
+    node.left = rotateRR(node.left);
+    return rotateLL(node);
   }
 
   private Node rotateRL(Node node) {
-    return null;
+    node.right = rotateLL(node.right);
+    return rotateRR(node);
   }
 
   private long nodeHeight(Node node) {
     return node == null ? 0 : node.height;
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    printSubtree(root, 0, sb);
+    return sb.toString();
+  }
+
+  private void printSubtree(Node node, int depth, StringBuilder sb) {
+    for (int i = 0; i < depth; ++i) {
+      sb.append("  ");
+    }
+    if (node == null) {
+      sb.append("null\n");
+    } else {
+      sb.append(node.val.toString());
+      sb.append('\n');
+      printSubtree(node.left, depth + 1, sb);
+      printSubtree(node.right, depth + 1, sb);
+    }
+  }
+
+  public void stats() {
+    if (root == null) {
+      System.out.println("Tree is empty, no stats");
+      return;
+    }
+
+    int[] acc = new int[1];
+    statsRec(root, 0, acc);
+
+    double pbAvgDepth = TreeUtils.pbAvgDepth(this.size);
+    double avgDepth = acc[0] * 1.0 / this.size;
+    System.out.println("# nodes: " + this.size);
+    System.out.println("Perfectly balanced avg depth: " + pbAvgDepth);
+    System.out.println("Avg depth: " + avgDepth);
+    System.out.println("Ratio: " + avgDepth / pbAvgDepth);
+  }
+
+  private void statsRec(Node node, int depth, int[] acc) {
+    acc[0] += depth;
+    if (node.left != null) {
+      statsRec(node.left, depth + 1, acc);
+    }
+    if (node.right != null) {
+      statsRec(node.right, depth + 1, acc);
+    }
+  }
+
+  public long size() {
+    return this.size;
+  }
+
+  public static void main(String[] args) {
+    AVLTree<Integer> avl = new AVLTree<>();
+    Random random = new Random();
+    for (int i = 0; i < 100000; ++i) {
+      avl.insert(random.nextInt());
+    }
+    avl.stats();
   }
 }
