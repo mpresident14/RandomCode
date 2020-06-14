@@ -16,9 +16,6 @@
 \maketitle
 
 
-\section*{Description}
-
-
 \section*{Insertion}
 The first part of insertion is the same as inserting into a regular BST. However, inserting may cause one or more nodes in the tree to become imbalanced. Note that when we insert a value, the only nodes whose heights change are the ancestors of the node that we inserted. So, if inserting a node causes imbalance, the inserted value must have at least two ancestors (otherwise the length of the path from the root to the inserted node has increased to at most 1, which cannot cause an imbalance since this would require a height of -1 in the other subtree).
 
