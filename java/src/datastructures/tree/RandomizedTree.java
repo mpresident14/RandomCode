@@ -2,51 +2,22 @@ package datastructures.tree;
 
 import java.util.Random;
 
-public class RandomizedTree<T extends Comparable<T>> {
+public class RandomizedTree<T extends Comparable<T>> extends BST<T, RandomizedTree<T>.Node> {
 
-  private static Random random = new Random(5);
+  private static Random random = new Random();
 
-  private class Node {
-    private T val;
-    private int size;
-    private Node left;
-    private Node right;
+  class Node extends BST<T, Node>.Node {
+    private long size;
 
     Node(T val) {
-      this.val = val;
+      super(val);
       this.size = 1;
     }
   }
 
-  private Node root;
-
-  public boolean contains(T val) {
-    return containsRec(val, root);
-  }
-
-  private boolean containsRec(T val, Node node) {
-    if (node == null) {
-      return false;
-    }
-
-    int comp = val.compareTo(node.val);
-    if (comp == 0) {
-      return true;
-    } else if (comp < 0) {
-      return containsRec(val, node.left);
-    } else {
-      return containsRec(val, node.right);
-    }
-  }
-
-  public void insertAll(Iterable<? extends T> iterable) {
-    for (T value : iterable) {
-      insert(value);
-    }
-  }
-
+  @Override
   public boolean insert(T val) {
-    int oldSize = nodeSize(root);
+    long oldSize = nodeSize(root);
     root = insertRandom(val, root);
     return root.size != oldSize;
   }
@@ -58,7 +29,7 @@ public class RandomizedTree<T extends Comparable<T>> {
    * be non-null
    */
   private Node insertRandom(T val, Node node) {
-    if (node == null || random.nextInt(node.size + 1) == 0) {
+    if (node == null || random.nextLong() % (node.size + 1) == 0) {
       return insertAt(val, node);
     }
 
@@ -111,43 +82,9 @@ public class RandomizedTree<T extends Comparable<T>> {
     }
   }
 
-  /*
-   * Rotate the subtree rooted at node to the left and return the new root of the
-   * subtree
-   *
-   * - node.right must be non-null
-   */
-  private Node rotateLeft(Node node) {
-    Node newRoot = node.right;
-    node.right = newRoot.left;
-    newRoot.left = node;
-
-    updateSize(node);
-    updateSize(newRoot);
-
-    return newRoot;
-  }
-
-  /*
-   * Rotate the subtree rooted at node to the right and return the new root of the
-   * subtree
-   *
-   * - node.left must be non-null
-   */
-  private Node rotateRight(Node node) {
-    Node newRoot = node.left;
-    node.left = newRoot.right;
-    newRoot.right = node;
-
-    updateSize(node);
-    updateSize(newRoot);
-
-    return newRoot;
-  }
-
-
+  @Override
   public boolean delete(T val) {
-    int oldSize = nodeSize(root);
+    long oldSize = nodeSize(root);
     root = deleteRec(val, root);
     return oldSize != nodeSize(root);
   }
@@ -186,39 +123,24 @@ public class RandomizedTree<T extends Comparable<T>> {
     return node;
   }
 
-  /*
-   * Return the minimum value in the subtree rooted by node
-   */
-  private T minValue(Node node) {
-    Node current = node;
-    while (current.left != null) {
-      current = current.left;
-    }
-    return current.val;
+  @Override
+  protected Node rotateLeft(Node node) {
+    Node newRoot = super.rotateLeft(node);
+    updateSize(node);
+    updateSize(newRoot);
+    return newRoot;
   }
 
-
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    printSubtree(root, 0, sb);
-    return sb.toString();
+  @Override
+  protected Node rotateRight(Node node) {
+    Node newRoot = super.rotateRight(node);
+    updateSize(node);
+    updateSize(newRoot);
+    return newRoot;
   }
 
-  private void printSubtree(Node node, int depth, StringBuilder sb) {
-    for (int i = 0; i < depth; ++i) {
-      sb.append("  ");
-    }
-    if (node == null) {
-      sb.append("null\n");
-    } else {
-      sb.append(node.val.toString());
-      sb.append('\n');
-      printSubtree(node.left, depth + 1, sb);
-      printSubtree(node.right, depth + 1, sb);
-    }
-  }
-
-  public int size() {
+  @Override
+  public long size() {
     return nodeSize(root);
   }
 
@@ -226,38 +148,9 @@ public class RandomizedTree<T extends Comparable<T>> {
     node.size = 1 + nodeSize(node.left) + nodeSize(node.right);
   }
 
-  private int nodeSize(Node node) {
+  private long nodeSize(Node node) {
     return node == null ? 0 : node.size;
   }
-
-  public void stats() {
-    if (root == null) {
-      System.out.println("Tree is empty, no stats");
-      return;
-    }
-
-    int[] acc = new int[1];
-    statsRec(root, 0, acc);
-
-    double pbAvgDepth = TreeUtils.pbAvgDepth(root.size);
-    double avgDepth = acc[0] * 1.0 / root.size;
-    System.out.println("# nodes: " + root.size);
-    System.out.println("Perfectly balanced avg depth (approx): " + pbAvgDepth);
-    System.out.println("Avg depth: " + avgDepth);
-    System.out.println("Ratio: " + avgDepth / pbAvgDepth);
-  }
-
-  private void statsRec(Node node, int depth, int[] acc) {
-    acc[0] += depth;
-    if (node.left != null) {
-      statsRec(node.left, depth + 1, acc);
-    }
-    if (node.right != null) {
-      statsRec(node.right, depth + 1, acc);
-    }
-  }
-
-
 
   public static void main(String[] args) {
     RandomizedTree<Integer> rt = new RandomizedTree<>();

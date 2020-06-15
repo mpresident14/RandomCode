@@ -2,49 +2,17 @@ package datastructures.tree;
 
 import java.util.Random;
 
-public class Treap<T extends Comparable<T>> {
-
-  private static Random random = new Random();
-
-  private class Node {
-    private T val;
+public class Treap<T extends Comparable<T>> extends BST<T, Treap<T>.Node> {
+  class Node extends BST<T, Node>.Node {
     private double priority;
-    private Node left;
-    private Node right;
 
     Node(T val, double priority) {
-      this.val = val;
+      super(val);
       this.priority = priority;
     }
   }
 
-  private Node root;
-  private long size;
-
-  public boolean contains(T val) {
-    return containsRec(val, root);
-  }
-
-  private boolean containsRec(T val, Node node) {
-    if (node == null) {
-      return false;
-    }
-
-    int comp = val.compareTo(node.val);
-    if (comp == 0) {
-      return true;
-    } else if (comp < 0) {
-      return containsRec(val, node.left);
-    } else {
-      return containsRec(val, node.right);
-    }
-  }
-
-  public void insertAll(Iterable<? extends T> iterable) {
-    for (T value : iterable) {
-      insert(value);
-    }
-  }
+  private static Random random = new Random();
 
   public boolean insert(T val) {
     boolean[] inserted = new boolean[1];
@@ -115,6 +83,7 @@ public class Treap<T extends Comparable<T>> {
     }
   }
 
+  @Override
   public boolean delete(T val) {
     boolean[] deleted = new boolean[1];
     root = deleteRec(val, root, deleted);
@@ -171,85 +140,6 @@ public class Treap<T extends Comparable<T>> {
     }
   }
 
-  /*
-   * Rotate the subtree rooted at node to the left and return the new root of the
-   * subtree
-   *
-   * - node.right must be non-null
-   */
-  private Node rotateLeft(Node node) {
-    Node newRoot = node.right;
-    node.right = newRoot.left;
-    newRoot.left = node;
-
-    return newRoot;
-  }
-
-  /*
-   * Rotate the subtree rooted at node to the right and return the new root of the
-   * subtree
-   *
-   * - node.left must be non-null
-   */
-  private Node rotateRight(Node node) {
-    Node newRoot = node.left;
-    node.left = newRoot.right;
-    newRoot.right = node;
-
-    return newRoot;
-  }
-
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    printSubtree(root, 0, sb);
-    return sb.toString();
-  }
-
-  private void printSubtree(Node node, int depth, StringBuilder sb) {
-    for (int i = 0; i < depth; ++i) {
-      sb.append("  ");
-    }
-    if (node == null) {
-      sb.append("null\n");
-    } else {
-      sb.append(node.val.toString());
-      sb.append('\n');
-      printSubtree(node.left, depth + 1, sb);
-      printSubtree(node.right, depth + 1, sb);
-    }
-  }
-
-  public void stats() {
-    if (root == null) {
-      System.out.println("Tree is empty, no stats");
-      return;
-    }
-
-    int[] acc = new int[1];
-    statsRec(root, 0, acc);
-
-    double pbAvgDepth = TreeUtils.pbAvgDepth(this.size);
-    double avgDepth = acc[0] * 1.0 / this.size;
-    System.out.println("# nodes: " + this.size);
-    System.out.println("Perfectly balanced avg depth: " + pbAvgDepth);
-    System.out.println("Avg depth: " + avgDepth);
-    System.out.println("Ratio: " + avgDepth / pbAvgDepth);
-  }
-
-  private void statsRec(Node node, int depth, int[] acc) {
-    acc[0] += depth;
-    if (node.left != null) {
-      statsRec(node.left, depth + 1, acc);
-    }
-    if (node.right != null) {
-      statsRec(node.right, depth + 1, acc);
-    }
-  }
-
-  public long size() {
-    return this.size;
-  }
-
   public static void main(String[] args) {
     Treap<Integer> treap = new Treap<>();
     Random random = new Random();
@@ -258,4 +148,5 @@ public class Treap<T extends Comparable<T>> {
     }
     treap.stats();
   }
+
 }

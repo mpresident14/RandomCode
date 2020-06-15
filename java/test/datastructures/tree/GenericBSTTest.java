@@ -8,28 +8,28 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
-public class BSTTest {
+public class GenericBSTTest {
 
   private static List<Integer> L1 = Arrays.asList(7, 4, 3, 2, 9, 12);
   private static List<Integer> L2 = Arrays.asList(-4, 7, 9, 3, 5, 19, 11);
-  
+
   private static List<Integer> L1_SHUF = new ArrayList<>(L1);
   private static List<Integer> L2_SHUF = new ArrayList<>(L2);
   static {
     Collections.shuffle(L1_SHUF);
     Collections.shuffle(L2_SHUF);
   }
-  
-  private BST<Integer> bst;
+
+  private GenericBST<Integer> bst;
 
   @Before
   public void setUp() {
-    bst = new BST<>();
+    bst = new GenericBST<>();
   }
 
   @Test
   public void test_insert() {
-    bst.insert(L1);
+    bst.insertAll(L1);
 
     assertEquals(L1.size(), bst.size());
     assertFalse(bst.insert(9));
@@ -37,8 +37,8 @@ public class BSTTest {
     assertTrue(bst.insert(8));
     assertEquals(L1.size() + 1, bst.size());
 
-    bst = new BST<>();
-    bst.insert(L2);
+    bst = new GenericBST<>();
+    bst.insertAll(L2);
 
     assertEquals(L2.size(), bst.size());
     assertFalse(bst.insert(9));
@@ -49,7 +49,7 @@ public class BSTTest {
 
   @Test
   public void test_delete() {
-    bst.insert(L1);
+    bst.insertAll(L1);
 
     assertFalse(bst.delete(8));
     assertEquals(L1.size(), bst.size());
@@ -58,7 +58,7 @@ public class BSTTest {
     }
     assertEquals(0, bst.size());
 
-    bst.insert(L2);
+    bst.insertAll(L2);
 
     assertFalse(bst.delete(8));
     assertEquals(L2.size(), bst.size());

@@ -54,7 +54,7 @@ public class RandomizedTreeTest {
   }
 
   @Test
-  public void delete_noDup() {
+  public void delete_noDups() {
     tree.insertAll(L1);
     assertEquals(L1.size(), tree.size());
 

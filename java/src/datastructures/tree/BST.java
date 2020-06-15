@@ -1,133 +1,144 @@
 package datastructures.tree;
 
-public class BST<T extends Comparable<T>> {
-  private class Node {
-    T val;
-    Node left;
-    Node right;
+public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeType>.Node> {
+  protected abstract class Node {
+    protected T val;
+    protected NodeType left;
+    protected NodeType right;
 
-    Node(T val) {
+    protected Node(T val) {
       this.val = val;
-      this.left = null;
-      this.right = null;
     }
   }
 
-  Node root;
-  int size;
+  protected NodeType root;
+  protected long size;
 
-  public void insert(Iterable<? extends T> iterable) {
-    for (T value : iterable) {
-      insert(value);
-    }
-  }
+  public abstract boolean insert(T value);
 
-  public boolean insert(T value) {
-    if (root == null) {
-      root = new Node(value);
-      this.size++;
-      return true;
-    }
-
-    Node currentNode = root;
-    while (true) {
-      int comp = value.compareTo(currentNode.val);
-      if (comp == 0) {
-        return false;
-      } else if (comp < 0) {
-        if (currentNode.left == null) {
-          currentNode.left = new Node(value);
-          this.size++;
-          return true;
-        } else {
-          currentNode = currentNode.left;
-        }
-      } else {
-        if (currentNode.right == null) {
-          currentNode.right = new Node(value);
-          this.size++;
-          return true;
-        } else {
-          currentNode = currentNode.right;
-        }
-      }
-    }
-  }
-
-  public boolean delete(T val) {
-    boolean[] deleted = new boolean[1];
-    root = deleteRec(val, root, deleted);
-    if (deleted[0]) {
-      --this.size;
-    }
-    return deleted[0];
-  }
-
-  /*
-   * Deletes val from the subtree rooted at Node and returns the root of the
-   * resulting subtree
-   */
-  private Node deleteRec(T val, Node node, boolean[] deleted) {
-    if (node == null) {
-      return null;
-    }
-
-    int comp = val.compareTo(node.val);
-    if (comp == 0) {
-      // This is the node to delete
-      deleted[0] = true;
-      if (node.left == null) {
-        // Just slide the right child up
-        return node.right;
-      } else if (node.right == null) {
-        // Just slide the left child up
-        return node.left;
-      } else {
-        // Find next inorder node and replace deleted node with it
-        T nextInorder = minValue(node.right);
-        node.val = nextInorder;
-        node.right = deleteRec(nextInorder, node.right, deleted);
-      }
-    } else if (comp < 0) {
-      node.left = deleteRec(val, node.left, deleted);
-    } else {
-      node.right = deleteRec(val, node.right, deleted);
-    }
-
-    return node;
-  }
+  public abstract boolean delete(T val);
 
   /*
    * Return the minimum value in the subtree rooted by node
    */
-  private T minValue(Node node) {
-    Node current = node;
+  protected T minValue(NodeType node) {
+    NodeType current = node;
     while (current.left != null) {
       current = current.left;
     }
     return current.val;
   }
 
-  public String toString() {
-    return toStringHelper(root, 0);
+  public void insertAll(Iterable<? extends T> iterable) {
+    for (T value : iterable) {
+      insert(value);
+    }
   }
 
-  public String toStringHelper(Node node, int depth) {
+  public boolean contains(T val) {
+    return containsRec(val, root);
+  }
+
+  private boolean containsRec(T val, NodeType node) {
     if (node == null) {
-      return "";
+      return false;
     }
-    StringBuilder builder = new StringBuilder();
-    for (int i = 0; i < depth; i++) {
-      builder.append("  ");
+
+    int comp = val.compareTo(node.val);
+    if (comp == 0) {
+      return true;
+    } else if (comp < 0) {
+      return containsRec(val, node.left);
+    } else {
+      return containsRec(val, node.right);
     }
-    builder.append(node.val);
-    builder.append('\n');
-    builder.append(toStringHelper(node.left, depth + 1));
-    builder.append(toStringHelper(node.right, depth + 1));
-    return builder.toString();
   }
 
-  public int size() {
-    return size;
+  /*
+   * Rotate the subtree rooted at node to the left and return the new root of the
+   * subtree
+   *
+   * - node.right must be non-null
+   */
+  protected NodeType rotateLeft(NodeType node) {
+    NodeType newRoot = node.right;
+    node.right = newRoot.left;
+    newRoot.left = node;
+
+    return newRoot;
+  }
+
+  /*
+   * Rotate the subtree rooted at node to the right and return the new root of the
+   * subtree
+   *
+   * - node.left must be non-null
+   */
+  protected NodeType rotateRight(NodeType node) {
+    NodeType newRoot = node.left;
+    node.left = newRoot.right;
+    newRoot.right = node;
+
+    return newRoot;
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    printSubtree(root, 0, sb);
+    return sb.toString();
+  }
+
+  private void printSubtree(NodeType node, int depth, StringBuilder sb) {
+    for (int i = 0; i < depth; ++i) {
+      sb.append("  ");
+    }
+    if (node == null) {
+      sb.append("null\n");
+    } else {
+      sb.append(node.val.toString());
+      sb.append('\n');
+      printSubtree(node.left, depth + 1, sb);
+      printSubtree(node.right, depth + 1, sb);
+    }
+  }
+
+  public void stats() {
+    if (root == null) {
+      System.out.println("Tree is empty, no stats");
+      return;
+    }
+
+    int[] acc = new int[1];
+    statsRec(root, 0, acc);
+
+    double pbAvgDepth = pbAvgDepth(size());
+    double avgDepth = acc[0] * 1.0 / size();
+    System.out.println("# nodes: " + size());
+    System.out.println("Perfectly balanced avg depth: " + pbAvgDepth);
+    System.out.println("Avg depth: " + avgDepth);
+    System.out.println("Ratio: " + avgDepth / pbAvgDepth);
+  }
+
+  private void statsRec(NodeType node, int depth, int[] acc) {
+    acc[0] += depth;
+    if (node.left != null) {
+      statsRec(node.left, depth + 1, acc);
+    }
+    if (node.right != null) {
+      statsRec(node.right, depth + 1, acc);
+    }
+  }
+
+  private static double pbAvgDepth(long n) {
+    long pbHeight = (long) Math.floor(Math.log(n) / Math.log(2));
+    long pbHeightPow2 = 1 << pbHeight;
+    // https://www.wolframalpha.com/input/?i=sum+d*2%5Ed%2C+d+%3D+0+to+h+-+1
+    long completeDepthSum = pbHeightPow2 * pbHeight - 2 * (pbHeightPow2 - 1);
+    long lastRowDepthSum = (n - pbHeightPow2 + 1) * pbHeight;
+    return (completeDepthSum + lastRowDepthSum) * 1.0 / n;
+  }
+
+  public long size() {
+    return this.size;
   }
 }
