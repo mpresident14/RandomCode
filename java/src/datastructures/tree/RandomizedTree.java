@@ -154,9 +154,9 @@ public class RandomizedTree<T extends Comparable<T>> extends BST<T, RandomizedTr
 
   public static void main(String[] args) {
     RandomizedTree<Integer> rt = new RandomizedTree<>();
-    Random random = new Random();
-    for (int i = 0; i < 100000; ++i) {
-      rt.insert(random.nextInt());
+    int n = new Random().nextInt(100000);
+    for (int i = 0; i < n; ++i) {
+      rt.insert(i);
     }
     rt.stats();
   }

@@ -24,7 +24,7 @@ Now, suppose that inserting a node $v$ caused an imbalance. Let $z$ be the first
 \begin{enumerate}
   \item LL: $y$ is the left child of $z$ and $x$ is the left child of $y$.
 
-  \begin{figure}[h!]
+  \begin{figure}[!ht]
     \centering
     \includegraphics[trim=50 50 150 40, clip,scale=0.33]{pics/avl_insert_ll1}
     \includegraphics[trim=250 50 50 40, clip,scale=0.33]{pics/avl_insert_ll2}
@@ -39,7 +39,7 @@ Now, suppose that inserting a node $v$ caused an imbalance. Let $z$ be the first
 
   \item LR: $y$ is the left child of $z$ and $x$ is the right child of $y$.
 
-  \begin{figure}[h!]
+  \begin{figure}[!ht]
   \centering
     \includegraphics[trim=50 0 150 40, clip,scale=0.33]{pics/avl_insert_lr1}\\
     \includegraphics[trim=0 0 250 40, clip,scale=0.33]{pics/avl_insert_lr2}
@@ -65,7 +65,7 @@ The first part of deletion is the same as deleting from a regular BST. However, 
 \begin{enumerate}
   \item LL: $y$ is the left child of $z$ and $x$ is the left child of $y$.
 
-  \begin{figure}[h!]
+  \begin{figure}[!ht]
     \centering
     \includegraphics[trim=50 50 150 40, clip,scale=0.33]{pics/avl_delete_ll1}
     \includegraphics[trim=250 50 50 40, clip,scale=0.33]{pics/avl_delete_ll2}
@@ -86,7 +86,7 @@ The first part of deletion is the same as deleting from a regular BST. However, 
 
   After the rotation, we can see that all the nodes are balanced, but again, the height of the subtree has changed, so we must check all the ancestors.
 
-  \begin{figure}[h!]
+  \begin{figure}[!ht]
   \centering
     \includegraphics[trim=50 0 150 40, clip,scale=0.33]{pics/avl_insert_lr1}\\
     \includegraphics[trim=0 0 250 40, clip,scale=0.33]{pics/avl_insert_lr2}

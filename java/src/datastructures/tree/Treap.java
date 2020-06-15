@@ -143,9 +143,9 @@ public class Treap<T extends Comparable<T>> extends BST<T, Treap<T>.Node> {
 
   public static void main(String[] args) {
     Treap<Integer> treap = new Treap<>();
-    Random random = new Random();
-    for (int i = 0; i < 100000; ++i) {
-      treap.insert(random.nextInt());
+    int n = new Random().nextInt(100000);
+    for (int i = 0; i < n; ++i) {
+      treap.insert(i);
     }
     treap.stats();
   }
