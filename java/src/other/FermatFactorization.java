@@ -1,7 +1,7 @@
 package other;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 class FermatFactorization {
@@ -16,7 +16,7 @@ class FermatFactorization {
     if (n < 2) {
       return;
     }
-    
+
     // Get 2 as a prime factor if even
     if (n % 2 == 0) {
       result.add(2l);
@@ -36,22 +36,22 @@ class FermatFactorization {
       else {
         primeFactorization(factors[0], result);
         primeFactorization(factors[1], result);
-      }  
+      }
     }
   }
 
   // Key: Find a & b s.t. a^2 - b^2 = n. Then, n = (a+b)(a-b)
-  // Only works for odd numbers and multiples of 4 b/c a+b & a-b are either 
+  // Only works for odd numbers and multiples of 4 b/c a+b & a-b are either
   //  both odd or both even
   private static long[] fermatFactor(long n) {
     long a = (long) Math.ceil(Math.sqrt(n));
-    long bSquared = a*a - n;
+    long bSquared = a * a - n;
     double b = Math.sqrt(bSquared);
-    
+
     // Check if b is a  perfect square
     while ((long) b - b != 0) {
       a++;
-      bSquared = a*a - n;
+      bSquared = a * a - n;
       b = Math.sqrt(bSquared);
     }
 
@@ -68,10 +68,10 @@ class FermatFactorization {
     }
 
     long n = Long.valueOf(args[0]);
-    String s = FermatFactorization.primeFactorization(n)
-                  .stream()
-                  .map(e -> Long.toString(e))
-                  .collect(Collectors.joining(",", "[", "]"));
+    String s =
+        FermatFactorization.primeFactorization(n).stream()
+            .map(e -> Long.toString(e))
+            .collect(Collectors.joining(",", "[", "]"));
     System.out.println(s);
   }
 }

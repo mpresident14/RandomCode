@@ -1,15 +1,15 @@
 package crypto;
 
-import org.junit.*;
 import static org.junit.Assert.*;
+
+import org.junit.*;
 
 public class OneTimePadBreakerTest {
 
   private static final String HEX1 = "af452521dc";
   private static final String HEX2 = "39204fadcbff35";
 
-  private static final OneTimePadBreaker breaker = 
-      new OneTimePadBreaker(new String[] {HEX1, HEX2});
+  private static final OneTimePadBreaker breaker = new OneTimePadBreaker(new String[] {HEX1, HEX2});
 
   @Test
   public void test_xorCharIsValidLetter() {

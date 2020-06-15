@@ -32,22 +32,24 @@ public class AsyncOperation<T> {
 
   @SuppressWarnings("unchecked")
   public AsyncOperation<Void> consume(Consumer<T> consumer) {
-    next = new AsyncOperation<Void>((T var) -> 
-        {
-            consumer.accept(var);
-            return null;
-        });
+    next =
+        new AsyncOperation<Void>(
+            (T var) -> {
+              consumer.accept(var);
+              return null;
+            });
     next.first = this.first;
     return (AsyncOperation<Void>) next;
   }
 
   @SuppressWarnings("unchecked")
   public AsyncOperation<Void> consumeCollapse(Function<T, AsyncOperation<Void>> transform) {
-    next = new AsyncOperation<Void>((T var) -> 
-        {
-            AsyncGraph.getSync(transform.apply(var));
-            return null;
-        });
+    next =
+        new AsyncOperation<Void>(
+            (T var) -> {
+              AsyncGraph.getSync(transform.apply(var));
+              return null;
+            });
     next.first = this.first;
     return (AsyncOperation<Void>) next;
   }

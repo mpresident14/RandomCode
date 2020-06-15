@@ -1,7 +1,8 @@
 package crypto;
 
 public class CryptoUtil {
-  private CryptoUtil() {};
+  private CryptoUtil() {}
+  ;
 
   public static String byteArrayToHexString(byte[] bytes) {
     int len = bytes.length;
@@ -17,16 +18,16 @@ public class CryptoUtil {
     byte[] result = new byte[(len + 1) / 2];
     int i = 0;
     int j = 0;
-    
+
     if (len % 2 == 1) {
       result[0] = (byte) Short.parseShort(str.substring(0, 1), 16);
       i++;
       j++;
     }
-    
+
     for (; i < len; i += 2) {
-      // Have to use short and cast to byte because the java byte is 
-      // unsigned, and it interprets the string as a positive value, 
+      // Have to use short and cast to byte because the java byte is
+      // unsigned, and it interprets the string as a positive value,
       // so it doesn't fit into the positive range of a byte.
       result[j] = (byte) Short.parseShort(str.substring(i, i + 2), 16);
       j++;
@@ -53,10 +54,7 @@ public class CryptoUtil {
     return result;
   }
 
-  /** 
-   * Ex: 
-   * 0x81e0 XOR 0xaf = 0x2ee0
-   */
+  /** Ex: 0x81e0 XOR 0xaf = 0x2ee0 */
   public static byte[] xor(byte[] b1, byte[] b2) {
     byte[] longer;
     byte[] shorter;
@@ -70,7 +68,7 @@ public class CryptoUtil {
 
     byte[] result = new byte[longer.length];
     int i;
-    for (i =0; i < shorter.length; i++) {
+    for (i = 0; i < shorter.length; i++) {
       result[i] = (byte) (shorter[i] ^ longer[i]);
     }
     for (; i < longer.length; i++) {
@@ -79,10 +77,7 @@ public class CryptoUtil {
     return result;
   }
 
-  /** 
-   * Ex: 
-   * 0x81e0 XOR 0xaf = 0x2e
-   */
+  /** Ex: 0x81e0 XOR 0xaf = 0x2e */
   public static byte[] xorTruncate(byte[] b1, byte[] b2) {
     int minSize = b1.length < b2.length ? b1.length : b2.length;
     byte[] result = new byte[minSize];
@@ -94,9 +89,9 @@ public class CryptoUtil {
 
   public static void printBytes(byte[] b) {
     int len = b.length;
-    for (int i = 0; i < len; i++) { 
-      System.out.format(" 0x%02X", b[i]); 
-    } 
+    for (int i = 0; i < len; i++) {
+      System.out.format(" 0x%02X", b[i]);
+    }
     System.out.println('\n');
   }
 }

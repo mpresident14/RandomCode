@@ -1,15 +1,14 @@
 package datastructures;
 
-import java.util.Map;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.function.BiFunction;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
-import java.util.Comparator;
-
 import other.Pair;
 
 /** Directed, Weighted Graph */
@@ -47,7 +46,7 @@ class ArrayGraph<Vertex> {
     for (List<Integer> vertexRow : grid) {
       vertexRow.add(null);
     }
-    
+
     numVertices++;
   }
 
@@ -65,8 +64,7 @@ class ArrayGraph<Vertex> {
 
   public boolean addEdge(Vertex v1, Vertex v2) {
     if (weightCalculator == null) {
-      throw new UnsupportedOperationException(
-          "This ArrayGraph has no weight calculator.");
+      throw new UnsupportedOperationException("This ArrayGraph has no weight calculator.");
     }
     return addEdge(v1, v2, weightCalculator.apply(v1, v2));
   }
@@ -94,42 +92,40 @@ class ArrayGraph<Vertex> {
     return sb.toString();
   }
 
-  /** 
-   * Same as djikstra, but instead of a FIFO queue, it uses a 
-   * priority queue to try the path with the least value of f(v) + g(v),
-   * where f(v) is length of path so far, and g(v) is an admissible 
-   * heuristic. A heuristic is an estimate of the cost of the path between
-   * the some vertex and the goal vertex. For a heuristic to be admissible,
-   * it must never overestimate the actual length of the path.
+  /**
+   * Same as djikstra, but instead of a FIFO queue, it uses a priority queue to try the path with
+   * the least value of f(v) + g(v), where f(v) is length of path so far, and g(v) is an admissible
+   * heuristic. A heuristic is an estimate of the cost of the path between the some vertex and the
+   * goal vertex. For a heuristic to be admissible, it must never overestimate the actual length of
+   * the path.
    */
   public List<Vertex> aStar(Vertex v1, Vertex v2, BiFunction<Vertex, Vertex, Integer> heuristic) {
     // Vertex -> (shortestPathLen, prevVertexOnShortestPath)
     Map<Vertex, Pair<Integer, Vertex>> shortestPathSoFar = new HashMap<>();
     return findPath(
-      v1, 
-      v2, 
-      shortestPathSoFar, 
-      new PriorityQueue<>(
-          (u, v) -> 
-              Integer.compare(
-                  shortestPathSoFar.get(u).first + heuristic.apply(u, v2), 
-                  shortestPathSoFar.get(v).first + heuristic.apply(v, v2))));
+        v1,
+        v2,
+        shortestPathSoFar,
+        new PriorityQueue<>(
+            (u, v) ->
+                Integer.compare(
+                    shortestPathSoFar.get(u).first + heuristic.apply(u, v2),
+                    shortestPathSoFar.get(v).first + heuristic.apply(v, v2))));
   }
 
-  /** 
-   * Same as djikstra, but instead of a FIFO queue, it uses a 
-   * priority queue to try the path with the least weight so far.
+  /**
+   * Same as djikstra, but instead of a FIFO queue, it uses a priority queue to try the path with
+   * the least weight so far.
    */
   public List<Vertex> uniformCostSearch(Vertex v1, Vertex v2) {
     // Vertex -> (shortestPathLen, prevVertexOnShortestPath)
     Map<Vertex, Pair<Integer, Vertex>> shortestPathSoFar = new HashMap<>();
     return findPath(
-      v1, 
-      v2, 
-      shortestPathSoFar, 
-      new PriorityQueue<>(
-          Comparator.comparingInt(
-              vertex -> shortestPathSoFar.get(vertex).first)));
+        v1,
+        v2,
+        shortestPathSoFar,
+        new PriorityQueue<>(
+            Comparator.comparingInt(vertex -> shortestPathSoFar.get(vertex).first)));
   }
 
   public List<Vertex> djikstra(Vertex v1, Vertex v2) {
@@ -139,10 +135,7 @@ class ArrayGraph<Vertex> {
   }
 
   private List<Vertex> findPath(
-    Vertex v1, 
-    Vertex v2, 
-    Map<Vertex, Pair<Integer, Vertex>> shortestPathSoFar, 
-    Queue<Vertex> q) {
+      Vertex v1, Vertex v2, Map<Vertex, Pair<Integer, Vertex>> shortestPathSoFar, Queue<Vertex> q) {
     if (getIndex(v1) == null || getIndex(v2) == null) {
       return null;
     }
@@ -163,7 +156,7 @@ class ArrayGraph<Vertex> {
         // Add all adj vertices and update shortest path length and previous vertex if nec.
         if (weight == null) {
           continue;
-        }  
+        }
 
         int newCurrentPathLength = polledPathLength + weight;
         // If we found our target and this path being searched is longer than
@@ -171,7 +164,7 @@ class ArrayGraph<Vertex> {
         if (foundV2 && shortestPathSoFar.get(v2).first <= newCurrentPathLength) {
           continue;
         }
-        
+
         Vertex current = getVertex(i);
         Pair<Integer, Vertex> currentPathPair = shortestPathSoFar.get(current);
         // Haven't visited this vertex yet
@@ -184,10 +177,10 @@ class ArrayGraph<Vertex> {
             q.offer(current);
           }
         } else if (newCurrentPathLength < currentPathPair.first) {
-            shortestPathSoFar.put(current, new Pair<>(newCurrentPathLength, polled));
+          shortestPathSoFar.put(current, new Pair<>(newCurrentPathLength, polled));
         }
       }
-    }  
+    }
 
     LinkedList<Vertex> shortestPath = new LinkedList<>();
     shortestPath.addFirst(v2);
@@ -230,7 +223,7 @@ class ArrayGraph<Vertex> {
     g.addEdge('M', 'T');
     g.addEdge('N', 'Z');
     g.addEdge('G', 'Z');
-    
+
     System.out.println("DJIKSTRA");
     System.out.println(g.djikstra('A', 'Z'));
     System.out.println();
@@ -240,8 +233,8 @@ class ArrayGraph<Vertex> {
     System.out.println();
 
     // The heuristic is the distance between letters
-    // Distance between any vertex and the goal vertex will always be 
-    // <= actual length of shortest path between them, so the heuristic 
+    // Distance between any vertex and the goal vertex will always be
+    // <= actual length of shortest path between them, so the heuristic
     // is admissible.
     System.out.println("A STAR SEARCH");
     System.out.println(g.aStar('A', 'Z', (c1, c2) -> Math.abs(c1 - c2)));

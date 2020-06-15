@@ -1,9 +1,9 @@
 package async;
 
-/** 
- * Defines interfaces for combining AsyncOperations using AsyncGraph::combine. 
- * Essentially java.util.Function::apply with more arguments.
- * */
+/**
+ * Defines interfaces for combining AsyncOperations using AsyncGraph::combine. Essentially
+ * java.util.Function::apply with more arguments.
+ */
 public class AsyncCombiners {
   private AsyncCombiners() {}
 

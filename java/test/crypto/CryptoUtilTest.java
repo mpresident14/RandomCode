@@ -1,22 +1,21 @@
 package crypto;
 
-import org.junit.*;
 import static org.junit.Assert.*;
+
+import org.junit.*;
 
 public class CryptoUtilTest {
 
   private static final String ODD = "Odd";
   private static final String EVEN = "Even";
-  
-  private static final byte[] ODD_BYTES 
-      = new byte[] {(byte) 0x4f, (byte) 0x64, (byte) 0x64};
-  private static final byte[] EVEN_BYTES 
-      = new byte[] {(byte) 0x45, (byte) 0x76, (byte) 0x65, (byte) 0x6e};  
-  private static final byte[] NEGATIVES_BYTES 
-      = new byte[] {(byte) 0xf5, (byte) 0xd6, (byte) 0x65, (byte) 0xae};
-  private static final byte[] LEAD_ZERO_BYTES 
-      = new byte[] {(byte) 0x05, (byte) 0x1e, (byte) 0xd9};
-  
+
+  private static final byte[] ODD_BYTES = new byte[] {(byte) 0x4f, (byte) 0x64, (byte) 0x64};
+  private static final byte[] EVEN_BYTES =
+      new byte[] {(byte) 0x45, (byte) 0x76, (byte) 0x65, (byte) 0x6e};
+  private static final byte[] NEGATIVES_BYTES =
+      new byte[] {(byte) 0xf5, (byte) 0xd6, (byte) 0x65, (byte) 0xae};
+  private static final byte[] LEAD_ZERO_BYTES = new byte[] {(byte) 0x05, (byte) 0x1e, (byte) 0xd9};
+
   private static final String ODD_STR = "4f6464";
   private static final String EVEN_STR = "4576656e";
   private static final String NEGATIVES_STR = "f5d665ae";

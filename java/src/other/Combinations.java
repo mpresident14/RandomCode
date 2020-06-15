@@ -1,23 +1,22 @@
 package other;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ArrayList;
 
 /* BIG IDEA
- * 
+ *
  * f(list, csize) = {list[0] + each of f(list[1:], csize-1)} +
  *                  {list[1] + each of f(list[2:], csize-1)} +
  *                  ... +
  *                  {list[n-csize] + each of f(list[n-csize+1], csize-1)}
- * 
- * Example: 
+ *
+ * Example:
  * f([1,2,3,4,5], 2) = {1 + each of f([2,3,4,5], 1)} +
  *                     {2 + each of f([3,4,5], 1)} +
  *                     {3 + each of f([4,5], 1)} +
  *                     {4 + each of f([5], 1)}
  */
-
 
 class Combinations {
 
@@ -39,7 +38,7 @@ class Combinations {
   }
 
   public static void main(String[] args) {
-    List<Integer> list = Arrays.asList(1,2,3,4,5);
+    List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
     List<List<Integer>> combos = getCombinations(list, 3);
     System.out.println(combos);
   }

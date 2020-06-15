@@ -1,12 +1,12 @@
 package datastructures.tree;
 
-import org.junit.*;
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.ArrayList;
+import org.junit.*;
 
 public class GenericBSTTest {
 
@@ -15,6 +15,7 @@ public class GenericBSTTest {
 
   private static List<Integer> L1_SHUF = new ArrayList<>(L1);
   private static List<Integer> L2_SHUF = new ArrayList<>(L2);
+
   static {
     Collections.shuffle(L1_SHUF);
     Collections.shuffle(L2_SHUF);

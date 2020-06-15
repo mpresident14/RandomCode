@@ -1,14 +1,12 @@
 package datastructures.hashmap;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.lang.Integer;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-
 import other.Pair;
 import testing.MyAssert;
 
@@ -18,7 +16,7 @@ public class MapOpenAddressing<Key, Value> {
     QUADRATIC,
     DOUBLE_HASHING
   }
-  
+
   public interface TriFunction<Key> {
     int call(int hash, int hash2, int attempts);
   }
@@ -53,7 +51,7 @@ public class MapOpenAddressing<Key, Value> {
       buckets.add(null);
     }
 
-    switch(type) {
+    switch (type) {
       case LINEAR:
         getBucketNum = this::getBucketNumLin;
         break;
@@ -92,9 +90,9 @@ public class MapOpenAddressing<Key, Value> {
       collisions++;
       attempts++;
       bucketNum = getBucketNum.call(hash, hash2, attempts);
-      pair = buckets.get(bucketNum);      
+      pair = buckets.get(bucketNum);
     }
-    
+
     // Key not in map yet
     buckets.set(bucketNum, new Pair<>(key, value));
     this.size++;
@@ -157,7 +155,7 @@ public class MapOpenAddressing<Key, Value> {
 
   /* Note: I think this could possibly result in an infinite loop */
   private int getBucketNumQuad(int hash, int unused, int i) {
-    hash = hash + i*i;
+    hash = hash + i * i;
     if (hash < 0) {
       hash += Integer.MAX_VALUE;
     }
@@ -172,23 +170,19 @@ public class MapOpenAddressing<Key, Value> {
     return doubleHash % buckets.size();
   }
 
-  /** 
-   * For double hashing. Never returns 0.
-   * Note: Since our table size is always a power of 2, we make sure this
-   * function always returns an odd number. This ensures that it is always
-   * relatively prime to the table size, preventing any infinite loops
-   * caused by not searching every bucket.
-   * 
-   * Proof: If (b, h) = 1, then h1 + hx = h1 + hy (mod b) -> x = y (mod b)
-   *    Let b = # buckets and h be the value of hash2. Let (b, h) = 1 
-   *    and suppose h1 + hx = h1 + hy (mod b), where h1 is the value of the 
-   *    first hash. Then hx = hy (mod b) -> x = y (mod b) by Cancellation Thm.
-   *    since (b, h) = 1. 
-   * 
-   * Furthermore, since the number of attempts will always be fewer than 
-   * the number of buckets, we know x,y < b. Thus x = y. By the contrapositive, 
-   * if (b, h) = 1, then x != y -> h1 + hx != h1 + hy (mod b), so we will 
-   * always try every bucket.
+  /**
+   * For double hashing. Never returns 0. Note: Since our table size is always a power of 2, we make
+   * sure this function always returns an odd number. This ensures that it is always relatively
+   * prime to the table size, preventing any infinite loops caused by not searching every bucket.
+   *
+   * <p>Proof: If (b, h) = 1, then h1 + hx = h1 + hy (mod b) -> x = y (mod b) Let b = # buckets and
+   * h be the value of hash2. Let (b, h) = 1 and suppose h1 + hx = h1 + hy (mod b), where h1 is the
+   * value of the first hash. Then hx = hy (mod b) -> x = y (mod b) by Cancellation Thm. since (b,
+   * h) = 1.
+   *
+   * <p>Furthermore, since the number of attempts will always be fewer than the number of buckets,
+   * we know x,y < b. Thus x = y. By the contrapositive, if (b, h) = 1, then x != y -> h1 + hx != h1
+   * + hy (mod b), so we will always try every bucket.
    */
   private int hash2(int hash) {
     int result = 7 - (hash % 7);
@@ -220,7 +214,7 @@ public class MapOpenAddressing<Key, Value> {
      ***********/
     for (double d = 0.1; d < 0.6; d += 0.1) {
       for (AddressingType type : AddressingType.values()) {
-      
+
         MapOpenAddressing<Integer, Integer> myMap = new MapOpenAddressing<>(d, type);
         Set<Integer> addedKeys = new HashSet<>(numItems);
 
@@ -241,27 +235,33 @@ public class MapOpenAddressing<Key, Value> {
           MyAssert.assertEquals(myMap.size(), addedKeys.size());
           MyAssert.assertEquals(myMap.get(n), 0);
         }
-        
+
         // Print Collisions
-        System.out.println(String.format("%.1f", d) + ", " + type.toString() + ": " + myMap.collisions() + " collisions");
+        System.out.println(
+            String.format("%.1f", d)
+                + ", "
+                + type.toString()
+                + ": "
+                + myMap.collisions()
+                + " collisions");
       }
       System.out.println();
-    }  
+    }
 
     /******************
-     * Execution time * 
-     ******************/ 
+     * Execution time *
+     ******************/
     Set<Integer> set = new HashSet<>(numItems);
     for (int i = 0; i < numItems; i++) {
       set.add(random.nextInt() % 1000000);
     }
 
-    MapOpenAddressing<Integer, Integer> mapLinear 
-        = new MapOpenAddressing<>(0.33, AddressingType.LINEAR);
-    MapOpenAddressing<Integer, Integer> mapQuadratic 
-        = new MapOpenAddressing<>(0.33, AddressingType.QUADRATIC);
-    MapOpenAddressing<Integer, Integer> mapDouble 
-        = new MapOpenAddressing<>(0.33, AddressingType.DOUBLE_HASHING);
+    MapOpenAddressing<Integer, Integer> mapLinear =
+        new MapOpenAddressing<>(0.33, AddressingType.LINEAR);
+    MapOpenAddressing<Integer, Integer> mapQuadratic =
+        new MapOpenAddressing<>(0.33, AddressingType.QUADRATIC);
+    MapOpenAddressing<Integer, Integer> mapDouble =
+        new MapOpenAddressing<>(0.33, AddressingType.DOUBLE_HASHING);
     Map<Integer, Integer> mapJava = new HashMap<>();
 
     // PUT
@@ -290,7 +290,7 @@ public class MapOpenAddressing<Key, Value> {
     }
     endTime = System.nanoTime();
     System.out.println("Double Hashing: " + (endTime - startTime) * 1.0 / 1000000000);
-  
+
     // Java
     startTime = System.nanoTime();
     for (Integer n : set) {
@@ -326,7 +326,7 @@ public class MapOpenAddressing<Key, Value> {
     }
     endTime = System.nanoTime();
     System.out.println("Double Hashing: " + (endTime - startTime) * 1.0 / 1000000000);
-  
+
     // Java
     startTime = System.nanoTime();
     for (Integer n : set) {

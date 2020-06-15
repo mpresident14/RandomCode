@@ -1,24 +1,23 @@
 package datastructures.hashmap;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Random;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Iterator;
 import java.util.Set;
-import java.util.HashSet;
-
 import other.Pair;
 import testing.MyAssert;
 
 public class MapSeparateChaining<Key, Value> implements Iterable<Pair<Key, Value>> {
-  
+
   private class MapIterator implements Iterator<Pair<Key, Value>> {
     private int bucket;
     private Iterator<Pair<Key, Value>> iter;
-    
+
     private MapIterator() {
       bucket = 0;
       iter = buckets.get(bucket).iterator();
@@ -61,7 +60,7 @@ public class MapSeparateChaining<Key, Value> implements Iterable<Pair<Key, Value
     this.loadFactor = loadFactor;
   }
 
-  public void put(Key key, Value value) {    
+  public void put(Key key, Value value) {
     Queue<Pair<Key, Value>> bucket = buckets.get(getBucketNum(key));
     for (Pair<Key, Value> pair : bucket) {
       // Key already exists, so update value
@@ -141,12 +140,9 @@ public class MapSeparateChaining<Key, Value> implements Iterable<Pair<Key, Value
     // Hashcode can be a negative number and % return remainder, which
     // can be negative, so we need absolute value
     int hash = key.hashCode();
-    return hash > 0 ? 
-        hash % buckets.size() : 
-        (hash + Integer.MAX_VALUE) % buckets.size();
+    return hash > 0 ? hash % buckets.size() : (hash + Integer.MAX_VALUE) % buckets.size();
   }
 
-  
   public static void main(String[] args) throws Exception {
     MapSeparateChaining<Integer, Integer> myMap = new MapSeparateChaining<>(5);
     int numItems = 100;
@@ -170,7 +166,7 @@ public class MapSeparateChaining<Key, Value> implements Iterable<Pair<Key, Value
       MyAssert.assertTrue(myMap.size() == numItems);
       MyAssert.assertTrue(myMap.get(n).equals(0));
     }
-    
+
     // Test iterator
     int count = 0;
     for (Pair<Integer, Integer> pair : myMap) {

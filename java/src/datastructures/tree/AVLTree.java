@@ -17,7 +17,6 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
     }
   }
 
-
   @Override
   public boolean insert(T val) {
     List<Node> path = new ArrayList<>();
@@ -28,17 +27,15 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
       return false;
     }
 
-
     int pathLen = path.size();
     // Find first imbalanced node on path from leaf to root
     for (int i = 2; i < pathLen; ++i) {
       Node node = path.get(i);
       if (!node.isBalanced()) {
-        insertRebalance(node, path.get(i-1), path.get(i-2));
+        insertRebalance(node, path.get(i - 1), path.get(i - 2));
         break;
       }
     }
-
 
     ++this.size;
     return true;
@@ -66,7 +63,6 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
     return node;
   }
 
-
   void insertRebalance(Node z, Node y, Node x) {
     if (z.left == y) {
       if (y.left == x) {
@@ -87,7 +83,6 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
   public boolean delete(T val) {
     return false;
   }
-
 
   private Node rotateLR(Node node) {
     node.left = rotateLeft(node.left);

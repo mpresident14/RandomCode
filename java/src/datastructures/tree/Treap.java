@@ -117,8 +117,8 @@ public class Treap<T extends Comparable<T>> extends BST<T, Treap<T>.Node> {
   }
 
   /**
-   * Rotate the subtree currently rooted at node while maintaining the heap
-   * structure. If node is a leaf, returns null (deletes it)
+   * Rotate the subtree currently rooted at node while maintaining the heap structure. If node is a
+   * leaf, returns null (deletes it)
    */
   private Node deleteAtLeaf(Node node) {
     if (node.left == null && node.right == null) {
@@ -127,7 +127,8 @@ public class Treap<T extends Comparable<T>> extends BST<T, Treap<T>.Node> {
     } else {
       // Rotate max priority child to the root of the subtree, which pushes node
       // towards the leaves
-      boolean leftChildHigher = node.right == null || (node.left != null && node.left.priority > node.right.priority);
+      boolean leftChildHigher =
+          node.right == null || (node.left != null && node.left.priority > node.right.priority);
       if (leftChildHigher) {
         Node newRoot = rotateRight(node);
         newRoot.right = deleteAtLeaf(node);
@@ -148,5 +149,4 @@ public class Treap<T extends Comparable<T>> extends BST<T, Treap<T>.Node> {
     }
     treap.stats();
   }
-
 }

@@ -1,10 +1,10 @@
 package datastructures;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Comparator;
-import java.util.Collection;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 /** Min Heap (or custom Comparator) */
 class Heap<T> {
@@ -69,9 +69,9 @@ class Heap<T> {
     }
   }
 
-  /** 
-   * Determine if lesser child is less than parent and return
-   * its index. Return null if no such child.
+  /**
+   * Determine if lesser child is less than parent and return its index. Return null if no such
+   * child.
    */
   private Integer getSwapChildIndex(T parent, int parentIndex) {
     Integer childIndex = null;
@@ -120,7 +120,7 @@ class Heap<T> {
   }
 
   public static void main(String[] args) {
-    List<Integer> nums = new ArrayList<>(Arrays.asList(4,3,6,10,7));
+    List<Integer> nums = new ArrayList<>(Arrays.asList(4, 3, 6, 10, 7));
     // Least to greatest
     Heap<Integer> heap = new Heap<>();
     heap.insert(nums);

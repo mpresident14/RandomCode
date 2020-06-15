@@ -21,7 +21,8 @@ public class MyAssert {
     }
   }
 
-  public static void assertEquals(Object actual, Object expected, String errorMsg) throws Exception {
+  public static void assertEquals(Object actual, Object expected, String errorMsg)
+      throws Exception {
     if (expected == null || !expected.equals(actual)) {
       throw new Exception("Expected: " + expected + ". Got: " + actual + ". " + errorMsg);
     }
