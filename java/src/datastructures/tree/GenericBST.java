@@ -1,5 +1,7 @@
 package datastructures.tree;
 
+import java.util.Random;
+
 public class GenericBST<T extends Comparable<T>> extends BST<T, GenericBST<T>.Node> {
   class Node extends BST<T, GenericBST<T>.Node>.Node {
     Node(T val) {
@@ -82,5 +84,17 @@ public class GenericBST<T extends Comparable<T>> extends BST<T, GenericBST<T>.No
     }
 
     return node;
+  }
+
+  public static void main(String[] args) {
+    GenericBST<Integer> bst = new GenericBST<>();
+    Random random = new Random();
+    int range = 100000;
+    for (int i = 0; i < range; ++i) {
+      bst.insert(random.nextInt(range));
+      bst.insert(i);
+      bst.delete(random.nextInt(range));
+    }
+    bst.stats();
   }
 }
