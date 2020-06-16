@@ -52,6 +52,7 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
         }
         break;
       } else {
+        // TODO: Break if height does not change
         node.updateHeight();
       }
     }
@@ -82,6 +83,76 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
     return node;
   }
 
+  @Override
+  public boolean delete(T val) {
+    List<Node> path = new ArrayList<>();
+    root = deleteRec(val, root, path);
+
+    if (!path.isEmpty() && path.get(0) == null) {
+      return false;
+    }
+
+    int pathLen = path.size();
+    // Find first imbalanced node on path from leaf to root
+    for (int i = 0; i < pathLen; ++i) {
+      Node node = path.get(i);
+      if (!node.isBalanced()) {
+        Node y = nodeHeight(node.left) > nodeHeight(node.right) ? node.left : node.right;
+        Node x = nodeHeight(y.left) >= nodeHeight(y.right) ? y.left : y.right;
+        Node rebalanced = rebalance(node, y, x);
+        // Attach the rebalanced subtree to the parent
+        Node parent = i == pathLen - 1 ? null : path.get(i + 1);
+        if (parent == null) {
+          root = rebalanced;
+        } else if (parent.left == node) {
+          parent.left = rebalanced;
+        } else {
+          parent.right = rebalanced;
+        }
+      } else {
+        // TODO: Break if height does not change
+        node.updateHeight();
+      }
+    }
+
+    --this.size;
+    return true;
+  }
+
+  private Node deleteRec(T val, Node node, List<Node> path) {
+    if (node == null) {
+      // Not in the set
+      path.add(null);
+      return null;
+    }
+
+    int comp = val.compareTo(node.val);
+    if (comp == 0) {
+      // This is the node to delete
+      if (node.left == null) {
+        // Just slide the right child up
+        return node.right;
+      } else if (node.right == null) {
+        // Just slide the left child up
+        return node.left;
+      } else {
+        // Find next inorder node and replace deleted node with it
+        T nextInorder = minValue(node.right);
+        node.val = nextInorder;
+        node.right = deleteRec(nextInorder, node.right, path);
+        path.add(node);
+      }
+    } else if (comp < 0) {
+      node.left = deleteRec(val, node.left, path);
+      path.add(node);
+    } else {
+      node.right = deleteRec(val, node.right, path);
+      path.add(node);
+    }
+
+    return node;
+  }
+
   Node rebalance(Node z, Node y, Node x) {
     if (z.left == y) {
       if (y.left == x) {
@@ -96,11 +167,6 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
         return rotateRR(z);
       }
     }
-  }
-
-  @Override
-  public boolean delete(T val) {
-    return false;
   }
 
   private Node rotateLL(Node node) {
@@ -143,11 +209,12 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
 
   public static void main(String[] args) {
     AVLTree<Integer> avl = new AVLTree<>();
-    Random random = new Random();
-    int range = 100000;
+    Random random = new Random(0);
+    int range = 1000000;
     for (int i = 0; i < range; ++i) {
       avl.insert(random.nextInt(range));
       avl.insert(i);
+      avl.delete(random.nextInt(range));
     }
     avl.stats();
   }
