@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+
 import org.junit.*;
 
 public class GenericBSTTest {
@@ -21,51 +23,86 @@ public class GenericBSTTest {
     Collections.shuffle(L2_SHUF);
   }
 
-  private GenericBST<Integer> bst;
+  private GenericBST<Integer> tree;
 
   @Before
   public void setUp() {
-    bst = new GenericBST<>();
+    tree = new GenericBST<>();
   }
 
   @Test
-  public void test_insert() {
-    bst.insertAll(L1);
-
-    assertEquals(L1.size(), bst.size());
-    assertFalse(bst.insert(9));
-    assertEquals(L1.size(), bst.size());
-    assertTrue(bst.insert(8));
-    assertEquals(L1.size() + 1, bst.size());
-
-    bst = new GenericBST<>();
-    bst.insertAll(L2);
-
-    assertEquals(L2.size(), bst.size());
-    assertFalse(bst.insert(9));
-    assertEquals(L2.size(), bst.size());
-    assertTrue(bst.insert(8));
-    assertEquals(L2.size() + 1, bst.size());
-  }
-
-  @Test
-  public void test_delete() {
-    bst.insertAll(L1);
-
-    assertFalse(bst.delete(8));
-    assertEquals(L1.size(), bst.size());
+  public void insert_noDups() {
+    for (Integer n : L1) {
+      assertTrue(tree.insert(n));
+    }
     for (Integer n : L1_SHUF) {
-      assertTrue(bst.delete(n));
+      assertTrue(tree.contains(n));
     }
-    assertEquals(0, bst.size());
+    assertEquals(L1.size(), tree.size());
+  }
 
-    bst.insertAll(L2);
-
-    assertFalse(bst.delete(8));
-    assertEquals(L2.size(), bst.size());
+  @Test
+  public void insert_withDup() {
+    for (Integer n : L2) {
+      assertTrue(tree.insert(n));
+    }
     for (Integer n : L2_SHUF) {
-      assertTrue(bst.delete(n));
+      assertTrue(tree.contains(n));
     }
-    assertEquals(0, bst.size());
+    assertEquals(L2.size(), tree.size());
+
+    assertFalse(tree.insert(9));
+    assertTrue(tree.contains(9));
+    assertEquals(L2.size(), tree.size());
+
+    assertTrue(tree.insert(8));
+    assertTrue(tree.contains(8));
+    assertEquals(L2.size() + 1, tree.size());
+  }
+
+  @Test
+  public void delete_noDups() {
+    for (Integer n : L1) {
+      assertTrue(tree.insert(n));
+    }
+    assertEquals(L1.size(), tree.size());
+
+    for (Integer n : L1_SHUF) {
+      assertTrue(tree.delete(n));
+    }
+    assertEquals(0, tree.size());
+  }
+
+  @Test
+  public void delete_withDup() {
+    for (Integer n : L2) {
+      assertTrue(tree.insert(n));
+    }
+    assertFalse(tree.delete(8));
+    assertEquals(L2.size(), tree.size());
+
+    for (Integer n : L2_SHUF) {
+      assertTrue(tree.delete(n));
+      assertFalse(tree.delete(n));
+    }
+    assertEquals(0, tree.size());
+  }
+
+  @Test
+  public void insertDelete_random() {
+    Random random = new Random();
+    int range = 1000;
+    for (int i = 0; i < range; ++i) {
+      int n = random.nextInt(range);
+      tree.insert(n);
+      assertTrue(tree.contains(n));
+
+      tree.insert(i);
+      assertTrue(tree.contains(i));
+
+      n = random.nextInt(range);
+      tree.delete(n);
+      assertFalse(tree.contains(n));
+    }
   }
 }

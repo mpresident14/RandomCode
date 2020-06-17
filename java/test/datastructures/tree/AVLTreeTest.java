@@ -34,22 +34,26 @@ public class AVLTreeTest {
 
   @Test
   public void insert_noDups() {
-    tree.insertAll(L1);
+    for (Integer n : L1) {
+      assertTrue(tree.insert(n));
+      checkBalance(tree);
+    }
     for (Integer n : L1_SHUF) {
       assertTrue(tree.contains(n));
     }
     assertEquals(L1.size(), tree.size());
-    checkBalance(tree);
   }
 
   @Test
   public void insert_withDup() {
-    tree.insertAll(L2);
+    for (Integer n : L2) {
+      assertTrue(tree.insert(n));
+      checkBalance(tree);
+    }
     for (Integer n : L2_SHUF) {
       assertTrue(tree.contains(n));
     }
     assertEquals(L2.size(), tree.size());
-    checkBalance(tree);
 
     assertFalse(tree.insert(9));
     assertTrue(tree.contains(9));
@@ -64,9 +68,11 @@ public class AVLTreeTest {
 
   @Test
   public void delete_noDup() {
-    tree.insertAll(L1);
+    for (Integer n : L1) {
+      assertTrue(tree.insert(n));
+      checkBalance(tree);
+    }
     assertEquals(L1.size(), tree.size());
-    checkBalance(tree);
 
     for (Integer n : L1_SHUF) {
       assertTrue(tree.delete(n));
@@ -77,7 +83,10 @@ public class AVLTreeTest {
 
   @Test
   public void delete_withDup() {
-    tree.insertAll(L2);
+    for (Integer n : L2) {
+      assertTrue(tree.insert(n));
+      checkBalance(tree);
+    }
     assertFalse(tree.delete(8));
     assertEquals(L2.size(), tree.size());
 

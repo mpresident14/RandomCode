@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+
 import org.junit.*;
 
 public class RandomizedTreeTest {
@@ -30,7 +32,9 @@ public class RandomizedTreeTest {
 
   @Test
   public void insert_noDups() {
-    tree.insertAll(L1);
+    for (Integer n : L1) {
+      assertTrue(tree.insert(n));
+    }
     for (Integer n : L1_SHUF) {
       assertTrue(tree.contains(n));
     }
@@ -39,7 +43,9 @@ public class RandomizedTreeTest {
 
   @Test
   public void insert_withDup() {
-    tree.insertAll(L2);
+    for (Integer n : L2) {
+      assertTrue(tree.insert(n));
+    }
     for (Integer n : L2_SHUF) {
       assertTrue(tree.contains(n));
     }
@@ -56,7 +62,9 @@ public class RandomizedTreeTest {
 
   @Test
   public void delete_noDups() {
-    tree.insertAll(L1);
+    for (Integer n : L1) {
+      assertTrue(tree.insert(n));
+    }
     assertEquals(L1.size(), tree.size());
 
     for (Integer n : L1_SHUF) {
@@ -67,7 +75,9 @@ public class RandomizedTreeTest {
 
   @Test
   public void delete_withDup() {
-    tree.insertAll(L2);
+    for (Integer n : L2) {
+      assertTrue(tree.insert(n));
+    }
     assertFalse(tree.delete(8));
     assertEquals(L2.size(), tree.size());
 
@@ -76,5 +86,23 @@ public class RandomizedTreeTest {
       assertFalse(tree.delete(n));
     }
     assertEquals(0, tree.size());
+  }
+
+  @Test
+  public void insertDelete_random() {
+    Random random = new Random();
+    int range = 1000;
+    for (int i = 0; i < range; ++i) {
+      int n = random.nextInt(range);
+      tree.insert(n);
+      assertTrue(tree.contains(n));
+
+      tree.insert(i);
+      assertTrue(tree.contains(i));
+
+      n = random.nextInt(range);
+      tree.delete(n);
+      assertFalse(tree.contains(n));
+    }
   }
 }
