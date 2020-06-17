@@ -35,6 +35,12 @@ public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeT
     }
   }
 
+  public void deleteAll(Iterable<? extends T> iterable) {
+    for (T value : iterable) {
+      delete(value);
+    }
+  }
+
   public boolean contains(T val) {
     return containsRec(val, root);
   }
