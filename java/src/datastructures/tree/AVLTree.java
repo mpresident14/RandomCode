@@ -13,7 +13,8 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
       this.height = 1;
     }
 
-    private boolean isBalanced() {
+    // Visible for testing
+    boolean isBalanced() {
       return Math.abs(nodeHeight(left) - nodeHeight(right)) <= 1;
     }
 
@@ -97,8 +98,16 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
     for (int i = 0; i < pathLen; ++i) {
       Node node = path.get(i);
       if (!node.isBalanced()) {
-        Node y = nodeHeight(node.left) > nodeHeight(node.right) ? node.left : node.right;
-        Node x = nodeHeight(y.left) >= nodeHeight(y.right) ? y.left : y.right;
+        // See writeup for explanation
+        Node y = null;
+        Node x = null;
+        if (nodeHeight(node.left) > nodeHeight(node.right)) {
+          y = node.left;
+          x = nodeHeight(y.left) >= nodeHeight(y.right) ? y.left : y.right;
+        } else {
+          y = node.right;
+          x = nodeHeight(y.right) >= nodeHeight(y.left) ? y.right : y.left;
+        }
         Node rebalanced = rebalance(node, y, x);
         // Attach the rebalanced subtree to the parent
         Node parent = i == pathLen - 1 ? null : path.get(i + 1);
