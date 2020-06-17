@@ -53,8 +53,13 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
         }
         break;
       } else {
-        // TODO: Break if height does not change
+        long origHeight = node.height;
         node.updateHeight();
+        // We can stop once a node's height does not change b/c then none of the
+        // ancestors' heights will have changed either
+        if (node.height == origHeight) {
+          break;
+        }
       }
     }
 
@@ -97,6 +102,7 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
     // Find first imbalanced node on path from leaf to root
     for (int i = 0; i < pathLen; ++i) {
       Node node = path.get(i);
+      long origHeight = node.height;
       if (!node.isBalanced()) {
         // See writeup for explanation
         Node y = null;
@@ -118,9 +124,19 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
         } else {
           parent.right = rebalanced;
         }
+
+        // We can stop once a node's height does not change b/c then none of the
+        // ancestors' heights will have changed either
+        if (rebalanced.height == origHeight) {
+          break;
+        }
       } else {
-        // TODO: Break if height does not change
         node.updateHeight();
+        // We can stop once a node's height does not change b/c then none of the
+        // ancestors' heights will have changed either
+        if (node.height == origHeight) {
+          break;
+        }
       }
     }
 
@@ -218,7 +234,7 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
 
   public static void main(String[] args) {
     AVLTree<Integer> avl = new AVLTree<>();
-    Random random = new Random(0);
+    Random random = new Random();
     int range = 1000000;
     for (int i = 0; i < range; ++i) {
       avl.insert(random.nextInt(range));
