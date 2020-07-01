@@ -9,14 +9,17 @@ import subprocess
 # - test (matching src file tree structure)
 # NOTE: Classpath separator is colon for Linux, semicolon for Windows
 
+javac = "javac -g -d bin -Xlint"
+java = "java -XX:+ShowCodeDetailsInExceptionMessages"
+
 def run(pathDots, pathSlashes):
-  compileCmd = f"javac -g -cp src src/{pathSlashes}.java -d bin -Xlint"
-  runCmd = f"java -cp bin {pathDots}"
+  compileCmd = javac + f" -cp src src/{pathSlashes}.java"
+  runCmd = java + f" -cp bin {pathDots}"
   return compileCmd, runCmd
 
 def test(pathDots, pathSlashes):
-  compileCmd = f"javac -g -cp /usr/share/java/junit4.jar:test:src test/{pathSlashes}.java -d bin -Xlint"
-  runCmd = f"java -cp /usr/share/java/junit4.jar:bin:src org.junit.runner.JUnitCore {pathDots}"
+  compileCmd = javac + f" -cp /usr/share/java/junit4.jar:test:src test/{pathSlashes}.java"
+  runCmd = java + f" -cp /usr/share/java/junit4.jar:bin:src org.junit.runner.JUnitCore {pathDots}"
   return compileCmd, runCmd
 
 if __name__ == "__main__":
