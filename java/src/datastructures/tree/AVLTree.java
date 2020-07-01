@@ -25,6 +25,7 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
 
   @Override
   public boolean insert(T val) {
+    // Path is reversed (starts at node, ends at root)
     List<Node> path = new ArrayList<>();
     root = insertRec(val, root, path);
 
@@ -67,6 +68,7 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
     return true;
   }
 
+  /* Path is reversed (starts at node, ends at root) */
   Node insertRec(T val, Node node, List<Node> path) {
     if (node == null) {
       Node newNode = new Node(val);

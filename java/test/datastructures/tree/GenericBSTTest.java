@@ -114,7 +114,7 @@ public class GenericBSTTest {
 
     List<Integer> actual = new ArrayList<>();
     tree.insertAll(L1);
-    for (Iterator<Integer> iter = tree.iterator(); iter.hasNext();) {
+    for (var iter = tree.iterator(); iter.hasNext();) {
       actual.add(iter.next());
       iter.remove();
     }
