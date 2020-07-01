@@ -1,6 +1,11 @@
 package datastructures.tree;
 
-public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeType>.Node> {
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeType>.Node> implements Iterable<T> {
   protected abstract class Node {
     protected T val;
     protected NodeType left;
@@ -146,5 +151,52 @@ public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeT
 
   public long size() {
     return this.size;
+  }
+
+  @Override
+  public Iterator<T> iterator() {
+    return new MyIterator();
+  }
+
+  public class MyIterator implements Iterator<T> {
+    private List<T> nodes = new ArrayList<>();
+    private int index = 0;
+
+    MyIterator() {
+      inorder(BST.this.root);
+    }
+
+    private void inorder(Node node) {
+      if (node == null) {
+        return;
+      }
+
+      inorder(node.left);
+      nodes.add(node.val);
+      inorder(node.right);
+    }
+
+    @Override
+    public boolean hasNext() {
+      return index != nodes.size();
+    }
+
+    @Override
+    public T next() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      }
+      return nodes.get(index++);
+    }
+
+    public void remove() {
+      if (index == 0) {
+        throw new IllegalStateException();
+      }
+
+      T elem = nodes.get(index - 1);
+      BST.this.delete(elem);
+      nodes.remove(--index);
+    }
   }
 }

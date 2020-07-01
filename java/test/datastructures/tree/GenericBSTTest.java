@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -104,5 +105,21 @@ public class GenericBSTTest {
       tree.delete(n);
       assertFalse(tree.contains(n));
     }
+  }
+
+  @Test
+  public void traverse() {
+    List<Integer> expected = new ArrayList<>(L1);
+    Collections.sort(expected);
+
+    List<Integer> actual = new ArrayList<>();
+    tree.insertAll(L1);
+    for (Iterator<Integer> iter = tree.iterator(); iter.hasNext();) {
+      actual.add(iter.next());
+      iter.remove();
+    }
+
+    assertEquals(expected, actual);
+    assertEquals(0, tree.size());
   }
 }
