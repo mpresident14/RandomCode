@@ -10,7 +10,7 @@ import java.util.Random;
 
 import org.junit.*;
 
-public class TreapTest {
+public class SplayTreeTest {
 
   private static List<Integer> L1 = Arrays.asList(7, 4, 3, 2, 9, 12);
   private static List<Integer> L2 = Arrays.asList(-4, 7, 9, 3, 5, 19, 11);
@@ -23,11 +23,11 @@ public class TreapTest {
     Collections.shuffle(L2_SHUF);
   }
 
-  private Treap<Integer> tree;
+  private SplayTree<Integer> tree;
 
   @Before
   public void setUp() {
-    tree = new Treap<>();
+    tree = new SplayTree<>();
   }
 
   @Test
