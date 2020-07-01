@@ -10,13 +10,13 @@ import subprocess
 # NOTE: Classpath separator is colon for Linux, semicolon for Windows
 
 def run(pathDots, pathSlashes):
-  compileCmd = f"javac -g -cp \"src\" src/{pathSlashes}.java -d bin -Xlint"
+  compileCmd = f"javac -g -cp src src/{pathSlashes}.java -d bin -Xlint"
   runCmd = f"java -cp bin {pathDots}"
   return compileCmd, runCmd
 
 def test(pathDots, pathSlashes):
-  compileCmd = f"javac -g -cp \"/usr/share/java/junit4.jar:test:src\" test/{pathSlashes}.java -d bin -Xlint"
-  runCmd = f"java -cp \"/usr/share/java/junit4.jar:bin:src\" org.junit.runner.JUnitCore {pathDots}"
+  compileCmd = f"javac -g -cp /usr/share/java/junit4.jar:test:src test/{pathSlashes}.java -d bin -Xlint"
+  runCmd = f"java -cp /usr/share/java/junit4.jar:bin:src org.junit.runner.JUnitCore {pathDots}"
   return compileCmd, runCmd
 
 if __name__ == "__main__":
@@ -32,9 +32,7 @@ if __name__ == "__main__":
     compileCmd, runCmd = \
         test(pathDots, pathSlashes) if args.test else run(pathDots, pathSlashes)
 
-    print(compileCmd)
-    subprocess.check_call(compileCmd, shell=True) # Super bad security
-
-    print(runCmd)
-    print()
-    subprocess.call(runCmd, shell=True) # Super bad security
+    print(compileCmd, end="\n\n")
+    subprocess.check_call(compileCmd.split())
+    print(runCmd, end="\n\n")
+    subprocess.call(runCmd.split())
