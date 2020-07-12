@@ -11,139 +11,64 @@
 
 \begin{document}
 
-\title{Splay Trees}
+\title{Red-Black and 2-3-4 Trees}
 \author{}
 \maketitle
 
 \section*{Description}
-AVL trees are self-balancing BSTs that are not strictly balanced. On each access (query or insert), the accessed node is splayed up to the root of the tree. This results in faster runtimes times when nodes are repeatedly access. In this way, a splay tree functions as a cache.
+Red-black trees are loosely self-balanced BSTs. They have a 1-to-1 correspondence to 2-3-4 trees, and are easier and more efficient to implement; however, the theory behind the rebalancing is clearer to illustrate with 2-3-4 trees.
 
-\section*{Splaying}
-There are four cases for splaying an accessed node $x$.
+Compared to AVL trees, lookup times in a red-black tree are generally slower because they are less strictly balanced. However, insertion and deletion are generally faster because they require fewer rotations to rebalance the tree. In general red-black trees are used for language libraries (e.g. C++'s set and map) and AVL trees are used in databases, where fast lookups are preferred.
+
+\section*{Properties}
+2-3-4 trees have the following properties:
 \begin{enumerate}
-  \item $x$ is the root. In this case there is nothing to do.
-  \item Zig/Zag: $x$ is the left/child child of the root.
-    \begin{figure}[!ht]
-      \centering
-      \includegraphics[scale=0.16]{pics/splay_tree/zig}
-      \caption{Zig Rotation}
-    \end{figure}
-  \item Zig-Zig/Zag-Zag: $x$ is the left/right child of $p$ and $p$ is the left/right child of $g$. \\
-    \begin{figure}[!ht]
-      \centering
-      \includegraphics[scale=0.16]{pics/splay_tree/zig_zig}
-      \caption{Zig-Zig Rotation}
-    \end{figure}
-  \item Zig-Zag/Zag-Zig: $x$ is the left/right child of $p$ and $p$ is the right/left child of $g$. \\
-    \begin{figure}[!ht]
-      \centering
-      \includegraphics[scale=0.16]{pics/splay_tree/zig_zag}
-      \caption{Zag-Zig Rotation}
-    \end{figure}
+  \item Each node has either 2, 3, or 4 children (and 1 fewer key). \item The depth of every leaf node is the same.
 \end{enumerate}
 
-\section*{Time Complexity}
-We will analyze the time complexity of a splay using the potential method. We define the \emph{size} of a node $x_i$ to be the size of the subtree rooted at $x_i$. Next, define the \emph{rank} of a node $x$ to be $r(x) = \log s(x)$. Letting $n$ be the number of nodes in the tree, our potential function will be
-\[ \Phi = \sum_{i=1}^n r(x_i) \]
-We claim this satisfies the requirements of a potential function. First, $\Phi_1 = 0$. Since $s(x_i) \geq 1$, $r(x_i) \geq 0$, so $\Phi_i \geq 0 \ \forall i$.
-\lskip
-
-\begin{lemma}
-  If $x>0, y>0$, and $x+y \leq 1$, then $\log x + \log y \leq -2$.
-\end{lemma}
-
-\begin{proof}
-  First, $\log x + \log y = \log (xy)$. Since $\log$ is strictly increasing, we can equivalently maximize $xy$. Since $x$ and $y$ are nonnegative, the maximum value of $xy$ will clearly occur when $x+y=1$.
-
-  Then $y = x-1$, so we are maximizing $x(1-x)$. Setting the derivative to 0 gives us
-  \begin{align*}
-    1-2x &= 0 \\
-    x &= \frac{1}{2}
-  \end{align*}
-  Then $y = \frac{1}{2}$ and $\log x + \log y = -1 + -1 = -2$.
-\end{proof}
-
-We will now calculate the amortized cost of each rotation within a splay individually. Then, we will use these results to show that the amortized cost of splaying a node $x$ in a tree with root $t$ is at most $3(r(t) - r(x)) + 1$. In each of the following calculations, let $r'(x)$ denote the rank of $x$ after the rotation.
-
+\noindent Red-black trees have the following properties.
 \begin{enumerate}
-  \item $x$ is the root. $O(1)$.
-  \item Zig/Zag:
-  \begin{figure}[!ht]
+  \item Nodes are colored red or black.
+  \item The root is always black.
+  \item No red node has a red child.
+  \item \label{rb_desc_prop} Every path from a given node to each of its descendant leaves has the same number of black nodes.
+\end{enumerate}
+Note that by Property \ref{rb_desc_prop}, every root-to-leaf path has the same number of black nodes. We refer to this value as the \emph{black height} of the tree. The black height of a red-black tree is equal to the height of its corresponding 2-3-4 tree.
+
+\section*{Insertion}
+To insert into a red-black tree, we start with a normal BST insert and color the inserted node $N$ red. There are three cases for the position of $N$.
+\begin{enumerate}
+  \item $N$ is the root. In this case, we just color the insertednode the black and we have increase the black height of the tree by 1.
+  \item $N$ has a black parent. In this case, the black height has not changed and no double red was created, so we are done.
+  \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.2]{pics/splay_tree/zig2}
+    \includegraphics[scale=0.75]{pics/red_black_tree/ins_bpar}
+    \caption{Insertion where $N$ has a black parent}
   \end{figure}
+  \item $N$ has a red parent. This case is further divided into two cases:
+  \begin{enumerate}
+    \item $N$'s uncle is null. Note that $N$'s uncle cannot be black and $S$ must be a leaf, otherwise black height will not be constant. To rebalance, we simply perform an AVL rotation and recolor.
+    \begin{figure}[h!]
+      \centering
+      \includegraphics[scale=0.75]{pics/red_black_tree/ins_rpar_bunc_rr}
+      \caption{Insertion where $N$ has a red parent and black uncle: RR rotation}
+    \end{figure}
+    \begin{figure}[h!]
+      \centering
+      \includegraphics[scale=0.65]{pics/red_black_tree/ins_rpar_bunc_rl}
+      \caption{Insertion where $N$ has a red parent and black uncle: RL rotation}
+    \end{figure}
+    \item $N$'s uncle is red. To rebalance, we color the parent and uncle black, color the grandparent red (if it is not the root), and then recurse on the grandparent if we created a double red. Note how this corresponds to ``pushing up'' a node in the 2-3-4 tree.
+    \begin{figure}[h!]
+      \centering
+      \includegraphics[scale=0.5]{pics/red_black_tree/ins_rpar_runc_rb}
+      \includegraphics[scale=0.5]{pics/red_black_tree/ins_rpar_runc_234}
+      \caption{Insertion where $N$ has a red parent and red uncle}
+    \end{figure}
 
-  The actual cost of operation is 1, since a single rotation is required. We now claim that the change in potential is at most $3(r'(x) - r(x))$, or equivalently, that $\Delta\Phi - 3r'(x) + 3r(x) \leq 0$. To that end, we can see from the figure that
-  \[ \Delta\Phi = r'(x) + r'(p) - r(x) - r(p) \]
-  Now we have
-  \begin{align*}
-    \Delta\Phi - 3r'(x) + 3r(x) &= r'(x) + r'(p) - r(x) - r(p) - 3r'(x) + 3r(x) \\
-    &= r'(p) - r(p) - 2r'(x) + 2r(x) \\
-    &\leq r'(x) - r(p) - 2r'(x) + 2r(x) \\
-    &\leq r'(x) - r(x) - 2r'(x) + 2r(x) \\
-    &= -r'(x) + r(x) \\
-    &= \log s(x) - \log s'(x) \\
-    &= \log \frac{s(x)}{s'(x)}
-  \end{align*}
-  Since $s(x) \leq s'(x)$, $\frac{s(x)}{s'(x)} \leq 1$, and thus $\log \frac{s(x)}{s'(x)} \leq 0$. Altogether, amortized cost of a Zig (actual cost plus the change in potential) is at most
-  \[ 1 + 3(r'(x) - r(x)) \]
-
-  \item Zig-Zig/Zag-Zag:
-  \begin{figure}[!ht]
-    \centering
-    \includegraphics[scale=0.33]{pics/splay_tree/zig_zig2}
-  \end{figure}
-  The actual cost of the operation is 2, since two rotations are required. We now claim that the change in potential is at most $3(r'(x) - r(x)) - 2$, or equivalently, that $\Delta\Phi -3r'(x) + 3r(x) \leq -2$. To that end, we can see from the figure that
-  \[ \Delta\Phi = r'(x) + r'(p)+ r'(g) - r(x) - r(p) - r(g) \]
-  We can also see that $r(g) = r'(x)$, so these cancel, giving us
-  \[ \Delta\Phi = r'(p)+ r'(g) - r(x) - r(p) \]
-  Now, we have
-  \begin{align*}
-    \Delta\Phi -3r'(x) + 3r(x) &= r'(p) + r'(g) - r(x) - r(p) -3r'(x) + 3r(x) \\
-    &= r'(p) + r'(g) - r(p) - 3r'(x) + 2r(x)\\
-    &\leq r'(x) + r'(g) - r(p) - 3r'(x) + 2r(x)\\
-    &\leq r'(g) + r'(g) - r(x) - 3r'(x) + 2r(x)\\
-    &= r'(g) - 2r'(x) + r(x)\\
-    &= r(x) - r'(x) + r'(g) - r'(x)\\
-    &= \log s(x) - \log s'(x) + \log s'(g) - \log s'(x)\\
-    &= \log \frac{s(x)}{s'(x)} + \log \frac{s'(g)}{s'(x)} \\
-  \end{align*}
-  Clearly $\frac{s(x)}{s'(x)}, \frac{s'(g)}{s'(x)} > 0$, but we also need to show that $\frac{s(x)}{s'(x)} + \frac{s'(g)}{s'(x)} \leq 1$ to use our lemma. Equivalently, we'll show that $s(x) + s'(g) \leq s'(x)$. We can see that
-  \begin{align*}
-    s(x) &= w(x) + s(A) + s(B) \\
-    s'(g) &= w(g) + s(C) + s(D) \\
-    s'(x) &= w(x) + w(p) + w(g) + s(A) + s(B) + s(C) + s(D) \\
-  \end{align*}
-  so $s(x) + s'(g) \leq s'(x)$. Therefore, we can apply our lemma to get
-  \[ \log \frac{s(x)}{s'(x)} + \log \frac{s'(g)}{s'(x)} \leq -2 \]
-  Altogether, amortized cost of a Zig-Zig is at most
-  \[ 2 + 3(r'(x) - r(x)) - 2 = 3(r'(x) - r(x)) \]
-
-  \item Zig-Zag/Zag-Zig:
-  \begin{figure}[!ht]
-    \centering
-    \includegraphics[scale=0.33]{pics/splay_tree/zig_zag2}
-  \end{figure}
-
-  Again, the actual cost is 2 and we will show that $\Delta\Phi - 3r'(x) + 3r(x) \leq -2$. To that end
-  \[ \Delta\Phi = r'(x) + r'(p)+ r'(g) - r(x) - r(p) - r(g) \]
-  Since $r(g) = r'(x)$, we have
-  \begin{align*}
-    \Delta\Phi - 3r'(x) + 3r(x) &= r'(p) + r'(g) - r(x) - r(g) - 3r'(x) + 3r(x) \\
-    &= r'(p) + r'(g) - r(g) - 3r'(x) + 2r(x) \\
-    &\leq r'(x) + r'(g) - r(x) - 3r'(x) + 2r(x) \\
-    &= r'(g) - 2r'(x) + r(x) \\
-  \end{align*}
-  This is now the same as the previous case, so the amortized cost of a Zig-Zag is also at most
-  \[ 2 + 3(r'(x) - r(x)) - 2 = 3(r'(x) - r(x)) \]
+  \end{enumerate}
 \end{enumerate}
 
-Now, suppose the splay contains  $k$ Zig-Zig/Zig-Zag rotations. Via a telescoping argument, the total amortized cost of these rotations is
-\[ 3(r'(x) - r(x)) + 3(r''(x) - r'(x)) + \ldots + 3(r^{(k)}(x) - r^{(k-1)}(x)) = 3(r^{(k)}(x) - r(x)) \]
+%\section*{Time Complexity}
 
-Note that there can be at most one Zig/Zag operation, since it only occurs when the accessed node is a child of the root. This has an amortized cost of $3(r^{(k+1)}(x) - r^{(k)}(x)) + 1$. Because $x$ is at the root at the end of this splay, we know $r^{(k+1)}(x) = r(t)$, where $t$ is the original root of the tree. So, altogether we have an amortized cost of $3(r^{(k)}(x) - r(x)) + 3(r(t) - r^{(k)}(x)) + 1 = 3(r(t) - r(x)) + 1$.
-
-Now, we note that $s(t) = n$, which means $r(t) = \log n$, and $s(x) \geq 1$, which means $r(x) \geq 0$. Therefore the amortized cost of a splay is at most
-\[ 3(r(t) - r(x)) + 1 \leq 3(\log n - 0) + 1 \in O(\log n)\]
-So, for $m$ operations, $T_{amortized}(m) = O(m \log n)$.
 \end{document}
