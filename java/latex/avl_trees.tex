@@ -28,8 +28,8 @@ Now, suppose that inserting a node $v$ caused an imbalance. Let $z$ be the first
 
   \begin{figure}[!ht]
     \centering
-    \includegraphics[trim=50 50 150 40, clip,scale=0.33]{pics/avl_insert_ll1}
-    \includegraphics[trim=250 50 50 40, clip,scale=0.33]{pics/avl_insert_ll2}
+    \includegraphics[trim=50 50 150 40, clip,scale=0.33]{pics/avl_tree/insert_ll1}
+    \includegraphics[trim=250 50 50 40, clip,scale=0.33]{pics/avl_tree/insert_ll2}
     \caption{LL rotation on insertion}
   \end{figure}
 
@@ -43,9 +43,9 @@ Now, suppose that inserting a node $v$ caused an imbalance. Let $z$ be the first
 
   \begin{figure}[!ht]
   \centering
-    \includegraphics[trim=50 0 150 40, clip,scale=0.33]{pics/avl_insert_lr1}\\
-    \includegraphics[trim=0 0 250 40, clip,scale=0.33]{pics/avl_insert_lr2}
-    \includegraphics[trim=50 50 50 40, clip,scale=0.33]{pics/avl_insert_lr3}
+    \includegraphics[trim=50 0 150 40, clip,scale=0.33]{pics/avl_tree/insert_lr1}\\
+    \includegraphics[trim=0 0 250 40, clip,scale=0.33]{pics/avl_tree/insert_lr2}
+    \includegraphics[trim=50 50 50 40, clip,scale=0.33]{pics/avl_tree/insert_lr3}
     \caption{LR rotation on insertion}
   \end{figure}
 
@@ -69,8 +69,8 @@ The first part of deletion is the same as deleting from a regular BST. However, 
 
   \begin{figure}[!ht]
     \centering
-    \includegraphics[trim=50 50 150 40, clip,scale=0.33]{pics/avl_delete_ll1}
-    \includegraphics[trim=250 50 50 40, clip,scale=0.33]{pics/avl_delete_ll2}
+    \includegraphics[trim=50 50 150 40, clip,scale=0.33]{pics/avl_tree/delete_ll1}
+    \includegraphics[trim=250 50 50 40, clip,scale=0.33]{pics/avl_tree/delete_ll2}
     \caption{LL rotation on deletion}
   \end{figure}
 
@@ -90,9 +90,9 @@ The first part of deletion is the same as deleting from a regular BST. However, 
 
   \begin{figure}[!ht]
   \centering
-    \includegraphics[trim=50 0 150 40, clip,scale=0.33]{pics/avl_insert_lr1}\\
-    \includegraphics[trim=0 0 250 40, clip,scale=0.33]{pics/avl_insert_lr2}
-    \includegraphics[trim=50 50 50 40, clip,scale=0.33]{pics/avl_insert_lr3}
+    \includegraphics[trim=50 0 150 40, clip,scale=0.33]{pics/avl_tree/insert_lr1}\\
+    \includegraphics[trim=0 0 250 40, clip,scale=0.33]{pics/avl_tree/insert_lr2}
+    \includegraphics[trim=50 50 50 40, clip,scale=0.33]{pics/avl_tree/insert_lr3}
     \caption{LR rotation on deletion}
   \end{figure}
 
@@ -104,7 +104,7 @@ The first part of deletion is the same as deleting from a regular BST. However, 
 Given a height $h$, let $T_h$ be the AVL tree with the fewest possible number of nodes. Since $h$ is the asymptotic time it takes for each one of an AVL tree's methods, $T_h$ has the worst possible runtimes as a function of the number of nodes. We can see that $T_0 = 0$ and $T_1 = 1$, and in general $T_h$ has a root with $T_{h-1}$ and $T_{h-2}$ as subtrees.
 \begin{figure}[h]
   \centering
-  \includegraphics[scale=0.5]{pics/avl_time} \\
+  \includegraphics[scale=0.5]{pics/avl_tree/time_comp} \\
   \caption{Worst-case AVL tree of height 4}
 \end{figure}
 
