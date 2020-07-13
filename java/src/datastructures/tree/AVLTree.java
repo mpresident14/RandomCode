@@ -45,13 +45,7 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
         Node rebalanced = rebalance(node, path.get(i - 1), path.get(i - 2));
         // Attach the rebalanced subtree to the parent
         Node parent = i == pathLen - 1 ? null : path.get(i + 1);
-        if (parent == null) {
-          root = rebalanced;
-        } else if (parent.left == node) {
-          parent.left = rebalanced;
-        } else {
-          parent.right = rebalanced;
-        }
+        attachSubroot(rebalanced, node, parent);
         break;
       } else {
         long origHeight = node.height;
@@ -119,14 +113,7 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
         Node rebalanced = rebalance(node, y, x);
         // Attach the rebalanced subtree to the parent
         Node parent = i == pathLen - 1 ? null : path.get(i + 1);
-        if (parent == null) {
-          root = rebalanced;
-        } else if (parent.left == node) {
-          parent.left = rebalanced;
-        } else {
-          parent.right = rebalanced;
-        }
-
+        attachSubroot(rebalanced, node, parent);
         // We can stop once a node's height does not change b/c then none of the
         // ancestors' heights will have changed either
         if (rebalanced.height == origHeight) {
@@ -179,6 +166,18 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
 
     path.add(node);
     return node;
+  }
+
+  void attachSubroot(Node newSubroot, Node oldSubroot, Node parent) {
+    if (parent == null) {
+      root = newSubroot;
+    } else {
+      if (oldSubroot == parent.left) {
+        parent.left = newSubroot;
+      } else {
+        parent.right = newSubroot;
+      }
+    }
   }
 
   Node rebalance(Node z, Node y, Node x) {
