@@ -96,13 +96,13 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
     List<Node> path = new ArrayList<>();
     root = deleteRec(val, root, path);
 
-    if (!path.isEmpty() && path.get(0) == null) {
+    if (path.get(0) == null) {
       return false;
     }
 
     int pathLen = path.size();
-    // Find first imbalanced node on path from leaf to root
-    for (int i = 0; i < pathLen; ++i) {
+    // Find first imbalanced node on path from deleted node to root
+    for (int i = 1; i < pathLen; ++i) {
       Node node = path.get(i);
       long origHeight = node.height;
       if (!node.isBalanced()) {
@@ -157,9 +157,11 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
     if (comp == 0) {
       // This is the node to delete
       if (node.left == null) {
+        path.add(node);
         // Just slide the right child up
         return node.right;
       } else if (node.right == null) {
+        path.add(node);
         // Just slide the left child up
         return node.left;
       } else {
@@ -167,16 +169,15 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
         T nextInorder = minValue(node.right);
         node.val = nextInorder;
         node.right = deleteRec(nextInorder, node.right, path);
-        path.add(node);
       }
     } else if (comp < 0) {
       node.left = deleteRec(val, node.left, path);
-      path.add(node);
+
     } else {
       node.right = deleteRec(val, node.right, path);
-      path.add(node);
     }
 
+    path.add(node);
     return node;
   }
 
