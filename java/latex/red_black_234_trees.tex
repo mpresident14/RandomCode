@@ -96,7 +96,7 @@ For deletion, we once again start with a normal BST delete. Recall that in a BST
       \captionof{figure}{Deletion where $N$ is a black leaf and has a black sibling and a red nephew: RL rotation}
     \end{center}
 
-    \item \label{bleaf_bsib2} $N$ has a black sibling and no red nephews. Here, we color the sibling red and the parent black. Then, we recurse parent on if it was already black and is not the root. Note that there is no risk of double red because both children are black or null.
+    \item \label{bleaf_bsib2} $N$ has a black sibling and no red nephews. Here, we color the sibling red and the parent black. Then, we recurse on the parent (case 3) on if it was already black and is not the root. Note that there is no risk of double red because both children are black or null.
     \begin{center}
       \includegraphics[scale=0.5]{pics/red_black_tree/del_bleaf_bsib_bnephs_rpar}
       \captionof{figure}{Deletion where $N$ has a black sibling, no red nephews, and a red parent}

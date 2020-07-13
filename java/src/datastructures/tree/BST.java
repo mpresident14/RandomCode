@@ -15,6 +15,10 @@ public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeT
       this.val = val;
     }
 
+    boolean isLeaf() {
+      return this.left == null && this.right == null;
+    }
+
     public String toString() {
       return val.toString();
     }

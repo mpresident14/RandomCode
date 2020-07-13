@@ -1,5 +1,10 @@
 package datastructures.tree;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -61,7 +66,7 @@ public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T
     return node;
   }
 
-  void insertRebalance(List<Node> path) {
+  private void insertRebalance(List<Node> path) {
     Node inserted = path.get(0);
 
     // Case 1
@@ -84,17 +89,8 @@ public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T
       newSubroot.color = Color.BLACK;
       newSubroot.left.color = Color.RED;
       newSubroot.right.color = Color.RED;
-      // Reattach new subroot
-      if (path.size() == 3) {
-        root = newSubroot;
-      } else {
-        Node greatGrandparent = path.get(3);
-        if (grandparent == greatGrandparent.left) {
-          greatGrandparent.left = newSubroot;
-        } else {
-          greatGrandparent.right = newSubroot;
-        }
-      }
+      Node greatGrandparent = path.size() == 3 ? null : path.get(3);
+      attachSubroot(newSubroot, grandparent, greatGrandparent);
     } else {
       // Case 3b
       parent.color = Color.BLACK;
@@ -106,11 +102,137 @@ public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T
 
   @Override
   public boolean delete(T val) {
+    List<Node> path = new ArrayList<>();
+    root = deleteRec(val, root, path);
+
+    if (path.get(0) == null) {
+      return false;
+    }
+
+    deleteRebalance(path);
+    --this.size;
     return true;
   }
 
   private Node deleteRec(T val, Node node, List<Node> path) {
-    return null;
+    if (node == null) {
+      // Not in the set
+      path.add(null);
+      return null;
+    }
+
+    int comp = val.compareTo(node.val);
+    if (comp == 0) {
+      // This is the node to delete
+      if (node.left == null) {
+        path.add(node);
+        // Just slide the right child up
+        return node.right;
+      } else if (node.right == null) {
+        path.add(node);
+        // Just slide the left child up
+        return node.left;
+      } else {
+        // Find next inorder node and replace deleted node with it
+        T nextInorder = minValue(node.right);
+        node.val = nextInorder;
+        node.right = deleteRec(nextInorder, node.right, path);
+      }
+    } else if (comp < 0) {
+      node.left = deleteRec(val, node.left, path);
+
+    } else {
+      node.right = deleteRec(val, node.right, path);
+    }
+
+    path.add(node);
+    return node;
+  }
+
+  private void deleteRebalance(List<Node> path) {
+    Node deleted = path.get(0);
+
+    // Case 1
+    if (deleted.color == Color.RED && deleted.isLeaf()) {
+      return;
+    }
+
+    // Case 2
+    if (isRed(deleted.left)) {
+      deleted.left.color = Color.BLACK;
+      return;
+    } else if (isRed(deleted.right)) {
+      deleted.right.color = Color.BLACK;
+      return;
+    }
+
+    // TODO: Remove when done
+    assertEquals(deleted.color, Color.BLACK);
+    assertTrue(deleted.isLeaf());
+
+    delRebalanceCase3(path);
+  }
+
+  private void delRebalanceCase3(List<Node> path) {
+    Node deleted = path.get(0);
+    if (deleted == root) {
+      return;
+    }
+
+    Node parent = path.get(1);
+    Node sibling = parent.left == deleted ? parent.right : parent.left;
+
+    if (sibling.color == Color.BLACK) {
+      Node redNephew = null;
+      if (isRed(sibling.left)) {
+        redNephew = sibling.left;
+      } else if (isRed(sibling.right)) {
+        redNephew = sibling.right;
+      }
+
+      if (redNephew != null) {
+        // Case 3a
+        Node newSubroot = avlRotate(parent, sibling, redNephew);
+        newSubroot.color = parent.color;
+        newSubroot.left.color = Color.BLACK;
+        newSubroot.right.color = Color.BLACK;
+        Node grandparent = path.size() == 2 ? null : path.get(2);
+        attachSubroot(newSubroot, parent, grandparent);
+      } else {
+        // Case 3b
+        boolean shouldRecurse = parent.color == Color.BLACK;
+        sibling.color = Color.RED;
+        parent.color = Color.BLACK;
+        if (shouldRecurse) {
+          delRebalanceCase3(path.subList(1, path.size()));
+        }
+      }
+    } else {
+      // Case 3c
+      parent.color = Color.RED;
+      sibling.color = Color.BLACK;
+      Node newSubroot;
+      if (deleted == parent.left) {
+        newSubroot = super.rotateRight(parent);
+      } else {
+        newSubroot = super.rotateLeft(parent);
+      }
+      Node grandparent = path.size() == 2 ? null : path.get(2);
+      attachSubroot(newSubroot, parent, grandparent);
+      delRebalanceCase3(path);
+    }
+  }
+
+  void attachSubroot(Node newSubroot, Node oldSubroot, Node parent) {
+    if (parent == null) {
+      root = newSubroot;
+    } else {
+      if (oldSubroot == parent.left) {
+        parent.left = newSubroot;
+      } else {
+        parent.right = newSubroot;
+      }
+    }
   }
 
   Node avlRotate(Node z, Node y, Node x) {
@@ -149,15 +271,17 @@ public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T
     return rotateRR(node);
   }
 
+  private boolean isRed(Node node) {
+    return node != null && node.color == Color.RED;
+  }
+
   // Visible for testing
   void checkConstraints() {
     if (root == null) {
       return;
     }
 
-    if (root.color == Color.RED) {
-      throw new RuntimeException("Red root");
-    }
+    assertEquals(Color.RED, root.color);
     blackHeight(root, false);
   }
 
@@ -167,36 +291,34 @@ public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T
     }
 
     boolean isRed = node.color == Color.RED;
-    if (redParent && isRed) {
-      throw new RuntimeException("Double red");
-    }
+    assertFalse(redParent && isRed);
 
     long leftBlkHeight = blackHeight(node.left, isRed);
     long rightBlkHeight = blackHeight(node.right, isRed);
-    if (leftBlkHeight != rightBlkHeight) {
-      throw new RuntimeException("Non-constant black height");
-    }
+    assertEquals(leftBlkHeight, rightBlkHeight);
 
     return node.color == Color.BLACK ? 1 + leftBlkHeight : leftBlkHeight;
   }
 
   public static void main(String[] args) {
     RedBlackTree<Integer> rb = new RedBlackTree<>();
-    Random random = new Random();
-    int range = 10000;
+    Random random = new Random(0);
+    int range = 10;
     for (int i = 0; i < range; ++i) {
-      // avl.delete(random.nextInt(range));
+      rb.insert(random.nextInt(range));
+    }
+
+    for (int i = 0; i < range; ++i) {
+      System.out.println("DELETE " + i);
       try {
-        int n = random.nextInt(range);
-        rb.insert(n);
-        rb.checkConstraints();
-        rb.insert(i);
+        rb.delete(i);
         rb.checkConstraints();
       } catch (RuntimeException e) {
         e.printStackTrace();
-        System.exit(1);;
+        System.exit(1);
       }
     }
+
     rb.stats();
   }
 
