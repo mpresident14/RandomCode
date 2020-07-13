@@ -45,9 +45,9 @@ To insert into a red-black tree, we start with a normal BST insert and color the
     \includegraphics[scale=0.75]{pics/red_black_tree/ins_bpar}
     \captionof{figure}{Insertion where $N$ has a black parent}
   \end{center}
-  \item $N$ has a red parent. This case is further divided into two cases:
+  \item $N$ has a red parent. Since the root is always black, we know a grandparent exists. This case is further divided into two cases:
   \begin{enumerate}
-    \item $N$'s uncle is null. Note that $N$'s uncle cannot be black and $S$ must be a leaf, otherwise black height will not be constant. To rebalance, we simply perform an AVL rotation about the parent and recolor.
+    \item $N$'s uncle is black or null. Note that $S$ must be a leaf, otherwise black height will not be constant. To rebalance, we simply perform an AVL rotation about the grandparent and recolor.
     \begin{center}
       \includegraphics[scale=0.75]{pics/red_black_tree/ins_rpar_bunc_rr}
       \captionof{figure}{Insertion where $N$ has a red parent and black uncle: RR rotation}

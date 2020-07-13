@@ -6,6 +6,20 @@
   "configurations": [
     {
       "type": "java",
+      "name": "CodeLens (Launch) - RedBlackTree",
+      "request": "launch",
+      "mainClass": "datastructures.tree.RedBlackTree",
+      "projectName": "java"
+    },
+    {
+      "type": "java",
+      "name": "CodeLens (Launch) - AVLTree",
+      "request": "launch",
+      "mainClass": "datastructures.tree.AVLTree",
+      "projectName": "java"
+    },
+    {
+      "type": "java",
       "name": "CodeLens (Launch) - RandomTree",
       "request": "launch",
       "mainClass": "datastructures.tree.RandomTree",

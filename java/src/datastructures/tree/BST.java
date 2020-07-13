@@ -14,6 +14,10 @@ public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeT
     protected Node(T val) {
       this.val = val;
     }
+
+    public String toString() {
+      return val.toString();
+    }
   }
 
   protected NodeType root;
@@ -106,7 +110,7 @@ public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeT
     if (node == null) {
       sb.append("null\n");
     } else {
-      sb.append(node.val.toString());
+      sb.append(node.toString());
       sb.append('\n');
       printSubtree(node.left, depth + 1, sb);
       printSubtree(node.right, depth + 1, sb);
