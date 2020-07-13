@@ -4,6 +4,7 @@
 \usepackage{amsmath,amsthm,amssymb}
 \usepackage{graphicx}
 \usepackage{multicol}
+\usepackage{capt-of}
 
 \newcommand{\lemma}{\noindent \textbf{Lemma: }}
 \newcommand{\thm}{\noindent \textbf{Theorem: }}
@@ -40,35 +41,80 @@ To insert into a red-black tree, we start with a normal BST insert and color the
 \begin{enumerate}
   \item $N$ is the root. In this case, we just color the insertednode the black and we have increase the black height of the tree by 1.
   \item $N$ has a black parent. In this case, the black height has not changed and no double red was created, so we are done.
-  \begin{figure}[h!]
-    \centering
+  \begin{center}
     \includegraphics[scale=0.75]{pics/red_black_tree/ins_bpar}
-    \caption{Insertion where $N$ has a black parent}
-  \end{figure}
+    \captionof{figure}{Insertion where $N$ has a black parent}
+  \end{center}
   \item $N$ has a red parent. This case is further divided into two cases:
   \begin{enumerate}
-    \item $N$'s uncle is null. Note that $N$'s uncle cannot be black and $S$ must be a leaf, otherwise black height will not be constant. To rebalance, we simply perform an AVL rotation and recolor.
-    \begin{figure}[h!]
-      \centering
+    \item $N$'s uncle is null. Note that $N$'s uncle cannot be black and $S$ must be a leaf, otherwise black height will not be constant. To rebalance, we simply perform an AVL rotation about the parent and recolor.
+    \begin{center}
       \includegraphics[scale=0.75]{pics/red_black_tree/ins_rpar_bunc_rr}
-      \caption{Insertion where $N$ has a red parent and black uncle: RR rotation}
-    \end{figure}
-    \begin{figure}[h!]
-      \centering
-      \includegraphics[scale=0.65]{pics/red_black_tree/ins_rpar_bunc_rl}
-      \caption{Insertion where $N$ has a red parent and black uncle: RL rotation}
-    \end{figure}
+      \captionof{figure}{Insertion where $N$ has a red parent and black uncle: RR rotation}
+    \end{center}
+    \begin{center}
+      \includegraphics[scale=0.55]{pics/red_black_tree/ins_rpar_bunc_rl}
+      \captionof{figure}{Insertion where $N$ has a red parent and black uncle: RL rotation}
+    \end{center}
     \item $N$'s uncle is red. To rebalance, we color the parent and uncle black, color the grandparent red (if it is not the root), and then recurse on the grandparent if we created a double red. Note how this corresponds to ``pushing up'' a node in the 2-3-4 tree.
-    \begin{figure}[h!]
-      \centering
+    \begin{center}
       \includegraphics[scale=0.5]{pics/red_black_tree/ins_rpar_runc_rb}
       \includegraphics[scale=0.5]{pics/red_black_tree/ins_rpar_runc_234}
-      \caption{Insertion where $N$ has a red parent and red uncle}
-    \end{figure}
-
+      \captionof{figure}{Insertion where $N$ has a red parent and red uncle}
+      \includegraphics[scale=0.55]{pics/red_black_tree/ins_rpar_bunc_rl}
+      \captionof{figure}{Insertion where $N$ has a red parent and black uncle: RL rotation}
+    \end{center}
   \end{enumerate}
 \end{enumerate}
 
-%\section*{Time Complexity}
+
+\section*{Deletion}
+For deletion, we once again start with a normal BST delete. Recall that in a BST deletion, the node we ultimately remove from the tree will either be a leaf or have only one child. However, if we are deleting a red node, it cannot have a single black child because the black height would be different between the left and right subtrees, and by rule, it cannot have a red child. That leaves us with three cases:
+
+\begin{enumerate}
+  \item Red leaf. The node can simply be removed without changing the black height.
+  \begin{center}
+    \includegraphics[scale=0.75]{pics/red_black_tree/del_red_leaf}
+    \captionof{figure}{Deletion where $N$ is a red leaf}
+  \end{center}
+
+  \item Black node with a single child. Note that its child must be red to maintain a constant black height. We replace $N$ with the child and color the child black. The black height of the tree does not change.
+  \begin{center}
+    \includegraphics[scale=0.7]{pics/red_black_tree/del_black_red_child}
+    \captionof{figure}{Deletion where $N$ is a black node with a single child}
+  \end{center}
+
+  \item Black leaf. This case is further divided into three cases.
+  \begin{enumerate}
+    \item \label{bleaf_bsib1} $N$ has a black sibling and a red nephew. $N$ is a leaf, so ? must be red or null to maintain constant black height. To rebalance, we perform an AVL rotation about the parent and recolor.
+    \begin{center}
+      \includegraphics[scale=0.65]{pics/red_black_tree/del_bleaf_bsib_rneph_rr}
+      \captionof{figure}{Deletion where $N$ is a black leaf and has a black sibling and a red nephew: RR rotation}
+    \end{center}
+    \begin{center}
+      \includegraphics[scale=0.55]{pics/red_black_tree/del_bleaf_bsib_rneph_rl}
+      \captionof{figure}{Deletion where $N$ is a black leaf and has a black sibling and a red nephew: RL rotation}
+    \end{center}
+
+    \item \label{bleaf_bsib2} $N$ has a black sibling and no red nephews. Here, we color the sibling red and the parent black. Then, we recurse parent on if it was already black and is not the root. Note that there is no risk of double red because both children are black or null.
+    \begin{center}
+      \includegraphics[scale=0.5]{pics/red_black_tree/del_bleaf_bsib_bnephs_rpar}
+      \captionof{figure}{Deletion where $N$ has a black sibling, no red nephews, and a red parent}
+    \end{center}
+    \begin{center}
+      \includegraphics[scale=0.5]{pics/red_black_tree/del_bleaf_bsib_bnephs_bpar}
+      \captionof{figure}{Deletion where $N$ is a black leaf and has a black sibling, no red nephews, and a black parent}
+    \end{center}
+
+    \item $N$ has a red sibling. Note that $P$ has to be black to prevent a double red. Also, $X$ and $Y$ must be non-null, black and have no black children because the black height is 2. To rebalance, we perform a normal rotation about $P$, color $P$ red, and color $S$ black. Now we have a valid tree and we are deleting a black leaf with a black sibling, so we can proceed to case \ref{bleaf_bsib1} or \ref{bleaf_bsib2}.
+    \begin{center}
+      \includegraphics[scale=0.55]{pics/red_black_tree/del_bleaf_rsib}
+      \captionof{figure}{Deletion where $N$ is a black leaf and has a red sibling}
+    \end{center}
+
+\end{enumerate}
+\end{enumerate}
+
+\section*{Time Complexity}
 
 \end{document}
