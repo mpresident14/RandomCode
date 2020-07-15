@@ -13,8 +13,8 @@ javac = "javac -g -d bin -Xlint"
 java = "java -XX:+ShowCodeDetailsInExceptionMessages"
 
 def run(pathDots, pathSlashes):
-  compileCmd = javac + f" -cp src src/{pathSlashes}.java"
-  runCmd = java + f" -cp bin {pathDots}"
+  compileCmd = javac + f" -cp src:/usr/share/java/junit4.jar src/{pathSlashes}.java"
+  runCmd = java + f" -cp bin:/usr/share/java/junit4.jar {pathDots}"
   return compileCmd, runCmd
 
 def test(pathDots, pathSlashes):

@@ -6,7 +6,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Random;
 
 public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T>.Node> {
@@ -102,8 +104,9 @@ public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T
 
   @Override
   public boolean delete(T val) {
-    List<Node> path = new ArrayList<>();
-    root = deleteRec(val, root, path);
+    // LinkedList because we need insertion at index 2 in case 3
+    List<Node> path = new LinkedList<>();
+    deleteRec(val, root, path);
 
     if (path.get(0) == null) {
       return false;
@@ -114,63 +117,63 @@ public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T
     return true;
   }
 
-  private Node deleteRec(T val, Node node, List<Node> path) {
+  /*
+   * Returns the path to the node that we actually end up deleting. Unlike the
+   * other trees, we don't actually delete the node here. Instead we delete it in
+   * deleteRebalance because it makes the recursion for case 3 more elegant.
+   */
+  private void deleteRec(T val, Node node, List<Node> path) {
     if (node == null) {
       // Not in the set
       path.add(null);
-      return null;
+      return;
     }
 
     int comp = val.compareTo(node.val);
     if (comp == 0) {
-      // This is the node to delete
-      if (node.left == null) {
-        path.add(node);
-        // Just slide the right child up
-        return node.right;
-      } else if (node.right == null) {
-        path.add(node);
-        // Just slide the left child up
-        return node.left;
-      } else {
+      // This is not the node to delete
+      if (!(node.left == null || node.right == null)) {
         // Find next inorder node and replace deleted node with it
         T nextInorder = minValue(node.right);
         node.val = nextInorder;
-        node.right = deleteRec(nextInorder, node.right, path);
+        deleteRec(nextInorder, node.right, path);
       }
     } else if (comp < 0) {
-      node.left = deleteRec(val, node.left, path);
+      deleteRec(val, node.left, path);
 
     } else {
-      node.right = deleteRec(val, node.right, path);
+      deleteRec(val, node.right, path);
     }
 
     path.add(node);
-    return node;
   }
 
   private void deleteRebalance(List<Node> path) {
     Node deleted = path.get(0);
+    Node parent = path.size() == 1 ? null : path.get(1);
 
     // Case 1
     if (deleted.color == Color.RED && deleted.isLeaf()) {
-      return;
-    }
-
-    // Case 2
-    if (isRed(deleted.left)) {
+      // Actually remove the node
+      attachSubroot(null, deleted, parent);
+    } else if (isRed(deleted.left)) {
+      // Case 2
       deleted.left.color = Color.BLACK;
+      // Actually remove the node
+      attachSubroot(deleted.left, deleted, parent);
       return;
     } else if (isRed(deleted.right)) {
+      // Case 2
       deleted.right.color = Color.BLACK;
+      // Actually remove the node
+      attachSubroot(deleted.right, deleted, parent);
       return;
+    } else {
+      // Case 3
+      delRebalanceCase3(path);
+      // Actually remove the node
+      attachSubroot(null, deleted, parent);
     }
-
-    // TODO: Remove when done
-    assertEquals(deleted.color, Color.BLACK);
-    assertTrue(deleted.isLeaf());
-
-    delRebalanceCase3(path);
   }
 
   private void delRebalanceCase3(List<Node> path) {
@@ -180,9 +183,12 @@ public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T
     }
 
     Node parent = path.get(1);
-    Node sibling = parent.left == deleted ? parent.right : parent.left;
+    // Is deleted node was left child, then sibling is the right, and vice versa
+    // (we know sibling must exist because deleted node was black)
+    boolean isLeftChild = deleted == parent.left;
+    Node sibling = isLeftChild ? parent.right : parent.left;
 
-    if (sibling.color == Color.BLACK) {
+    if (isBlack(sibling)) {
       Node redNephew = null;
       if (isRed(sibling.left)) {
         redNephew = sibling.left;
@@ -211,16 +217,15 @@ public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T
       // Case 3c
       parent.color = Color.RED;
       sibling.color = Color.BLACK;
-      Node newSubroot;
-      if (deleted == parent.left) {
-        newSubroot = super.rotateRight(parent);
-      } else {
-        newSubroot = super.rotateLeft(parent);
-      }
+      Node newSubroot = isLeftChild ? super.rotateLeft(parent) : super.rotateRight(parent);
       Node grandparent = path.size() == 2 ? null : path.get(2);
       attachSubroot(newSubroot, parent, grandparent);
+      // Fix the path because of the rotation
+      path.add(2, sibling);
+      // Will hit case 3a or 3b
       delRebalanceCase3(path);
     }
+
   }
 
   void attachSubroot(Node newSubroot, Node oldSubroot, Node parent) {
@@ -275,13 +280,17 @@ public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T
     return node != null && node.color == Color.RED;
   }
 
+  private boolean isBlack(Node node) {
+    return !isRed(node);
+  }
+
   // Visible for testing
   void checkConstraints() {
     if (root == null) {
       return;
     }
 
-    assertEquals(Color.RED, root.color);
+    assertEquals(Color.BLACK, root.color);
     blackHeight(root, false);
   }
 
@@ -302,24 +311,16 @@ public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T
 
   public static void main(String[] args) {
     RedBlackTree<Integer> rb = new RedBlackTree<>();
-    Random random = new Random(0);
-    int range = 10;
+    Random r = new Random();
+    long seed = r.nextLong();
+    System.out.println("SEED: " + seed);
+    Random random = new Random(seed);
+    int range = 1000000;
     for (int i = 0; i < range; ++i) {
       rb.insert(random.nextInt(range));
+      rb.insert(i);
+      rb.delete(random.nextInt(range));
     }
-
-    for (int i = 0; i < range; ++i) {
-      System.out.println("DELETE " + i);
-      try {
-        rb.delete(i);
-        rb.checkConstraints();
-      } catch (RuntimeException e) {
-        e.printStackTrace();
-        System.exit(1);
-      }
-    }
-
     rb.stats();
   }
-
 }
