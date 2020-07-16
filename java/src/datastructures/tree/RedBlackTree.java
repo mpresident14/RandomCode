@@ -1,19 +1,14 @@
 package datastructures.tree;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Random;
 
 public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T>.Node> {
 
-  private enum Color {
+  // Visible for testing
+  enum Color {
     RED, BLACK;
   }
 
@@ -276,51 +271,18 @@ public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T
     return rotateRR(node);
   }
 
-  private boolean isRed(Node node) {
+  // Visible for testing
+  boolean isRed(Node node) {
     return node != null && node.color == Color.RED;
   }
 
-  private boolean isBlack(Node node) {
+  // Visible for testing
+  boolean isBlack(Node node) {
     return !isRed(node);
   }
 
-  // Visible for testing
-  void checkConstraints() {
-    if (root == null) {
-      return;
-    }
-
-    assertEquals(Color.BLACK, root.color);
-    blackHeight(root, false);
-  }
-
-  private long blackHeight(Node node, boolean redParent) {
-    if (node == null) {
-      return 0;
-    }
-
-    boolean isRed = node.color == Color.RED;
-    assertFalse(redParent && isRed);
-
-    long leftBlkHeight = blackHeight(node.left, isRed);
-    long rightBlkHeight = blackHeight(node.right, isRed);
-    assertEquals(leftBlkHeight, rightBlkHeight);
-
-    return node.color == Color.BLACK ? 1 + leftBlkHeight : leftBlkHeight;
-  }
-
   public static void main(String[] args) {
-    RedBlackTree<Integer> rb = new RedBlackTree<>();
-    Random r = new Random();
-    long seed = r.nextLong();
-    System.out.println("SEED: " + seed);
-    Random random = new Random(seed);
-    int range = 1000000;
-    for (int i = 0; i < range; ++i) {
-      rb.insert(random.nextInt(range));
-      rb.insert(i);
-      rb.delete(random.nextInt(range));
-    }
-    rb.stats();
+    RedBlackTree<Integer> tree = new RedBlackTree<>();
+    mainFn(tree);
   }
 }

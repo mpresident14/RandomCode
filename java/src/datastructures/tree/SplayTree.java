@@ -46,20 +46,21 @@ public class SplayTree<T extends Comparable<T>> extends BST<T, SplayTree<T>.Node
   public boolean insert(T val) {
     // Path is reversed (starts at node, ends at root)
     List<Node> path = new ArrayList<>();
-    root = insertRec(val, root, path);
-    Node inserted = path.get(0);
-    if (inserted == null) {
-      return false;
-    }
+    boolean[] wasInserted = new boolean[1];
+    root = insertRec(val, root, path, wasInserted);
+    splay(path.get(0), path.subList(1, path.size()));
 
-    splay(inserted, path.subList(1, path.size()));
-    ++this.size;
-    return true;
+    if (wasInserted[0]) {
+      ++this.size;
+      return true;
+    }
+    return false;
   }
 
   /* Path is reversed (starts at node, ends at root) */
-  Node insertRec(T val, Node node, List<Node> path) {
+  Node insertRec(T val, Node node, List<Node> path, boolean[] wasInserted) {
     if (node == null) {
+      wasInserted[0] = true;
       Node newNode = new Node(val);
       path.add(newNode);
       return newNode;
@@ -67,16 +68,12 @@ public class SplayTree<T extends Comparable<T>> extends BST<T, SplayTree<T>.Node
 
     int comp = val.compareTo(node.val);
     if (comp < 0) {
-      node.left = insertRec(val, node.left, path);
-      path.add(node);
+      node.left = insertRec(val, node.left, path, wasInserted);
     } else if (comp > 0) {
-      node.right = insertRec(val, node.right, path);
-      path.add(node);
-    } else {
-      // Already exists in the set
-      path.add(null);
+      node.right = insertRec(val, node.right, path, wasInserted);
     }
 
+    path.add(node);
     return node;
   }
 
@@ -188,14 +185,8 @@ public class SplayTree<T extends Comparable<T>> extends BST<T, SplayTree<T>.Node
   }
 
   public static void main(String[] args) {
-    SplayTree<Integer> splay = new SplayTree<>();
-    Random random = new Random();
-    int range = 100000;
-    for (int i = 0; i < range; ++i) {
-      splay.insert(random.nextInt(range));
-      splay.delete(random.nextInt(range));
-    }
-    splay.stats();
+    SplayTree<Integer> tree = new SplayTree<>();
+    mainFn(tree);
   }
 
 }

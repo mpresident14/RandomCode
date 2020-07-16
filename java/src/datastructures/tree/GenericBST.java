@@ -87,14 +87,7 @@ public class GenericBST<T extends Comparable<T>> extends BST<T, GenericBST<T>.No
   }
 
   public static void main(String[] args) {
-    GenericBST<Integer> bst = new GenericBST<>();
-    Random random = new Random();
-    int range = 100000;
-    for (int i = 0; i < range; ++i) {
-      bst.insert(random.nextInt(range));
-      bst.insert(i);
-      bst.delete(random.nextInt(range));
-    }
-    bst.stats();
+    GenericBST<Integer> tree = new GenericBST<>();
+    mainFn(tree);
   }
 }

@@ -235,15 +235,8 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
   }
 
   public static void main(String[] args) {
-    AVLTree<Integer> avl = new AVLTree<>();
-    Random random = new Random();
-    int range = 1000000;
-    for (int i = 0; i < range; ++i) {
-      avl.insert(random.nextInt(range));
-      avl.insert(i);
-      avl.delete(random.nextInt(range));
-    }
-    avl.stats();
+    AVLTree<Integer> tree = new AVLTree<>();
+    mainFn(tree);
   }
 
 }

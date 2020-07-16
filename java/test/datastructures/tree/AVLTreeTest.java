@@ -1,149 +1,27 @@
 package datastructures.tree;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
-import java.util.Random;
+import java.util.function.Consumer;
 
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
 public class AVLTreeTest {
+  private static AVLTree<Integer> tree;
+  private static Consumer<Integer> constraintCheck = n -> checkBalance();
 
-  private static List<Integer> L1 = Arrays.asList(7, 4, 3, 2, 9, 12);
-  private static List<Integer> L2 = Arrays.asList(-4, 7, 9, 3, 5, 19, 11);
-
-  private static List<Integer> L1_SHUF = new ArrayList<>(L1);
-  private static List<Integer> L2_SHUF = new ArrayList<>(L2);
-
-  static {
-    Collections.shuffle(L1_SHUF);
-    Collections.shuffle(L2_SHUF);
-  }
-
-  private AVLTree<Integer> tree;
-
-  @Before
-  public void setUp() {
-    tree = new AVLTree<>();
-  }
-
-  @Test
-  public void insert_noDups() {
-    for (Integer n : L1) {
-      assertTrue(tree.insert(n));
-      checkBalance(tree);
-    }
-    for (Integer n : L1_SHUF) {
-      assertTrue(tree.contains(n));
-    }
-    assertEquals(L1.size(), tree.size());
-  }
-
-  @Test
-  public void insert_withDup() {
-    for (Integer n : L2) {
-      assertTrue(tree.insert(n));
-      checkBalance(tree);
-    }
-    for (Integer n : L2_SHUF) {
-      assertTrue(tree.contains(n));
-    }
-    assertEquals(L2.size(), tree.size());
-
-    assertFalse(tree.insert(9));
-    assertTrue(tree.contains(9));
-    assertEquals(L2.size(), tree.size());
-    checkBalance(tree);
-
-    assertTrue(tree.insert(8));
-    assertTrue(tree.contains(8));
-    assertEquals(L2.size() + 1, tree.size());
-    checkBalance(tree);
-  }
-
-  @Test
-  public void delete_noDup() {
-    for (Integer n : L1) {
-      assertTrue(tree.insert(n));
-      checkBalance(tree);
-    }
-    assertEquals(L1.size(), tree.size());
-
-    for (Integer n : L1_SHUF) {
-      assertTrue(tree.delete(n));
-      checkBalance(tree);
-    }
-    assertEquals(0, tree.size());
-  }
-
-  @Test
-  public void delete_withDup() {
-    for (Integer n : L2) {
-      assertTrue(tree.insert(n));
-      checkBalance(tree);
-    }
-    assertFalse(tree.delete(8));
-    assertEquals(L2.size(), tree.size());
-
-    for (Integer n : L2_SHUF) {
-      assertTrue(tree.delete(n));
-      assertFalse(tree.delete(n));
-      checkBalance(tree);
-    }
-    assertEquals(0, tree.size());
-  }
-
-  @Test
-  public void insertDelete_random() {
-    Random random = new Random();
-    int range = 1000;
-    for (int i = 0; i < range; ++i) {
-      int n = random.nextInt(range);
-      tree.insert(n);
-      assertTrue(tree.contains(n));
-
-      tree.insert(i);
-      assertTrue(tree.contains(i));
-
-      n = random.nextInt(range);
-      tree.delete(n);
-      assertFalse(tree.contains(n));
-
-      checkBalance(tree);
-    }
-  }
-
-  @Test
-  public void traverse() {
-    List<Integer> expected = new ArrayList<>(L1);
-    Collections.sort(expected);
-
-    List<Integer> actual = new ArrayList<>();
-    tree.insertAll(L1);
-    for (var iter = tree.iterator(); iter.hasNext();) {
-      actual.add(iter.next());
-      iter.remove();
-    }
-
-    assertEquals(expected, actual);
-    assertEquals(0, tree.size());
-  }
-
-
-  private <T extends Comparable<T>> void checkBalance(AVLTree<T> avl) {
-    if (avl.root == null) {
+  private static void checkBalance() {
+    if (tree.root == null) {
       return;
     }
 
-    Queue<AVLTree<T>.Node> q = new LinkedList<>();
-    q.add(avl.root);
+    Queue<AVLTree<Integer>.Node> q = new LinkedList<>();
+    q.add(tree.root);
     while (!q.isEmpty()) {
-      AVLTree<T>.Node node = q.poll();
+      AVLTree<Integer>.Node node = q.poll();
       assertTrue(node.isBalanced());
       if (node.left != null) {
         q.add(node.left);
@@ -152,5 +30,35 @@ public class AVLTreeTest {
         q.add(node.right);
       }
     }
+  }
+
+  @Before
+  public void setUp() {
+    tree = new AVLTree<>();
+  }
+
+  @Test
+  public void insert_rand() {
+    BSTTestUtils.insert_rand(tree, constraintCheck);
+  }
+
+  @Test
+  public void insert_dup() {
+    BSTTestUtils.insert_dup(tree, constraintCheck);
+  }
+
+  @Test
+  public void delete_rand() {
+    BSTTestUtils.delete_rand(tree, constraintCheck);
+  }
+
+  @Test
+  public void delete_withDup() {
+    BSTTestUtils.delete_dup(tree, constraintCheck);
+  }
+
+  @Test
+  public void traverse() {
+    BSTTestUtils.traverse(tree);
   }
 }

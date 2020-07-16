@@ -142,14 +142,7 @@ public class Treap<T extends Comparable<T>> extends BST<T, Treap<T>.Node> {
   }
 
   public static void main(String[] args) {
-    Treap<Integer> treap = new Treap<>();
-    Random random = new Random();
-    int range = 100000;
-    for (int i = 0; i < range; ++i) {
-      treap.insert(random.nextInt(range));
-      treap.insert(i);
-      treap.delete(random.nextInt(range));
-    }
-    treap.stats();
+    Treap<Integer> tree = new Treap<>();
+    mainFn(tree);
   }
 }
