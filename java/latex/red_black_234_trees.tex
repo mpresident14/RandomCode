@@ -32,9 +32,9 @@ Compared to AVL trees, lookup times in a red-black tree are generally slower bec
   \item Nodes are colored red or black.
   \item The root is always black.
   \item No red node has a red child.
-  \item \label{rb_desc_prop} Every path from a given node to each of its descendant leaves has the same number of black nodes.
+  \item \label{rb_desc_prop} Suppose that the null children of all the nodes are each represented by an imaginary ``nil'' node. Then, every path from a given node to each of its descendant nil nodes has the same number of black nodes.
 \end{enumerate}
-Note that by Property \ref{rb_desc_prop}, every root-to-leaf path has the same number of black nodes. We refer to this value as the \emph{black height} of the tree. The black height of a red-black tree is equal to the height of its corresponding 2-3-4 tree.
+Note that by Property \ref{rb_desc_prop}, every root-to-nil path has the same number of black nodes. We refer to this value as the \emph{black height} of the tree. The black height of a red-black tree is equal to the height of its corresponding 2-3-4 tree.
 
 \section*{Insertion}
 To insert into a red-black tree, we start with a normal BST insert and color the inserted node $N$ red. There are three cases for the position of $N$.
@@ -50,10 +50,10 @@ To insert into a red-black tree, we start with a normal BST insert and color the
     \item $N$'s uncle is black or null. Note that $S$ must be a leaf, otherwise black height will not be constant. To rebalance, we simply perform an AVL rotation about the grandparent and recolor.
     \begin{center}
       \includegraphics[scale=0.75]{pics/red_black_tree/ins_rpar_bunc_rr}
-      \captionof{figure}{Insertion where $N$ has a red parent and black uncle: RR rotation}
+      \captionof{figure}{Insertion where $N$ has a red parent and black/null uncle: RR rotation}
     \end{center}
     \begin{center}
-      \includegraphics[scale=0.55]{pics/red_black_tree/ins_rpar_bunc_rl}
+      \includegraphics[scale=0.57]{pics/red_black_tree/ins_rpar_bunc_rl}
       \captionof{figure}{Insertion where $N$ has a red parent and black uncle: RL rotation}
     \end{center}
     \item $N$'s uncle is red. To rebalance, we color the parent and uncle black, color the grandparent red (if it is not the root), and then recurse on the grandparent if we created a double red. Note how this corresponds to ``pushing up'' a node in the 2-3-4 tree.
@@ -62,7 +62,7 @@ To insert into a red-black tree, we start with a normal BST insert and color the
       \includegraphics[scale=0.5]{pics/red_black_tree/ins_rpar_runc_234}
       \captionof{figure}{Insertion where $N$ has a red parent and red uncle}
       \includegraphics[scale=0.55]{pics/red_black_tree/ins_rpar_bunc_rl}
-      \captionof{figure}{Insertion where $N$ has a red parent and black uncle: RL rotation}
+      \captionof{figure}{Insertion where $N$ has a red parent and black/null uncle: RL rotation}
     \end{center}
   \end{enumerate}
 \end{enumerate}
@@ -116,5 +116,7 @@ For deletion, we once again start with a normal BST delete. Recall that in a BST
 \end{enumerate}
 
 \section*{Time Complexity}
+Suppose the black height of a red-black tree is $h$. Then the smallest possible number of nodes $n$ occurs when all the nodes are black (in the case of a 2-3-4 tree of height $h$, when all the nodes are 2-nodes), so $n = 2^h - 1$. The largest possible number of nodes $n$ is when each black node has 2 red children (in the case of 2-3-4 tree of height $h$, when every node is a 4-node). In this case, the tree has height $2h$, and therefore $n = 2^{2h} - 1 = 4^h-1$. From the perspective of a 2-3-4 tree, $n = 3 \sum_{i=1}^h 4^{i-1} = 4^h-1$. Thus, $\log_4 n < \log_4 (n + 1) \leq h \leq \log_2 (n + 1) < 1 + \log_2 n$. Since all operations are worst case $O(h)$, we have an asymptotic runtime of $O(\log n)$.
+
 
 \end{document}
