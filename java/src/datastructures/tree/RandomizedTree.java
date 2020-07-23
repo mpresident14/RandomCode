@@ -153,7 +153,6 @@ public class RandomizedTree<T extends Comparable<T>> extends BST<T, RandomizedTr
   }
 
   public static void main(String[] args) {
-    RandomizedTree<Integer> tree = new RandomizedTree<>();
-    mainFn(tree);
+    mainFn(new RandomizedTree<>());
   }
 }

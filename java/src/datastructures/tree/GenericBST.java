@@ -86,7 +86,6 @@ public class GenericBST<T extends Comparable<T>> extends BST<T, GenericBST<T>.No
   }
 
   public static void main(String[] args) {
-    GenericBST<Integer> tree = new GenericBST<>();
-    mainFn(tree);
+    mainFn(new GenericBST<>());
   }
 }

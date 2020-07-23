@@ -183,7 +183,6 @@ public class SplayTree<T extends Comparable<T>> extends BST<T, SplayTree<T>.Node
   }
 
   public static void main(String[] args) {
-    SplayTree<Integer> tree = new SplayTree<>();
-    mainFn(tree);
+    mainFn(new SplayTree<>());
   }
 }

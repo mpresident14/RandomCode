@@ -284,7 +284,6 @@ public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T
   }
 
   public static void main(String[] args) {
-    RedBlackTree<Integer> tree = new RedBlackTree<>();
-    mainFn(tree);
+    mainFn(new RedBlackTree<>());
   }
 }
