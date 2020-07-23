@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Random;
 
-public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeType>.Node>
-    implements Iterable<T> {
+public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeType>.Node> implements Iterable<T> {
   protected abstract class Node {
     protected T val;
     protected NodeType left;
@@ -49,8 +48,8 @@ public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeT
   /*
    * Return the minimum value in the subtree rooted by node
    */
-  protected T minValue(NodeType node) {
-    NodeType current = node;
+  protected T minValue(Node node) {
+    Node current = node;
     while (current.left != null) {
       current = current.left;
     }
@@ -73,7 +72,7 @@ public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeT
     return containsRec(val, root);
   }
 
-  private boolean containsRec(T val, NodeType node) {
+  private boolean containsRec(T val, Node node) {
     if (node == null) {
       return false;
     }
@@ -122,7 +121,7 @@ public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeT
     return sb.toString();
   }
 
-  private void printSubtree(NodeType node, int depth, StringBuilder sb) {
+  private void printSubtree(Node node, int depth, StringBuilder sb) {
     for (int i = 0; i < depth; ++i) {
       sb.append("  ");
     }
@@ -153,7 +152,7 @@ public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeT
     System.out.println("Ratio: " + avgDepth / pbAvgDepth);
   }
 
-  private void statsRec(NodeType node, int depth, int[] acc) {
+  private void statsRec(Node node, int depth, int[] acc) {
     acc[0] += depth;
     if (node.left != null) {
       statsRec(node.left, depth + 1, acc);
@@ -182,26 +181,21 @@ public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeT
   }
 
   public class MyIterator implements Iterator<T> {
-    private List<T> nodes = new ArrayList<>();
-    private int index = 0;
+    private List<Node> path = new ArrayList<>();
+    private boolean visitedRight = false;
+    private Node toRemove = null;
 
-    MyIterator() {
-      inorder(BST.this.root);
-    }
-
-    private void inorder(Node node) {
-      if (node == null) {
-        return;
+    private MyIterator() {
+      Node currentNode = root;
+      while (currentNode != null) {
+        path.add(currentNode);
+        currentNode = currentNode.left;
       }
-
-      inorder(node.left);
-      nodes.add(node.val);
-      inorder(node.right);
     }
 
     @Override
     public boolean hasNext() {
-      return index != nodes.size();
+      return !path.isEmpty();
     }
 
     @Override
@@ -209,17 +203,40 @@ public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeT
       if (!hasNext()) {
         throw new NoSuchElementException();
       }
-      return nodes.get(index++);
+
+      toRemove = path.get(path.size() - 1);
+      moveToNext();
+      return toRemove.val;
     }
 
-    public void remove() {
-      if (index == 0) {
-        throw new IllegalStateException();
-      }
+    private void moveToNext() {
+      int pathLen = path.size();
+      Node last = path.get(pathLen - 1);
 
-      T elem = nodes.get(index - 1);
-      BST.this.delete(elem);
-      nodes.remove(--index);
+      if (!visitedRight && last.right != null) {
+        // Middle, go to next inorder node
+        Node current = last.right;
+        while (current != null) {
+          path.add(current);
+          current = current.left;
+        }
+      } else {
+        path.remove(pathLen - 1);
+        if (pathLen == 1) {
+          // Root, we're done
+          return;
+        }
+
+        Node parent = path.get(pathLen - 2);
+        if (parent.left == last) {
+          // Left node, parent is next
+          visitedRight = false;
+        } else {
+          // Right node, recurse on parent
+          visitedRight = true;
+          moveToNext();
+        }
+      }
     }
   }
 }

@@ -121,10 +121,8 @@ public class BSTTestUtils {
     tree.insertAll(LRAND);
     for (var iter = tree.iterator(); iter.hasNext(); ) {
       actual.add(iter.next());
-      iter.remove();
     }
 
     assertEquals(expected, actual);
-    assertEquals(0, tree.size());
   }
 }
