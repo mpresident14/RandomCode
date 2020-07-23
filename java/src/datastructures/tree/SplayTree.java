@@ -2,7 +2,6 @@ package datastructures.tree;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class SplayTree<T extends Comparable<T>> extends BST<T, SplayTree<T>.Node> {
   class Node extends BST<T, Node>.Node {
@@ -38,7 +37,6 @@ public class SplayTree<T extends Comparable<T>> extends BST<T, SplayTree<T>.Node
       boolean ret = containsRec(val, node.right, path);
       path.add(node);
       return ret;
-
     }
   }
 
@@ -188,5 +186,4 @@ public class SplayTree<T extends Comparable<T>> extends BST<T, SplayTree<T>.Node
     SplayTree<Integer> tree = new SplayTree<>();
     mainFn(tree);
   }
-
 }

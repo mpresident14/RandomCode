@@ -3,13 +3,13 @@ package datastructures.tree;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T>.Node> {
 
   // Visible for testing
   enum Color {
-    RED, BLACK;
+    RED,
+    BLACK;
   }
 
   class Node extends BST<T, Node>.Node {
@@ -22,7 +22,10 @@ public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T
 
     @Override
     public String toString() {
-      return new StringBuilder(val.toString()).append(": ").append(color == Color.RED ? "R" : "B").toString();
+      return new StringBuilder(val.toString())
+          .append(": ")
+          .append(color == Color.RED ? "R" : "B")
+          .toString();
     }
   }
 
@@ -220,7 +223,6 @@ public class RedBlackTree<T extends Comparable<T>> extends BST<T, RedBlackTree<T
       // Will hit case 3a or 3b
       delRebalanceCase3(path);
     }
-
   }
 
   void attachSubroot(Node newSubroot, Node oldSubroot, Node parent) {

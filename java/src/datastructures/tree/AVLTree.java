@@ -2,7 +2,6 @@ package datastructures.tree;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
   class Node extends BST<T, Node>.Node {
@@ -238,5 +237,4 @@ public class AVLTree<T extends Comparable<T>> extends BST<T, AVLTree<T>.Node> {
     AVLTree<Integer> tree = new AVLTree<>();
     mainFn(tree);
   }
-
 }

@@ -1,6 +1,5 @@
 package datastructures.tree;
 
-import java.util.Random;
 
 public class GenericBST<T extends Comparable<T>> extends BST<T, GenericBST<T>.Node> {
   class Node extends BST<T, GenericBST<T>.Node>.Node {

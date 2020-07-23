@@ -10,10 +10,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 // import java.util.stream.Collector;
-import java.util.stream.IntStream;
 
 public class BSTTestUtils {
   private static long seed = new Random().nextLong();
@@ -37,8 +35,8 @@ public class BSTTestUtils {
     insert_rand(tree, DO_NOTHING);
   }
 
-  static <Node extends BST<Integer, Node>.Node> void insert_rand(BST<Integer, Node> tree,
-      Consumer<Integer> constraintCheck) {
+  static <Node extends BST<Integer, Node>.Node> void insert_rand(
+      BST<Integer, Node> tree, Consumer<Integer> constraintCheck) {
     for (Integer n : LRAND) {
       assertTrue(tree.insert(n));
       constraintCheck.accept(n);
@@ -54,8 +52,8 @@ public class BSTTestUtils {
     insert_dup(tree, DO_NOTHING);
   }
 
-  static <Node extends BST<Integer, Node>.Node> void insert_dup(BST<Integer, Node> tree,
-      Consumer<Integer> constraintCheck) {
+  static <Node extends BST<Integer, Node>.Node> void insert_dup(
+      BST<Integer, Node> tree, Consumer<Integer> constraintCheck) {
     for (Integer n : LDUPS) {
       assertTrue(tree.insert(n));
       constraintCheck.accept(n);
@@ -77,8 +75,8 @@ public class BSTTestUtils {
     delete_rand(tree, DO_NOTHING);
   }
 
-  static <Node extends BST<Integer, Node>.Node> void delete_rand(BST<Integer, Node> tree,
-      Consumer<Integer> constraintCheck) {
+  static <Node extends BST<Integer, Node>.Node> void delete_rand(
+      BST<Integer, Node> tree, Consumer<Integer> constraintCheck) {
     for (Integer n : LRAND) {
       assertTrue(tree.insert(n));
       constraintCheck.accept(n);
@@ -96,8 +94,8 @@ public class BSTTestUtils {
     delete_dup(tree, DO_NOTHING);
   }
 
-  static <Node extends BST<Integer, Node>.Node> void delete_dup(BST<Integer, Node> tree,
-      Consumer<Integer> constraintCheck) {
+  static <Node extends BST<Integer, Node>.Node> void delete_dup(
+      BST<Integer, Node> tree, Consumer<Integer> constraintCheck) {
     for (Integer n : LDUPS) {
       assertTrue(tree.insert(n));
       constraintCheck.accept(n);
@@ -121,7 +119,7 @@ public class BSTTestUtils {
 
     List<Integer> actual = new ArrayList<>();
     tree.insertAll(LRAND);
-    for (var iter = tree.iterator(); iter.hasNext();) {
+    for (var iter = tree.iterator(); iter.hasNext(); ) {
       actual.add(iter.next());
       iter.remove();
     }

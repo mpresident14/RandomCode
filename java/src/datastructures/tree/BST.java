@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Random;
 
-public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeType>.Node> implements Iterable<T> {
+public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeType>.Node>
+    implements Iterable<T> {
   protected abstract class Node {
     protected T val;
     protected NodeType left;
@@ -28,7 +29,7 @@ public abstract class BST<T extends Comparable<T>, NodeType extends BST<T, NodeT
   protected NodeType root;
   protected long size;
 
-  public static <N extends BST<Integer,N>.Node> void mainFn(BST<Integer, N> tree) {
+  public static <N extends BST<Integer, N>.Node> void mainFn(BST<Integer, N> tree) {
     long seed = new Random().nextLong();
     System.out.println("SEED: " + seed);
     Random random = new Random(seed);
