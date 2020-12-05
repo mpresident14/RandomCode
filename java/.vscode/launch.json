@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "CodeLens (Launch) - SplayTree",
+      "request": "launch",
+      "mainClass": "datastructures.tree.SplayTree",
+      "projectName": "java"
+    },
+    {
+      "type": "java",
       "name": "CodeLens (Launch) - RedBlackTree",
       "request": "launch",
       "mainClass": "datastructures.tree.RedBlackTree",
