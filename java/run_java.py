@@ -11,6 +11,7 @@ import subprocess
 
 javac = "javac -g -d bin -Xlint -Xdiags:verbose"
 java = "java -XX:+ShowCodeDetailsInExceptionMessages"
+junitPath = "/usr/share/java/junit4.jar"
 
 def run(pathDots, pathSlashes):
   compileCmd = javac + f" -cp src src/{pathSlashes}.java"
@@ -18,8 +19,8 @@ def run(pathDots, pathSlashes):
   return compileCmd, runCmd
 
 def test(pathDots, pathSlashes):
-  compileCmd = javac + f" -cp /usr/share/java/junit4.jar:test:src test/{pathSlashes}.java"
-  runCmd = java + f" -cp /usr/share/java/junit4.jar:bin:src org.junit.runner.JUnitCore {pathDots}"
+  compileCmd = javac + f" -cp {junitPath}:test:src test/{pathSlashes}.java"
+  runCmd = java + f" -cp {junitPath}:bin:src org.junit.runner.JUnitCore {pathDots}"
   return compileCmd, runCmd
 
 if __name__ == "__main__":
